@@ -4,7 +4,7 @@ var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sa
 var async = require('async'); // https://www.npmjs.com/package/async
 var log = require('winston'); // https://github.com/winstonjs/winston
 
-var Machine = require('./machine');
+var Washer = require('./washer');
 
 // Singleton Laundry class, generally the entry point to the whole thing.
 function Laundry() {}
@@ -40,7 +40,7 @@ Laundry.prototype.doCommand = function(command, job) {
 Laundry.prototype.version = function() {
     var package = require('./package.json');
     var docs = '';
-    docs += '\nLaunder version ' + package.version + '\n';
+    docs += '\nLaundry version ' + package.version + '\n';
     console.log(docs);
 }
 
@@ -49,9 +49,9 @@ Laundry.prototype.help = function() {
     this.version();
     var package = require('./package.json');
     var docs = '';
-    docs += 'The available commands for launder are as follows: \n\n';
+    docs += 'The available commands for laundry are as follows: \n\n';
     for (var i in this._commands) {
-        docs += 'launder ' + this._commands[i] + '\n';
+        docs += 'laundry ' + this._commands[i] + '\n';
     }
 
     docs += '\nFor more info see ' + package.homepage + '\n';
@@ -61,7 +61,7 @@ Laundry.prototype.help = function() {
 // Given a job name, create a job folder and return a path to it.
 Laundry.prototype._getJobFolder = function(job, callback) {
     var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-    var configFolder = path.join(home, '.launder');
+    var configFolder = path.join(home, '.laundry');
     var jobFolder = path.join(configFolder, sanitize(job));
     fs.mkdirs(jobFolder, function(err) {
         callback(err, jobFolder);
@@ -75,7 +75,7 @@ Laundry.prototype.create = function(job) {
         console.log(jobFolder);
     });
 
-    console.log(new Machine().config);
+    console.log(new Washer().config);
 }
 
 // Edit an existing job.

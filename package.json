@@ -1,26 +1,26 @@
 {
-  "name": "launder",
-  "version": "1.0.0",
-  "description": "Illegal data transfers.",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/endquote/launder.git"
-  },
-  "author": "Josh Santangelo",
-  "license": "MIT",
-  "preferGlobal": true,
-  "bugs": {
-    "url": "https://github.com/endquote/launder/issues"
-  },
-  "homepage": "http://launder.today",
-  "bin": {
-    "launder": "index.js"
-  },
-  "dependencies": {
-    "async": "^1.2.0",
-    "fs-extra": "^0.18.4",
-    "sanitize-filename": "^1.3.0",
-    "winston": "^1.0.0"
-  }
+    "name": "laundry",
+    "version": "1.0.0",
+    "description": "Illegal data transfers.",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/endquote/laundry.git"
+    },
+    "author": "Josh Santangelo",
+    "license": "MIT",
+    "preferGlobal": true,
+    "bugs": {
+        "url": "https://github.com/endquote/laundry/issues"
+    },
+    "homepage": "http://laundry.today",
+    "bin": {
+        "laundry": "index.js"
+    },
+    "dependencies": {
+        "async": "^1.2.0",
+        "fs-extra": "^0.18.4",
+        "sanitize-filename": "^1.3.0",
+        "winston": "^1.0.0"
+    }
 }

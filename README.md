@@ -1,1 +1,1 @@
-Launder -- for illegal data transfers.
+Laundry -- for illegal data transfers.
