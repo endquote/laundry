@@ -1,14 +1,16 @@
-function Washer() {}
+var Backbone = require('Backbone'); // http://backbonejs.org/
 
-Washer.prototype.config = {
-    input: {
-        frequency: 60
-    }
-};
+var Washer = Backbone.Model.extend({
+    defaults: {
+        input: {
+            frequency: 60
+        }
+    },
 
-Washer.prototype.configure = function() {}
-Washer.prototype.authorize = function() {}
-Washer.prototype.input = function() {}
-Washer.prototype.output = function() {}
+    configure: function() {},
+    authorize: function() {},
+    input: function() {},
+    output: function() {},
+});
 
 module.exports = exports = Washer;
