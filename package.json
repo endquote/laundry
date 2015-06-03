@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Illegal data transfers.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/endquote/launder.git"
@@ -20,5 +17,10 @@
   "bin": {
     "launder": "index.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "async": "^1.2.0",
+    "fs-extra": "^0.18.4",
+    "sanitize-filename": "^1.3.0",
+    "winston": "^1.0.0"
+  }
 }
