@@ -12,6 +12,10 @@ var Job = Backbone.Model.extend({
         config: null
     },
 
+    initialize: function() {
+        this.set('config', []);
+    },
+
     // Save the job file to disk.
     save: function(callback) {
         fs.writeFile(Job.getPath(this.get('name')), JSON.stringify(this.toJSON(), null, 4), callback);
@@ -63,6 +67,11 @@ var Job = Backbone.Model.extend({
 
         var jobs = [];
         fs.readdir($$configFolder, function(err, files) {
+            if (err || !files.length) {
+                callback(jobs);
+                return;
+            }
+
             async.each(files, function(item, callback) {
                 if (path.extname(item) != '.json') {
                     callback();

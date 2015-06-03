@@ -5,15 +5,39 @@ var Washer = require('../washer');
 
 RSS = Washer.extend({
     defaults: {
-        configure: null,
-        input: {
-            url: null
-        },
-        output: {
-            file: null
-        }
+        name: 'RSS'
+    },
+
+    initialize: function() {},
+
+    description: 'Accepts data from an RSS feed, or outputs data to an RSS feed on disk.',
+
+    configInput: [{
+        name: 'url',
+        type: 'url',
+        prompt: 'What RSS feed URL do you want to launder?'
+    }, {
+        name: 'number',
+        type: 'number',
+        prompt: 'How old are you?'
+    }],
+
+    configOutput: [{
+        name: 'file',
+        type: 'file',
+        description: 'the file to output RSS to'
+    }],
+
+    doAuthorize: null,
+
+    doInput: function() {
+        console.log('input');
+    },
+
+    doOutput: function() {
+        console.log('output');
     }
 });
 
-_.merge(RSS.prototype.defaults, Washer.prototype.defaults);
-module.exports.RSS = RSS;
+_.merge(Washer.prototype.defaults, RSS.prototype.defaults);
+module.exports = RSS;

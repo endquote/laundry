@@ -4,9 +4,10 @@ var path = require('path'); // https://nodejs.org/api/path.html
 var async = require('async'); // https://www.npmjs.com/package/async
 var log = require('winston'); // https://github.com/winstonjs/winston
 var util = require('util'); // https://nodejs.org/api/util.html
+var readline = require('readline'); // https://nodejs.org/api/readline.html
+var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 
 var Washer = require('./washer');
-var Washers = require('./requireFolderNs')('./washers');
 var Job = require('./job');
 
 // Singleton Laundry class, generally the entry point to the whole thing.
@@ -25,11 +26,9 @@ var Laundry = Backbone.Model.extend({
         'help': 'help -- this help text'
     },
 
-    constructor: function() {
-        Backbone.Model.apply(this, arguments);
+    _wrapOpts: {
+        width: 70
     },
-
-    initialize: function() {},
 
     // Is the command you're trying to run a real command?
     isCommand: function(command) {
@@ -70,8 +69,108 @@ var Laundry = Backbone.Model.extend({
     // Create a new job.
     create: function(jobName) {
         log.info(jobName + ' - creating');
-        Job.getJob(jobName, function(job) {
-            job.save();
+
+        var that = this;
+        async.waterfall([
+
+            // Get all the washers and filter by the ones that support input.
+            function(callback) {
+                Washer.getAllWashers(function(washers) {
+                    callback(null, washers);
+                });
+            },
+
+            // Get the job
+            function(allWashers, callback) {
+                Job.getJob(jobName, function(job) {
+                    callback(null, job, allWashers);
+                });
+            },
+
+            // Set up the console and ask for the source washer.
+            function(job, allWashers, callback) {
+                var validWashers = allWashers.filter(function(washer) {
+                    return washer.configInput
+                });
+
+                var rl = readline.createInterface({
+                    input: process.stdin,
+                    output: process.stdout,
+                    completer: function(line) {
+                        line = line.toLowerCase();
+                        var completions = validWashers.map(function(washer) {
+                            return washer.get('name');
+                        });
+                        completions.sort();
+                        completions = completions.filter(function(completion) {
+                            return completion.toLowerCase().indexOf(line) != -1
+                        });
+                        return [completions, line];
+                    }
+                });
+
+                var washersList = '';
+                validWashers.forEach(function(washer) {
+                    washersList += util.format('%s - %s', washer.get('name'), washer.description);
+                });
+
+                var q = util.format("Great, let's create a new job called %s. Where do you want to launder data from? The sources we have are:\n%s\n", job.get('name'), washersList);
+                q = wrap(q, that._wrapOpts);
+
+                rl.question(q, function(answer) {
+                    callback(null, rl, answer, job, allWashers, validWashers);
+                });
+            },
+
+            // Validate that the first washer is real and configure it.
+            function(rl, answer, job, allWashers, validWashers, callback) {
+                var washer = validWashers.filter(function(washer) {
+                    return washer.get('name').toLowerCase() == answer.toLowerCase();
+                })[0];
+
+                if (!washer) {
+                    rl.write(wrap("Hm, couldn't find that one.", that._wrapOpts));
+                    callback(true, rl);
+                    return;
+                }
+
+                rl.write(wrap(util.format("Cool, we'll start with %s.\n", washer.get('name')), that._wrapOpts));
+
+                job.get('config').push(washer);
+
+                // For each of the config options, ask for a value and validate the input.
+                var config = {};
+                async.eachSeries(washer.configInput, function(item, callback) {
+                    var valid = false;
+                    async.whilst(function() {
+                            return !valid;
+                        },
+                        function(callback) {
+                            rl.question(wrap(item.prompt + '\n', that._wrapOpts), function(answer) {
+                                // TODO: Validate answers according to field type
+                                valid = answer;
+                                if (valid) {
+                                    config[item.name] = answer;
+                                } else {
+                                    rl.write(wrap("That's not a valid answer. Let's try again.\n", that._wrapOpts));
+                                }
+                                callback();
+                            })
+                        }, function(err) {
+                            callback(err);
+                        });
+                }, function(err) {
+                    washer.set('input', config);
+                    callback(err, rl, job);
+                });
+            }
+        ], function(err, rl, job) {
+            if (!err && job) {
+                job.save();
+            }
+
+            rl.write('\n');
+            rl.close();
         });
     },
 
@@ -95,7 +194,7 @@ var Laundry = Backbone.Model.extend({
         var out = 'Current jobs: \n';
 
         Job.getAllJobs(function(jobs) {
-            if (!jobs) {
+            if (!jobs.length) {
                 out = 'There are no jobs configured. Use "laundry create [job]" to make one.';
             }
 
