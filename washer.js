@@ -2,15 +2,15 @@ var Backbone = require('Backbone'); // http://backbonejs.org/
 
 var Washer = Backbone.Model.extend({
     defaults: {
-        input: {
-            frequency: 60
-        }
+        configure: {},
+        input: {},
+        output: {}
     },
 
     configure: function() {},
     authorize: function() {},
     input: function() {},
-    output: function() {},
+    output: function() {}
 });
 
-module.exports = exports = Washer;
+module.exports = Washer;

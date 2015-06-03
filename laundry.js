@@ -1,11 +1,13 @@
 var Backbone = require('Backbone'); // http://backbonejs.org/
-var fs = require('fs-extra'); // https://www.npmjs.com/package/fs-extra
+var fs = require('fs'); // https://nodejs.org/api/fs.html
 var path = require('path'); // https://nodejs.org/api/path.html
-var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sanitize-filename
 var async = require('async'); // https://www.npmjs.com/package/async
 var log = require('winston'); // https://github.com/winstonjs/winston
+var util = require('util'); // https://nodejs.org/api/util.html
 
 var Washer = require('./washer');
+var Washers = require('./requireFolderNs')('./washers');
+var Job = require('./job');
 
 // Singleton Laundry class, generally the entry point to the whole thing.
 var Laundry = Backbone.Model.extend({
@@ -65,48 +67,56 @@ var Laundry = Backbone.Model.extend({
         console.log(docs);
     },
 
-    // Given a job name, create a job folder and return a path to it.
-    _getJobFolder: function(job, callback) {
-        var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-        var configFolder = path.join(home, '.laundry');
-        var jobFolder = path.join(configFolder, sanitize(job));
-        fs.mkdirs(jobFolder, function(err) {
-            callback(err, jobFolder);
-        });
-    },
-
     // Create a new job.
-    create: function(job) {
-        log.info(job + ' - creating');
-        this._getJobFolder(job, function(err, jobFolder) {
-            console.log(jobFolder);
+    create: function(jobName) {
+        log.info(jobName + ' - creating');
+        Job.getJob(jobName, function(job) {
+            job.save();
         });
-
-        console.log(new Washer().get('input'));
     },
 
     // Edit an existing job.
-    edit: function(job) {
+    edit: function(jobName) {
 
     },
 
     // Run a job.
-    run: function(job) {
+    run: function(jobName) {
 
     },
 
     // Delete a job.
-    delete: function(job) {
+    delete: function(jobName) {
 
     },
 
     // List current jobs.
-    list: function(job) {
+    list: function() {
+        var out = 'Current jobs: \n';
 
+        Job.getAllJobs(function(jobs) {
+            if (!jobs) {
+                out = 'There are no jobs configured. Use "laundry create [job]" to make one.';
+            }
+
+            // sort?
+            jobs.forEach(function(job) {
+                if (job.get('after')) {
+                    out += util.format('%s runs after %s.', job.get('name'), job.get('after'));
+                } else if (!job.get('frequency')) {
+                    out += util.format('%s runs manually.', job.get('name'));
+                } else {
+                    out += util.format('%s runs every %d minutes.', job.get('name'), job.get('frequency'));
+                }
+                out += '\n';
+            });
+
+            console.log(out);
+        });
     },
 
     // Run jobs according to their schedule.
-    tick: function(job) {
+    tick: function() {
 
     },
 

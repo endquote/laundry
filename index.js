@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var fs = require('fs'); // https://nodejs.org/api/fs.html
+var path = require('path'); // https://nodejs.org/api/path.html
 var log = require('winston'); // https://github.com/winstonjs/winston
 
 // Configure logging
@@ -21,6 +23,14 @@ var job = '';
 if (args.length > 0) {
     job = args.shift().trim().toLowerCase();
 }
+
+// Make config folder
+var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+var configFolder = path.join(home, '.laundry');
+if (!fs.existsSync(configFolder)) {
+    fs.mkdirSync(configFolder);
+}
+global.$$configFolder = configFolder;
 
 // Do stuff
 var laundry = require('./laundry');
