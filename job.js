@@ -7,8 +7,7 @@ var async = require('async'); // https://www.npmjs.com/package/async
 var Job = Backbone.Model.extend({
     defaults: {
         name: null,
-        frequency: 60,
-        after: null,
+        schedule: null,
         input: null,
         output: null,
         filter: null

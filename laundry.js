@@ -6,6 +6,7 @@ var log = require('winston'); // https://github.com/winstonjs/winston
 var util = require('util'); // https://nodejs.org/api/util.html
 var readline = require('readline'); // https://nodejs.org/api/readline.html
 var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
+var moment = require('moment'); // http://momentjs.com/docs/
 
 var Washer = require('./washer');
 var Job = require('./job');
@@ -17,7 +18,7 @@ var Laundry = Backbone.Model.extend({
     _commands: {
         'create': 'create -- configure a new job',
         'edit': 'edit -- edit the configuration of an existing job',
-        'run': 'run -- run an existing job',
+        'run': 'run [job] -- run an existing job',
         'delete': 'delete -- delete an existing job',
         'list': 'list -- list configured jobs',
         'tick': 'tick -- run on an interval to execute scheduled jobs',
@@ -67,12 +68,21 @@ var Laundry = Backbone.Model.extend({
     },
 
     // Create a new job.
-    create: function() {
+    create: function(jobName) {
 
         var that = this;
         var validWashers = [];
+        var allJobs = [];
 
         async.waterfall([
+
+            // Get all the jobs, for scheduling.
+            function(callback) {
+                Job.getAllJobs(function(jobs) {
+                    allJobs = jobs;
+                    callback()
+                });
+            },
 
             // Set up the console.
             function(callback) {
@@ -97,7 +107,6 @@ var Laundry = Backbone.Model.extend({
 
             // Get a name for the job.
             function(rl, callback) {
-                var jobName = null;
                 async.whilst(function() {
                         return !jobName;
                     },
@@ -264,7 +273,68 @@ var Laundry = Backbone.Model.extend({
                 });
             },
 
-            // TODO: (0) Set frequency
+            function(rl, job, callback) {
+                validWashers = [];
+
+                var prompt = '';
+                prompt += "\nNow to set when this job will run.\n";
+                prompt += "- Leave blank to run only when 'laundry run [job]' is called.\n";
+                prompt += "- Enter a number to run after so many minutes. Entering 60 will run the job every hour.\n";
+                prompt += "- Enter a time to run at a certain time every day, like '9:30' or '13:00'.\n";
+                prompt += "- Enter the name of another job to run after that job runs.\n\n";
+                rl.write(wrap(prompt, that._wrapOpts));
+
+                var valid = false;
+                async.whilst(function() {
+                        return !valid;
+                    },
+                    function(callback) {
+                        rl.question(wrap("How do you want the job to be scheduled? ", that._wrapOpts), function(answer) {
+                            answer = answer.trim().toLowerCase();
+
+                            if (answer === '') {
+                                valid = true;
+                                rl.write(wrap(util.format("This job will only be run manually.\n"), that._wrapOpts));
+                            } else if (answer.indexOf(':') != -1) {
+                                var time = moment({
+                                    hour: answer.split(':')[0],
+                                    minute: answer.split(':')[1]
+                                });
+                                valid = time.isValid();
+                                if (valid) {
+                                    answer = time.hour() + ':' + time.minute();
+                                    rl.write(wrap(util.format("This job will run every day at %s.\n", answer), that._wrapOpts));
+                                }
+                            } else if (!isNaN(parseInt(answer))) {
+                                answer = parseInt(answer);
+                                valid = answer > 0;
+                                if (valid) {
+                                    rl.write(wrap(util.format("This job will run every %d minutes.\n", answer), that._wrapOpts));
+                                }
+                            } else {
+                                if (answer != job.get('name').toLowerCase()) {
+                                    allJobs.forEach(function(job) {
+                                        if (job.get('name').toLowerCase() == answer) {
+                                            valid = true;
+                                            answer = job.get('name');
+                                            rl.write(wrap(util.format("This job will run after the job '%s'.\n", answer), that._wrapOpts));
+                                        }
+                                    });
+                                }
+                            }
+
+                            if (valid) {
+                                job.set('schedule', answer);
+                            } else {
+                                rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
+                            }
+                            callback();
+                        })
+                    }, function(err) {
+                        callback(err, rl, job);
+                    });
+            }
+
             // TODO: (3) Set filters
         ], function(err, rl, job) {
             if (!err && job) {
@@ -277,17 +347,17 @@ var Laundry = Backbone.Model.extend({
     },
 
     // Edit an existing job.
-    edit: function() {
+    edit: function(jobName) {
         // TODO: (1) Implement job edits
     },
 
     // Run a job.
-    run: function() {
+    run: function(jobName) {
 
     },
 
     // Delete a job.
-    delete: function() {
+    delete: function(jobName) {
 
     },
 
@@ -302,12 +372,15 @@ var Laundry = Backbone.Model.extend({
 
             // TODO: Sort list alphabetically, but with "afters" ordered
             jobs.forEach(function(job) {
-                if (job.get('after')) {
-                    out += util.format('%s runs after %s.', job.get('name'), job.get('after'));
-                } else if (!job.get('frequency')) {
+                var schedule = job.get('schedule');
+                if (!isNaN(parseInt(schedule))) {
+                    out += util.format('%s runs every %d minutes.', job.get('name'), schedule);
+                } else if (schedule.indexOf(':') != -1) {
+                    out += util.format('%s runs every day at %s.', job.get('name'), schedule);
+                } else if (!schedule) {
                     out += util.format('%s runs manually.', job.get('name'));
                 } else {
-                    out += util.format('%s runs every %d minutes.', job.get('name'), job.get('frequency'));
+                    out += util.format('%s runs after another job called %s.', job.get('name'), schedule);
                 }
                 out += '\n';
             });
