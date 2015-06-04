@@ -2,10 +2,13 @@ var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var Backbone = require('Backbone'); // http://backbonejs.org/
 var _ = require('lodash'); // https://lodash.com/docs
 var request = require('request'); // https://www.npmjs.com/package/request
+var moment = require('moment'); // http://momentjs.com/docs/
+
 var FeedParser = require('feedparser'); // https://www.npmjs.com/package/feedparser
 var RSS = require('rss'); // https://www.npmjs.com/package/rss
 
 var Washer = require('../washer');
+var Item = require('../item');
 
 rss = Washer.extend({
     defaults: {
@@ -63,7 +66,14 @@ rss = Washer.extend({
             var item;
 
             while (item = stream.read()) {
-                items.push(item);
+                items.push(new Item({
+                    title: item.title,
+                    description: item.description,
+                    url: item.link,
+                    date: moment(item.date),
+                    author: item.author,
+                    tags: item.categories
+                }));
             }
         });
 
@@ -83,7 +93,14 @@ rss = Washer.extend({
         });
 
         items.forEach(function(item) {
-            feed.item(item);
+            feed.item({
+                title: item.get('title'),
+                description: item.get('description'),
+                url: item.get('url'),
+                date: item.get('date').toDate(),
+                author: item.get('author'),
+                categories: item.get('tags')
+            });
         });
 
         var xml = feed.xml({

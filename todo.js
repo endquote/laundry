@@ -1,8 +1,7 @@
+// TODO: (0) Ditch backbone for plain JS
 // TODO: Set up the daemon or tick automatically?
 // TODO: Set up file logging
-// TODO: Define data objects
 // TODO: verbs: star, comment, like, download, reblog, etc
-// TODO: configure filters
 // TODO: deploy builds from github as single binaries, enclosejs.com
 // TODO: easy global reblog
 

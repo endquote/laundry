@@ -366,7 +366,7 @@ var Laundry = Backbone.Model.extend({
                     });
             }
 
-            // TODO: (3) Set filters
+            // TODO: (1) Set filters
         ], function(err, rl, job) {
             if (!err && job) {
                 job.save();

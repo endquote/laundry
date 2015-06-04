@@ -30,7 +30,6 @@ var Job = Backbone.Model.extend({
     },
 
     // Return an existing job object, or create a new one.
-    // TODO: This shouldn't actually create a new job, you can just do that in the constructor
     getJob: function(jobName, callback) {
         if (!callback) {
             return;
