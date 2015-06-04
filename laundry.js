@@ -1,5 +1,5 @@
 var Backbone = require('Backbone'); // http://backbonejs.org/
-var fs = require('fs'); // https://nodejs.org/api/fs.html
+var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var async = require('async'); // https://www.npmjs.com/package/async
 var log = require('winston'); // https://github.com/winstonjs/winston
@@ -199,15 +199,16 @@ var Laundry = Backbone.Model.extend({
                         },
                         function(callback) {
                             rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
-                                answer = chalk.stripColor(answer).trim();
-                                // TODO: (2) Validate answers according to field type
-                                valid = answer;
-                                if (valid) {
-                                    washer.set(item.name, answer);
-                                } else {
-                                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
-                                }
-                                callback();
+                                Washer.validateField(item.type, answer, function(a) {
+                                    answer = a;
+                                    valid = answer;
+                                    if (valid) {
+                                        washer.set(item.name, answer);
+                                    } else {
+                                        rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                                    }
+                                    callback();
+                                });
                             });
                             rl.write(washer.get(item.name));
                         }, function(err) {
@@ -278,15 +279,16 @@ var Laundry = Backbone.Model.extend({
                         },
                         function(callback) {
                             rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
-                                answer = chalk.stripColor(answer).trim();
-                                // TODO: (2) Validate answers according to field type
-                                valid = answer;
-                                if (valid) {
-                                    washer.set(item.name, answer);
-                                } else {
-                                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
-                                }
-                                callback();
+                                Washer.validateField(item.type, answer, function(a) {
+                                    answer = a;
+                                    valid = answer;
+                                    if (valid) {
+                                        washer.set(item.name, answer);
+                                    } else {
+                                        rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                                    }
+                                    callback();
+                                });
                             });
                             rl.write(washer.get(item.name));
                         }, function(err) {

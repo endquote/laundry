@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var fs = require('fs'); // https://nodejs.org/api/fs.html
+var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var log = require('winston'); // https://github.com/winstonjs/winston
 

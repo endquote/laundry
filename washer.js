@@ -1,6 +1,8 @@
 var Backbone = require('Backbone'); // http://backbonejs.org/
-var fs = require('fs'); // https://nodejs.org/api/fs.html
+var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
+var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
+var touch = require('touch'); // https://github.com/isaacs/node-touch
 
 var Washer = Backbone.Model.extend({
 
@@ -35,6 +37,39 @@ var Washer = Backbone.Model.extend({
 
             callback(washers);
         });
+    },
+
+    // Attempt to coerce configuration values into valid values.
+    validateField: function(type, value, callback) {
+        if (!type || !callback) {
+            return;
+        }
+
+        value = chalk.stripColor(value).trim();
+
+        if (type == 'file') {
+            fs.mkdirp(path.dirname(value), function(err) {
+                if (err) {
+                    callback(null);
+                    return;
+                }
+
+                touch(value, {}, function(err) {
+                    callback(err ? null : value);
+                });
+            });
+
+        } else if (type == 'integer') {
+            value = parseInt(value);
+            callback(isNaN(value) ? null : value);
+
+        } else if (type == 'url') {
+            var rx = new RegExp(/([-a-zA-Z0-9^\p{L}\p{C}\u00a1-\uffff@:%_\+.~#?&//=]{2,256}){1}(\.[a-z]{2,4}){1}(\:[0-9]*)?(\/[-a-zA-Z0-9\u00a1-\uffff\(\)@:%,_\+.~#?&//=]*)?([-a-zA-Z0-9\(\)@:%,_\+.~#?&//=]*)?/i);
+            callback(rx.test(value) ? value : null);
+
+        } else {
+            callback(value);
+        }
     }
 });
 

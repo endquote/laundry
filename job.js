@@ -1,6 +1,6 @@
 var Backbone = require('Backbone'); // http://backbonejs.org/
 var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sanitize-filename
-var fs = require('fs'); // https://nodejs.org/api/fs.html
+var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var async = require('async'); // https://www.npmjs.com/package/async
 
