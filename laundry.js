@@ -125,11 +125,18 @@ var Laundry = Backbone.Model.extend({
 
             // Get the job
             function(rl, jobName, callback) {
-                rl.write(wrap(util.format("Great, let's create a new job called '%s'.\n", jobName), that._wrapOpts));
-                Job.getJob(jobName, function(job) {
-                    console.log(job);
+                var job = allJobs.filter(function(job) {
+                    return job.get('name').toLowerCase() == jobName.toLowerCase();
+                })[0];
+                if (job) {
+                    rl.write(wrap(util.format("There's already a job called '%s', so we'll edit it.\n", jobName), that._wrapOpts));
                     callback(null, rl, job);
-                });
+                } else {
+                    rl.write(wrap(util.format("Great, let's create a new job called '%s'.\n", jobName), that._wrapOpts));
+                    Job.getJob(jobName, function(job) {
+                        callback(null, rl, job);
+                    });
+                }
             },
 
             // A: Get all the washers and filter by the ones that support input.
@@ -162,12 +169,17 @@ var Laundry = Backbone.Model.extend({
                             })[0];
                             if (washer) {
                                 rl.write(wrap(util.format("Cool, we'll start with %s.\n", washer.get('name')), that._wrapOpts));
-                                job.set('input', washer);
+                                if (!job.get('input') || job.get('input').get('name') != washer.get('name')) {
+                                    job.set('input', washer);
+                                }
                             } else {
                                 rl.write(wrap("Hm, couldn't find that one. Try again?\n", that._wrapOpts));
                             }
                             callback();
                         });
+                        if (job.get('input')) {
+                            rl.write(job.get('input').get('name'));
+                        }
                     },
                     function(err) {
                         callback(err, rl, job);
@@ -194,7 +206,8 @@ var Laundry = Backbone.Model.extend({
                                     rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
                                 }
                                 callback();
-                            })
+                            });
+                            rl.write(washer.get(item.name));
                         }, function(err) {
                             callback(err);
                         });
@@ -233,12 +246,17 @@ var Laundry = Backbone.Model.extend({
                             })[0];
                             if (washer) {
                                 rl.write(wrap(util.format("Cool, we'll send it to %s.\n", washer.get('name')), that._wrapOpts));
-                                job.set('output', washer);
+                                if (!job.get('output') || job.get('output').get('name') != washer.get('name')) {
+                                    job.set('output', washer);
+                                }
                             } else {
                                 rl.write(wrap("Hm, couldn't find that one. Try again?\n", that._wrapOpts));
                             }
                             callback();
                         });
+                        if (job.get('output')) {
+                            rl.write(job.get('output').get('name'));
+                        }
                     },
                     function(err) {
                         callback(err, rl, job);
@@ -265,7 +283,8 @@ var Laundry = Backbone.Model.extend({
                                     rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
                                 }
                                 callback();
-                            })
+                            });
+                            rl.write(washer.get(item.name));
                         }, function(err) {
                             callback(err);
                         });
@@ -294,7 +313,7 @@ var Laundry = Backbone.Model.extend({
                         rl.question(wrap("How do you want the job to be scheduled? ", that._wrapOpts), function(answer) {
                             answer = answer.trim().toLowerCase();
 
-                            if (answer === '') {
+                            if (!answer) {
                                 valid = true;
                                 rl.write(wrap(util.format("This job will only be run manually.\n"), that._wrapOpts));
                             } else if (answer.indexOf(':') != -1) {
@@ -331,7 +350,10 @@ var Laundry = Backbone.Model.extend({
                                 rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
                             }
                             callback();
-                        })
+                        });
+                        if (job.get('schedule')) {
+                            rl.write(job.get('schedule').toString());
+                        }
                     }, function(err) {
                         callback(err, rl, job);
                     });
@@ -350,7 +372,7 @@ var Laundry = Backbone.Model.extend({
 
     // Edit an existing job.
     edit: function(jobName) {
-        // TODO: (1) Implement job edits
+        this.create(jobName);
     },
 
     // Run a job.

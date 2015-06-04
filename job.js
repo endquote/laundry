@@ -49,6 +49,21 @@ var Job = Backbone.Model.extend({
                     try {
                         var config = JSON.parse(data);
                         job = new Job(config);
+
+                        var input = null;
+                        try {
+                            input = require('./washers/' + job.get('input').name);
+                            input = new input(job.get('input'));
+                        } catch (e) {}
+                        job.set('input', input);
+
+                        var output = null;
+                        try {
+                            output = require('./washers/' + job.get('output').name);
+                            output = new output(job.get('output'));
+                        } catch (e) {}
+                        job.set('output', output);
+
                     } catch (e) {}
                 }
                 callback(job);
