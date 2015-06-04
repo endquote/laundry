@@ -16,6 +16,10 @@ var Job = Backbone.Model.extend({
     // Save the job file to disk.
     save: function(callback) {
         fs.writeFile(Job.getPath(this.get('name')), JSON.stringify(this.toJSON(), null, 4), callback);
+    },
+
+    del: function(callback) {
+        fs.unlink(Job.getPath(this.get('name')), callback);
     }
 }, {
     // Return the file path for the job file.

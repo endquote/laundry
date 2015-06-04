@@ -379,7 +379,7 @@ var Laundry = Backbone.Model.extend({
     // Edit an existing job.
     edit: function(jobName) {
         if (!jobName) {
-            console.log("Specify a job to edit with 'laundry edit [job]'.\n");
+            console.log("Specify a job to edit with " + chalk.bold("laundry edit [job]") + ".\n");
             this.list();
             return;
         }
@@ -394,7 +394,65 @@ var Laundry = Backbone.Model.extend({
 
     // Delete a job.
     delete: function(jobName) {
+        if (!jobName) {
+            console.log("Specify a job to edit with " + chalk.bold("laundry delete [job]") + ".\n");
+            this.list();
+            return;
+        }
 
+        var that = this;
+        var job = null;
+
+        async.waterfall([
+
+                // Find the requested job.
+                function(callback) {
+                    Job.getAllJobs(function(jobs) {
+                        job = jobs.filter(function(job) {
+                            return job.get('name').toLowerCase() == jobName.toLowerCase()
+                        })[0];
+                        if (!job) {
+                            console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
+                            that.list();
+                            callback(jobName);
+                        } else {
+                            callback(null, job);
+                        }
+                    });
+                },
+
+                // Set up the console.
+                function(job, callback) {
+                    var rl = readline.createInterface({
+                        input: process.stdin,
+                        output: process.stdout
+                    });
+
+                    callback(null, rl, job)
+                },
+
+                // Confirm and delete.
+                function(rl, job, callback) {
+                    rl.question(wrap(util.format("Are you sure you want to delete the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.get('name')), that._wrapOpts) + "\n", function(answer) {
+                        answer = chalk.stripColor(answer).trim().toLowerCase();
+                        if (answer == job.get('name').toLowerCase() && answer == jobName.toLowerCase()) {
+                            job.del(function(err) {
+                                rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " deleted."), job.get('name')), that._wrapOpts) + "\n");
+                                callback(err, rl);
+                            });
+                        } else {
+                            rl.write(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.get('name')), that._wrapOpts) + "\n");
+                            callback(null, rl);
+                        }
+                    });
+                }
+            ],
+            function(err, rl) {
+                if (rl) {
+                    rl.write("\n");
+                    rl.close();
+                }
+            });
     },
 
     // List current jobs.
