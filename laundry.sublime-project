@@ -1,18 +1,17 @@
 {
-	"folders":
-	[
-		{
-			"path": ".",
-		},
-		{
-			"path":"~/.laundry"
-		}
-	],
-	"settings": {
+    "folders": [
+        {
+            "path": ".",
+        },
+        {
+            "path":"~/.laundry"
+        }
+    ],
+    "settings": {
         "todoreview": {
             "exclude_folders": [
                 "*node_modules*"
             ]
         }
- 	}
+    }
 }

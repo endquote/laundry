@@ -15,13 +15,13 @@ var Laundry = Backbone.Model.extend({
 
     // Valid commands and their descriptions.
     _commands: {
-        'create': 'create [job] -- configure a new job',
-        'edit': 'edit [job] -- edit the configuration of an existing job',
-        'run': 'run [job] -- run an existing job',
-        'delete': 'delete [job] -- delete an existing job',
-        'list': 'list [job] -- list configured jobs',
+        'create': 'create -- configure a new job',
+        'edit': 'edit -- edit the configuration of an existing job',
+        'run': 'run -- run an existing job',
+        'delete': 'delete -- delete an existing job',
+        'list': 'list -- list configured jobs',
         'tick': 'tick -- run on an interval to execute scheduled jobs',
-        'daemon': 'daemon [port] -- run continuously and serve up generated static content',
+        'server': 'server [port] -- run continuously and serve up generated static content',
         'version': 'version -- output version info',
         'help': 'help -- this help text'
     },
@@ -67,8 +67,7 @@ var Laundry = Backbone.Model.extend({
     },
 
     // Create a new job.
-    create: function(jobName) {
-        log.info(jobName + ' - creating');
+    create: function() {
 
         var that = this;
         var validWashers = [];
@@ -96,9 +95,28 @@ var Laundry = Backbone.Model.extend({
                 callback(null, rl)
             },
 
-            // Get the job
+            // Get a name for the job.
             function(rl, callback) {
-                rl.write(wrap(util.format("Great, let's create a new job called %s.\n", jobName), that._wrapOpts));
+                var jobName = null;
+                async.whilst(function() {
+                        return !jobName;
+                    },
+                    function(callback) {
+                        rl.question(wrap("What do you want to call this job? ", that._wrapOpts), function(answer) {
+                            jobName = answer.trim();
+                            if (!jobName) {
+                                rl.write(wrap("That's not a valid name. Try again?\n", that._wrapOpts));
+                            }
+                            callback();
+                        })
+                    }, function(err) {
+                        callback(err, rl, jobName);
+                    });
+            },
+
+            // Get the job
+            function(rl, jobName, callback) {
+                rl.write(wrap(util.format("Great, let's create a new job called '%s'.\n", jobName), that._wrapOpts));
                 Job.getJob(jobName, function(job) {
                     callback(null, rl, job);
                 });
@@ -158,7 +176,7 @@ var Laundry = Backbone.Model.extend({
                         },
                         function(callback) {
                             rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
-                                // TODO: Validate answers according to field type
+                                // TODO: (2) Validate answers according to field type
                                 valid = answer;
                                 if (valid) {
                                     washer.set(item.name, answer);
@@ -229,7 +247,7 @@ var Laundry = Backbone.Model.extend({
                         },
                         function(callback) {
                             rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
-                                // TODO: Validate answers according to field type
+                                // TODO: (2) Validate answers according to field type
                                 valid = answer;
                                 if (valid) {
                                     washer.set(item.name, answer);
@@ -246,30 +264,30 @@ var Laundry = Backbone.Model.extend({
                 });
             },
 
-            // TODO: Set frequency
-            // TODO: Set filters
+            // TODO: (0) Set frequency
+            // TODO: (3) Set filters
         ], function(err, rl, job) {
             if (!err && job) {
                 job.save();
             }
 
-            rl.write(wrap('Cool, the job %s is all set up!\n', that._wrapOpts), job.get('name'));
+            rl.write(wrap(util.format("Cool, the job '%s' is all set up!\n", job.get('name')), that._wrapOpts));
             rl.close();
         });
     },
 
     // Edit an existing job.
-    edit: function(jobName) {
-
+    edit: function() {
+        // TODO: (1) Implement job edits
     },
 
     // Run a job.
-    run: function(jobName) {
+    run: function() {
 
     },
 
     // Delete a job.
-    delete: function(jobName) {
+    delete: function() {
 
     },
 
@@ -279,10 +297,10 @@ var Laundry = Backbone.Model.extend({
 
         Job.getAllJobs(function(jobs) {
             if (!jobs.length) {
-                out = 'There are no jobs configured. Use "laundry create [job]" to make one.';
+                out = 'There are no jobs configured. Use "laundry create" to make one.';
             }
 
-            // sort?
+            // TODO: Sort list alphabetically, but with "afters" ordered
             jobs.forEach(function(job) {
                 if (job.get('after')) {
                     out += util.format('%s runs after %s.', job.get('name'), job.get('after'));
@@ -304,7 +322,7 @@ var Laundry = Backbone.Model.extend({
     },
 
     // Run continuously and serve up generated static content.
-    daemon: function(port) {
+    server: function(port) {
 
     }
 });

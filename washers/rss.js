@@ -3,9 +3,9 @@ var _ = require('lodash'); // https://lodash.com/docs
 
 var Washer = require('../washer');
 
-RSS = Washer.extend({
+rss = Washer.extend({
     defaults: {
-        name: 'RSS'
+        name: 'rss'
     },
 
     input: {
@@ -37,5 +37,5 @@ RSS = Washer.extend({
     }
 });
 
-_.merge(Washer.prototype.defaults, RSS.prototype.defaults);
-module.exports = RSS;
+_.merge(Washer.prototype.defaults, rss.prototype.defaults);
+module.exports = rss;
