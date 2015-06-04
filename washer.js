@@ -23,7 +23,7 @@ var Washer = Backbone.Model.extend({
         }
 
         var washers = [];
-        var p = path.resolve('./washers');
+        var p = path.join(__dirname, 'washers');
         fs.readdir(p, function(err, files) {
             files.forEach(function(file) {
                 var file = path.resolve(path.join(p, file));
