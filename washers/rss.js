@@ -8,25 +8,23 @@ RSS = Washer.extend({
         name: 'RSS'
     },
 
-    initialize: function() {},
+    input: {
+        description: 'Loads data from an RSS feed.',
+        settings: [{
+            name: 'url',
+            type: 'url',
+            prompt: 'What RSS feed URL do you want to launder?'
+        }]
+    },
 
-    description: 'Accepts data from an RSS feed, or outputs data to an RSS feed on disk.',
-
-    configInput: [{
-        name: 'url',
-        type: 'url',
-        prompt: 'What RSS feed URL do you want to launder?'
-    }, {
-        name: 'number',
-        type: 'number',
-        prompt: 'How old are you?'
-    }],
-
-    configOutput: [{
-        name: 'file',
-        type: 'file',
-        description: 'the file to output RSS to'
-    }],
+    output: {
+        description: 'Writes data to an RSS feed on disk.',
+        settings: [{
+            name: 'file',
+            type: 'file',
+            prompt: 'Where do you want to save the output?'
+        }]
+    },
 
     doAuthorize: null,
 

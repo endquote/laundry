@@ -9,11 +9,9 @@ var Job = Backbone.Model.extend({
         name: null,
         frequency: 60,
         after: null,
-        config: null
-    },
-
-    initialize: function() {
-        this.set('config', []);
+        input: null,
+        output: null,
+        filter: null
     },
 
     // Save the job file to disk.

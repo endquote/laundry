@@ -71,28 +71,12 @@ var Laundry = Backbone.Model.extend({
         log.info(jobName + ' - creating');
 
         var that = this;
+        var validWashers = [];
+
         async.waterfall([
 
-            // Get all the washers and filter by the ones that support input.
+            // Set up the console.
             function(callback) {
-                Washer.getAllWashers(function(washers) {
-                    callback(null, washers);
-                });
-            },
-
-            // Get the job
-            function(allWashers, callback) {
-                Job.getJob(jobName, function(job) {
-                    callback(null, job, allWashers);
-                });
-            },
-
-            // Set up the console and ask for the source washer.
-            function(job, allWashers, callback) {
-                var validWashers = allWashers.filter(function(washer) {
-                    return washer.configInput
-                });
-
                 var rl = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout,
@@ -109,50 +93,77 @@ var Laundry = Backbone.Model.extend({
                     }
                 });
 
-                var washersList = '';
-                validWashers.forEach(function(washer) {
-                    washersList += util.format('%s - %s', washer.get('name'), washer.description);
-                });
+                callback(null, rl)
+            },
 
-                var q = util.format("Great, let's create a new job called %s. Where do you want to launder data from? The sources we have are:\n%s\n", job.get('name'), washersList);
-                q = wrap(q, that._wrapOpts);
-
-                rl.question(q, function(answer) {
-                    callback(null, rl, answer, job, allWashers, validWashers);
+            // Get the job
+            function(rl, callback) {
+                rl.write(wrap(util.format("Great, let's create a new job called %s.\n", jobName), that._wrapOpts));
+                Job.getJob(jobName, function(job) {
+                    callback(null, rl, job);
                 });
             },
 
-            // Validate that the first washer is real and configure it.
-            function(rl, answer, job, allWashers, validWashers, callback) {
-                var washer = validWashers.filter(function(washer) {
-                    return washer.get('name').toLowerCase() == answer.toLowerCase();
-                })[0];
+            // A: Get all the washers and filter by the ones that support input.
+            function(rl, job, callback) {
+                Washer.getAllWashers(function(washers) {
+                    validWashers = washers.filter(function(washer) {
+                        return washer.input
+                    });
+                    callback(null, rl, job);
+                });
+            },
 
-                if (!washer) {
-                    rl.write(wrap("Hm, couldn't find that one.", that._wrapOpts));
-                    callback(true, rl);
-                    return;
-                }
+            // B: Ask for the input washer.
+            function(rl, job, callback) {
+                var washersList = '';
+                validWashers.forEach(function(washer) {
+                    washersList += util.format('%s - %s', washer.get('name'), washer.input.description);
+                });
 
-                rl.write(wrap(util.format("Cool, we'll start with %s.\n", washer.get('name')), that._wrapOpts));
+                var list = util.format("Now to decide where to launder data from. The sources we have are:\n%s\n\n", washersList);
+                rl.write(wrap(list, that._wrapOpts));
 
-                job.get('config').push(washer);
+                var washer = null;
+                async.whilst(function() {
+                        return washer == null
+                    }, function(callback) {
+                        rl.question(wrap("Which source do you want to use? ", that._wrapOpts), function(answer) {
+                            washer = validWashers.filter(function(washer) {
+                                return washer.get('name').toLowerCase() == answer.toLowerCase();
+                            })[0];
+                            if (washer) {
+                                rl.write(wrap(util.format("Cool, we'll start with %s.\n", washer.get('name')), that._wrapOpts));
+                                job.set('input', washer);
+                            } else {
+                                rl.write(wrap("Hm, couldn't find that one. Try again?\n", that._wrapOpts));
+                            }
+                            callback();
+                        });
+                    },
+                    function(err) {
+                        callback(err, rl, job);
+                    });
+            },
 
-                // For each of the config options, ask for a value and validate the input.
+            // C: Configure the input washer.
+            function(rl, job, callback) {
+                validWashers = [];
                 var config = {};
-                async.eachSeries(washer.configInput, function(item, callback) {
+                var washer = job.get('input');
+                async.eachSeries(washer.input.settings, function(item, callback) {
                     var valid = false;
                     async.whilst(function() {
                             return !valid;
                         },
                         function(callback) {
-                            rl.question(wrap(item.prompt + '\n', that._wrapOpts), function(answer) {
+                            rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
                                 // TODO: Validate answers according to field type
                                 valid = answer;
                                 if (valid) {
-                                    config[item.name] = answer;
+                                    washer.set(item.name, answer);
                                 } else {
-                                    rl.write(wrap("That's not a valid answer. Let's try again.\n", that._wrapOpts));
+                                    rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
                                 }
                                 callback();
                             })
@@ -160,16 +171,89 @@ var Laundry = Backbone.Model.extend({
                             callback(err);
                         });
                 }, function(err) {
-                    washer.set('input', config);
                     callback(err, rl, job);
                 });
-            }
+            },
+
+            // A: Get all the washers and filter by the ones that support output.
+            function(rl, job, callback) {
+                Washer.getAllWashers(function(washers) {
+                    validWashers = washers.filter(function(washer) {
+                        return washer.output
+                    });
+                    callback(null, rl, job);
+                });
+            },
+
+            // B: Request the output washer.
+            function(rl, job, callback) {
+                var washersList = '';
+                validWashers.forEach(function(washer) {
+                    washersList += util.format('%s - %s', washer.get('name'), washer.output.description);
+                });
+
+                var list = util.format("Now to decide where to send data to. The options we have are:\n%s\n\n", washersList);
+                rl.write(wrap(list, that._wrapOpts));
+
+                var washer = null;
+                async.whilst(function() {
+                        return washer == null
+                    }, function(callback) {
+                        rl.question(wrap("Which target do you want to use? ", that._wrapOpts), function(answer) {
+                            washer = validWashers.filter(function(washer) {
+                                return washer.get('name').toLowerCase() == answer.toLowerCase();
+                            })[0];
+                            if (washer) {
+                                rl.write(wrap(util.format("Cool, we'll send it to %s.\n", washer.get('name')), that._wrapOpts));
+                                job.set('output', washer);
+                            } else {
+                                rl.write(wrap("Hm, couldn't find that one. Try again?\n", that._wrapOpts));
+                            }
+                            callback();
+                        });
+                    },
+                    function(err) {
+                        callback(err, rl, job);
+                    });
+            },
+
+            // C: Configure the output washer.
+            function(rl, job, callback) {
+                validWashers = [];
+                var config = {};
+                var washer = job.get('output');
+                async.eachSeries(washer.output.settings, function(item, callback) {
+                    var valid = false;
+                    async.whilst(function() {
+                            return !valid;
+                        },
+                        function(callback) {
+                            rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
+                                // TODO: Validate answers according to field type
+                                valid = answer;
+                                if (valid) {
+                                    washer.set(item.name, answer);
+                                } else {
+                                    rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
+                                }
+                                callback();
+                            })
+                        }, function(err) {
+                            callback(err);
+                        });
+                }, function(err) {
+                    callback(err, rl, job);
+                });
+            },
+
+            // TODO: Set frequency
+            // TODO: Set filters
         ], function(err, rl, job) {
             if (!err && job) {
                 job.save();
             }
 
-            rl.write('\n');
+            rl.write(wrap('Cool, the job %s is all set up!\n', that._wrapOpts), job.get('name'));
             rl.close();
         });
     },

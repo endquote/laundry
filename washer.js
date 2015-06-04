@@ -7,13 +7,10 @@ var Washer = Backbone.Model.extend({
     // Defaults properties are configurable and saved to disk.
     defaults: {
         name: null,
-        input: null,
-        output: null
     },
 
-    description: null,
-    configInput: [],
-    configOutput: [],
+    input: null,
+    output: null,
 
     doAuthorize: function() {},
     doInput: function() {},
