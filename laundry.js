@@ -133,9 +133,10 @@ var Laundry = Backbone.Model.extend({
                     callback(null, rl, job);
                 } else {
                     rl.write(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".\n", jobName), that._wrapOpts));
-                    Job.getJob(jobName, function(job) {
-                        callback(null, rl, job);
+                    job = new Job({
+                        name: jobName
                     });
+                    callback(null, rl, job);
                 }
             },
 
@@ -407,10 +408,7 @@ var Laundry = Backbone.Model.extend({
 
                 // Find the requested job.
                 function(callback) {
-                    Job.getAllJobs(function(jobs) {
-                        job = jobs.filter(function(job) {
-                            return job.get('name').toLowerCase() == jobName.toLowerCase()
-                        })[0];
+                    Job.getJob(jobName, function(job) {
                         if (!job) {
                             console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
                             that.list();

@@ -48,6 +48,7 @@ var Washer = Backbone.Model.extend({
         value = chalk.stripColor(value).trim();
 
         if (type == 'file') {
+            value = path.resolve(value);
             fs.mkdirp(path.dirname(value), function(err) {
                 if (err) {
                     callback(null);
