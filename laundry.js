@@ -127,6 +127,7 @@ var Laundry = Backbone.Model.extend({
             function(rl, jobName, callback) {
                 rl.write(wrap(util.format("Great, let's create a new job called '%s'.\n", jobName), that._wrapOpts));
                 Job.getJob(jobName, function(job) {
+                    console.log(job);
                     callback(null, rl, job);
                 });
             },
@@ -273,6 +274,7 @@ var Laundry = Backbone.Model.extend({
                 });
             },
 
+            // Configure scheduling.
             function(rl, job, callback) {
                 validWashers = [];
 
