@@ -47,6 +47,8 @@ osc
 
 /*
 
+announce: @waxpancake, @pinboard
+
 Fork Feedbin:
 Remove duplicates
 Header design
