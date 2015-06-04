@@ -7,6 +7,7 @@ var util = require('util'); // https://nodejs.org/api/util.html
 var readline = require('readline'); // https://nodejs.org/api/readline.html
 var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 var moment = require('moment'); // http://momentjs.com/docs/
+var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 
 var Washer = require('./washer');
 var Job = require('./job');
@@ -69,7 +70,6 @@ var Laundry = Backbone.Model.extend({
 
     // Create a new job.
     create: function(jobName) {
-
         var that = this;
         var validWashers = [];
         var allJobs = [];
@@ -112,9 +112,9 @@ var Laundry = Backbone.Model.extend({
                     },
                     function(callback) {
                         rl.question(wrap("What do you want to call this job? ", that._wrapOpts), function(answer) {
-                            jobName = answer.trim();
+                            jobName = chalk.stripColor(answer).trim();
                             if (!jobName) {
-                                rl.write(wrap("That's not a valid name. Try again?\n", that._wrapOpts));
+                                rl.write(wrap(chalk.red("That's not a valid name. Try again?\n"), that._wrapOpts));
                             }
                             callback();
                         })
@@ -129,10 +129,10 @@ var Laundry = Backbone.Model.extend({
                     return job.get('name').toLowerCase() == jobName.toLowerCase();
                 })[0];
                 if (job) {
-                    rl.write(wrap(util.format("There's already a job called '%s', so we'll edit it.\n", jobName), that._wrapOpts));
+                    rl.write(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.\n", jobName), that._wrapOpts));
                     callback(null, rl, job);
                 } else {
-                    rl.write(wrap(util.format("Great, let's create a new job called '%s'.\n", jobName), that._wrapOpts));
+                    rl.write(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".\n", jobName), that._wrapOpts));
                     Job.getJob(jobName, function(job) {
                         callback(null, rl, job);
                     });
@@ -153,27 +153,28 @@ var Laundry = Backbone.Model.extend({
             function(rl, job, callback) {
                 var washersList = '';
                 validWashers.forEach(function(washer) {
-                    washersList += util.format('%s - %s', washer.get('name'), washer.input.description);
+                    washersList += util.format(chalk.bold("%s") + " - %s", washer.get('name'), washer.input.description);
                 });
 
                 var list = util.format("Now to decide where to launder data from. The sources we have are:\n%s\n\n", washersList);
-                rl.write(wrap(list, that._wrapOpts));
+                rl.write("\n" + wrap(list, that._wrapOpts));
 
                 var washer = null;
                 async.whilst(function() {
                         return washer == null
                     }, function(callback) {
                         rl.question(wrap("Which source do you want to use? ", that._wrapOpts), function(answer) {
+                            answer = chalk.stripColor(answer).trim();
                             washer = validWashers.filter(function(washer) {
                                 return washer.get('name').toLowerCase() == answer.toLowerCase();
                             })[0];
                             if (washer) {
-                                rl.write(wrap(util.format("Cool, we'll start with %s.\n", washer.get('name')), that._wrapOpts));
+                                rl.write(wrap(util.format("Cool, we'll start with " + chalk.green.bold("%s") + ".\n", washer.get('name')), that._wrapOpts));
                                 if (!job.get('input') || job.get('input').get('name') != washer.get('name')) {
                                     job.set('input', washer);
                                 }
                             } else {
-                                rl.write(wrap("Hm, couldn't find that one. Try again?\n", that._wrapOpts));
+                                rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), that._wrapOpts));
                             }
                             callback();
                         });
@@ -198,12 +199,13 @@ var Laundry = Backbone.Model.extend({
                         },
                         function(callback) {
                             rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
+                                answer = chalk.stripColor(answer).trim();
                                 // TODO: (2) Validate answers according to field type
                                 valid = answer;
                                 if (valid) {
                                     washer.set(item.name, answer);
                                 } else {
-                                    rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
+                                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
                                 }
                                 callback();
                             });
@@ -230,27 +232,28 @@ var Laundry = Backbone.Model.extend({
             function(rl, job, callback) {
                 var washersList = '';
                 validWashers.forEach(function(washer) {
-                    washersList += util.format('%s - %s', washer.get('name'), washer.output.description);
+                    washersList += util.format(chalk.bold("%s") + " - %s", washer.get('name'), washer.input.description);
                 });
 
                 var list = util.format("Now to decide where to send data to. The options we have are:\n%s\n\n", washersList);
-                rl.write(wrap(list, that._wrapOpts));
+                rl.write("\n" + wrap(list, that._wrapOpts));
 
                 var washer = null;
                 async.whilst(function() {
                         return washer == null
                     }, function(callback) {
                         rl.question(wrap("Which target do you want to use? ", that._wrapOpts), function(answer) {
+                            answer = chalk.stripColor(answer).trim();
                             washer = validWashers.filter(function(washer) {
                                 return washer.get('name').toLowerCase() == answer.toLowerCase();
                             })[0];
                             if (washer) {
-                                rl.write(wrap(util.format("Cool, we'll send it to %s.\n", washer.get('name')), that._wrapOpts));
+                                rl.write(wrap(util.format("Cool, we'll send it to " + chalk.green.bold("%s") + ".\n", washer.get('name')), that._wrapOpts));
                                 if (!job.get('output') || job.get('output').get('name') != washer.get('name')) {
                                     job.set('output', washer);
                                 }
                             } else {
-                                rl.write(wrap("Hm, couldn't find that one. Try again?\n", that._wrapOpts));
+                                rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), that._wrapOpts));
                             }
                             callback();
                         });
@@ -275,12 +278,13 @@ var Laundry = Backbone.Model.extend({
                         },
                         function(callback) {
                             rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
+                                answer = chalk.stripColor(answer).trim();
                                 // TODO: (2) Validate answers according to field type
                                 valid = answer;
                                 if (valid) {
                                     washer.set(item.name, answer);
                                 } else {
-                                    rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
+                                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
                                 }
                                 callback();
                             });
@@ -298,12 +302,12 @@ var Laundry = Backbone.Model.extend({
                 validWashers = [];
 
                 var prompt = '';
-                prompt += "\nNow to set when this job will run.\n";
+                prompt += "Now to set when this job will run.\n";
                 prompt += "- Leave blank to run only when 'laundry run [job]' is called.\n";
                 prompt += "- Enter a number to run after so many minutes. Entering 60 will run the job every hour.\n";
                 prompt += "- Enter a time to run at a certain time every day, like '9:30' or '13:00'.\n";
                 prompt += "- Enter the name of another job to run after that job runs.\n\n";
-                rl.write(wrap(prompt, that._wrapOpts));
+                rl.write("\n" + wrap(prompt, that._wrapOpts));
 
                 var valid = false;
                 async.whilst(function() {
@@ -311,7 +315,7 @@ var Laundry = Backbone.Model.extend({
                     },
                     function(callback) {
                         rl.question(wrap("How do you want the job to be scheduled? ", that._wrapOpts), function(answer) {
-                            answer = answer.trim().toLowerCase();
+                            answer = chalk.stripColor(answer).trim().toLowerCase();
 
                             if (!answer) {
                                 valid = true;
@@ -338,7 +342,7 @@ var Laundry = Backbone.Model.extend({
                                         if (job.get('name').toLowerCase() == answer) {
                                             valid = true;
                                             answer = job.get('name');
-                                            rl.write(wrap(util.format("This job will run after the job '%s'.\n", answer), that._wrapOpts));
+                                            rl.write(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".\n", answer), that._wrapOpts));
                                         }
                                     });
                                 }
@@ -347,7 +351,7 @@ var Laundry = Backbone.Model.extend({
                             if (valid) {
                                 job.set('schedule', answer);
                             } else {
-                                rl.write(wrap("That's not a valid answer. Try again?\n", that._wrapOpts));
+                                rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
                             }
                             callback();
                         });
@@ -365,13 +369,19 @@ var Laundry = Backbone.Model.extend({
                 job.save();
             }
 
-            rl.write(wrap(util.format("Cool, the job '%s' is all set up!\n", job.get('name')), that._wrapOpts));
+            rl.write("\n" + chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.get('name')), that._wrapOpts)));
             rl.close();
         });
     },
 
     // Edit an existing job.
     edit: function(jobName) {
+        if (!jobName) {
+            console.log("Specify a job to edit with 'laundry edit [job]'.\n");
+            this.list();
+            return;
+        }
+
         this.create(jobName);
     },
 
@@ -398,13 +408,13 @@ var Laundry = Backbone.Model.extend({
             jobs.forEach(function(job) {
                 var schedule = job.get('schedule');
                 if (!isNaN(parseInt(schedule))) {
-                    out += util.format('%s runs every %d minutes.', job.get('name'), schedule);
+                    out += util.format(chalk.bold("%s") + " runs every %d minutes.", job.get('name'), schedule);
                 } else if (schedule.indexOf(':') != -1) {
-                    out += util.format('%s runs every day at %s.', job.get('name'), schedule);
+                    out += util.format(chalk.bold("%s") + " runs every day at %s.", job.get('name'), schedule);
                 } else if (!schedule) {
-                    out += util.format('%s runs manually.', job.get('name'));
+                    out += util.format(chalk.bold("%s") + " runs manually.", job.get('name'));
                 } else {
-                    out += util.format('%s runs after another job called %s.', job.get('name'), schedule);
+                    out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.get('name'), schedule);
                 }
                 out += '\n';
             });
