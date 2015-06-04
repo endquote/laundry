@@ -234,7 +234,7 @@ var Laundry = Backbone.Model.extend({
             function(rl, job, callback) {
                 var washersList = '';
                 validWashers.forEach(function(washer) {
-                    washersList += util.format(chalk.bold("%s") + " - %s", washer.get('name'), washer.input.description);
+                    washersList += util.format(chalk.bold("%s") + " - %s", washer.get('name'), washer.output.description);
                 });
 
                 var list = util.format("Now to decide where to send data to. The options we have are:\n%s\n\n", washersList);
@@ -390,7 +390,56 @@ var Laundry = Backbone.Model.extend({
 
     // Run a job.
     run: function(jobName) {
+        if (!jobName) {
+            console.log("Specify a job to run with " + chalk.bold("laundry run [job]") + ".\n");
+            this.list();
+            return;
+        }
 
+        var that = this;
+
+        async.waterfall([
+
+                // Find the requested job.
+                function(callback) {
+                    Job.getJob(jobName, function(job) {
+                        if (!job) {
+                            console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
+                            that.list();
+                            callback(jobName);
+                        } else {
+                            callback(null, job);
+                        }
+                    });
+                },
+
+                function(job, callback) {
+                    log.info(job.get('name') + " - running authorize - " + job.get('input').get('name'));
+                    job.get('input').doAuthorize(function(err) {
+                        callback(err, job);
+                    });
+                },
+
+                function(job, callback) {
+                    log.info(job.get('name') + " - running input - " + job.get('input').get('name'));
+                    job.get('input').doInput(function(err, items) {
+                        callback(err, job, items);
+                    });
+                },
+
+                function(job, items, callback) {
+                    log.info(job.get('name') + " - running output - " + job.get('output').get('name'));
+                    job.get('output').doOutput(items, function(err) {
+                        callback(err, job);
+                    });
+                }
+            ],
+            function(err, job) {
+                if (err) {
+                    log.error(job.get('name') + " - error - " + JSON.stringify(err));
+                }
+                log.info(job.get('name') + " - complete");
+            });
     },
 
     // Delete a job.

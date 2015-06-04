@@ -26,14 +26,12 @@ rss = Washer.extend({
         }]
     },
 
-    doAuthorize: null,
-
-    doInput: function() {
-        console.log('input');
+    doInput: function(callback) {
+        callback(null, []);
     },
 
-    doOutput: function() {
-        console.log('output');
+    doOutput: function(items, callback) {
+        callback(null);
     }
 });
 

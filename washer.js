@@ -14,9 +14,17 @@ var Washer = Backbone.Model.extend({
     input: null,
     output: null,
 
-    doAuthorize: function() {},
-    doInput: function() {},
-    doOutput: function() {}
+    doAuthorize: function(callback) {
+        callback(null);
+    },
+
+    doInput: function(callback) {
+        callback(null, []);
+    },
+
+    doOutput: function(items, callback) {
+        callback(null);
+    }
 }, {
     // Get instances of all available washers.
     getAllWashers: function(callback) {
