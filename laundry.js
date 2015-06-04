@@ -408,27 +408,28 @@ var Laundry = Backbone.Model.extend({
                             that.list();
                             callback(jobName);
                         } else {
+                            log.info(job.get('name') + " - starting");
                             callback(null, job);
                         }
                     });
                 },
 
                 function(job, callback) {
-                    log.info(job.get('name') + " - running authorize - " + job.get('input').get('name'));
+                    log.info(job.get('name') + "/" + job.get('input').get('name') + " - authorize");
                     job.get('input').doAuthorize(function(err) {
                         callback(err, job);
                     });
                 },
 
                 function(job, callback) {
-                    log.info(job.get('name') + " - running input - " + job.get('input').get('name'));
+                    log.info(job.get('name') + "/" + job.get('input').get('name') + " - input");
                     job.get('input').doInput(function(err, items) {
                         callback(err, job, items);
                     });
                 },
 
                 function(job, items, callback) {
-                    log.info(job.get('name') + " - running output - " + job.get('output').get('name'));
+                    log.info(job.get('name') + "/" + job.get('output').get('name') + " - output");
                     job.get('output').doOutput(items, function(err) {
                         callback(err, job);
                     });
