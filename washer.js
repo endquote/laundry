@@ -13,19 +13,19 @@ var Washer = function(config) {
             this[i] = config[i];
         }
     }
-}
+};
 
 Washer.prototype.doAuthorize = function(callback) {
     callback(null);
-}
+};
 
 Washer.prototype.doInput = function(callback) {
     callback(null, []);
-}
+};
 
 Washer.prototype.doOutput = function(items, callback) {
     callback(null);
-}
+};
 
 // Get instances of all available washers.
 Washer.getAllWashers = function(callback) {
@@ -37,7 +37,7 @@ Washer.getAllWashers = function(callback) {
     var p = path.join(__dirname, 'washers');
     fs.readdir(p, function(err, files) {
         files.forEach(function(file) {
-            var file = path.resolve(path.join(p, file));
+            file = path.resolve(path.join(p, file));
             if (path.extname(file) === '.js') {
                 var w = require(file);
                 washers.push(new w());
@@ -46,7 +46,7 @@ Washer.getAllWashers = function(callback) {
 
         callback(washers);
     });
-}
+};
 
 // Attempt to coerce configuration values into valid values.
 Washer.validateField = function(type, value, callback) {
@@ -80,6 +80,6 @@ Washer.validateField = function(type, value, callback) {
     } else {
         callback(value);
     }
-}
+};
 
 module.exports = Washer;

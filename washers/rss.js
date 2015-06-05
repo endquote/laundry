@@ -39,8 +39,8 @@ var rss = function(config) {
             type: 'string',
             prompt: 'What do you want the title of the output feed to be?'
         }]
-    }
-}
+    };
+};
 
 rss.prototype = _.create(Washer.prototype, {
     constructor: rss
@@ -74,7 +74,7 @@ rss.prototype.doInput = function(callback) {
         var meta = this.meta;
         var item;
 
-        while (item = stream.read()) {
+        while (item = stream.read()) { // jshint ignore:line
             items.push(new Item({
                 title: item.title,
                 description: item.description,
@@ -89,7 +89,7 @@ rss.prototype.doInput = function(callback) {
     feedparser.on('end', function(err) {
         callback(err, items);
     });
-}
+};
 
 // Format items as an RSS feed and write them to disk.
 rss.prototype.doOutput = function(items, callback) {
@@ -118,7 +118,7 @@ rss.prototype.doOutput = function(items, callback) {
 
     fs.writeFile(this.file, xml, function(err) {
         callback(err);
-    })
-}
+    });
+};
 
 module.exports = rss;

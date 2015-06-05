@@ -10,9 +10,10 @@ function Job(config) {
     this.output = null;
     this.filter = null;
 
+    var washer = null;
     if (config.input) {
         try {
-            var washer = require('./washers/' + config.input.name);
+            washer = require('./washers/' + config.input.name);
             this.input = new washer(config.input);
         } catch (e) {
             console.log(e);
@@ -21,7 +22,7 @@ function Job(config) {
 
     if (config.output) {
         try {
-            var washer = require('./washers/' + config.output.name);
+            washer = require('./washers/' + config.output.name);
             this.output = new washer(config.output);
         } catch (e) {}
     }
@@ -30,18 +31,18 @@ function Job(config) {
 // Save the job file to disk.
 Job.prototype.save = function(callback) {
     fs.writeFile(Job.getPath(this.name), JSON.stringify(this.toJSON(), null, 4), callback);
-}
+};
 
 Job.prototype.del = function(callback) {
     fs.unlink(Job.getPath(this.name), callback);
-}
+};
 
 // Return the file path for the job file.
 Job.getPath = function(jobName) {
     var configFile = sanitize(jobName) + '.json';
     var filePath = path.join($$configFolder, configFile);
     return filePath;
-}
+};
 
 // Return an existing job object, or create a new one.
 Job.getJob = function(jobName, callback) {
@@ -70,7 +71,7 @@ Job.getJob = function(jobName, callback) {
             callback(job);
         });
     });
-}
+};
 
 // Return an array of all job objects.
 Job.getAllJobs = function(callback) {
@@ -107,8 +108,8 @@ Job.getAllJobs = function(callback) {
 
         }, function(err) {
             callback(jobs);
-        })
+        });
     });
-}
+};
 
 module.exports = Job;

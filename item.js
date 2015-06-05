@@ -13,6 +13,6 @@ var Item = function(config) {
             this[i] = config[i];
         }
     }
-}
+};
 
 module.exports = Item;
