@@ -1,3 +1,7 @@
+/* jslint node: true */
+/* jshint strict: true */
+'use strict';
+
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var async = require('async'); // https://www.npmjs.com/package/async
@@ -53,23 +57,23 @@ Laundry.prototype.doCommand = function(command, job) {
 
 // Output version info.
 Laundry.prototype.version = function() {
-    var package = require('./package.json');
+    var p = require('./package.json');
     var docs = '';
-    docs += '\nLaundry version ' + package.version + '\n';
+    docs += '\nLaundry version ' + p.version + '\n';
     console.log(docs);
 };
 
 // Output help text.
 Laundry.prototype.help = function() {
     this.version();
-    var package = require('./package.json');
+    var p = require('./package.json');
     var docs = '';
     docs += 'The available commands for laundry are as follows: \n\n';
     for (var i in this._commands) {
         docs += 'laundry ' + this._commands[i] + '\n';
     }
 
-    docs += '\nFor more info see ' + package.homepage + '\n';
+    docs += '\nFor more info see ' + p.homepage + '\n';
     console.log(docs);
 };
 

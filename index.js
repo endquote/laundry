@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+/* jslint node: true */
+/* jshint strict: true */
+'use strict';
+
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var log = require('winston'); // https://github.com/winstonjs/winston
@@ -30,7 +34,7 @@ var configFolder = path.join(home, '.laundry');
 if (!fs.existsSync(configFolder)) {
     fs.mkdirSync(configFolder);
 }
-global.$$configFolder = configFolder;
+global.configFolder = configFolder;
 
 // Do stuff
 var laundry = require('./laundry');

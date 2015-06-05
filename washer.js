@@ -1,3 +1,7 @@
+/* jslint node: true */
+/* jshint strict: true */
+'use strict';
+
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
@@ -39,8 +43,8 @@ Washer.getAllWashers = function(callback) {
         files.forEach(function(file) {
             file = path.resolve(path.join(p, file));
             if (path.extname(file) === '.js') {
-                var w = require(file);
-                washers.push(new w());
+                var W = require(file);
+                washers.push(new W());
             }
         });
 

@@ -1,3 +1,7 @@
+/* jslint node: true */
+/* jshint strict: true */
+'use strict';
+
 // Basic class representing an item from anywhere.
 var Item = function(config) {
     this.title = null;

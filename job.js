@@ -1,3 +1,7 @@
+/* jslint node: true */
+/* jshint strict: true */
+'use strict';
+
 var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sanitize-filename
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
@@ -10,11 +14,11 @@ function Job(config) {
     this.output = null;
     this.filter = null;
 
-    var washer = null;
+    var Washer = null;
     if (config.input) {
         try {
-            washer = require('./washers/' + config.input.name);
-            this.input = new washer(config.input);
+            Washer = require('./washers/' + config.input.name);
+            this.input = new Washer(config.input);
         } catch (e) {
             console.log(e);
         }
@@ -22,8 +26,8 @@ function Job(config) {
 
     if (config.output) {
         try {
-            washer = require('./washers/' + config.output.name);
-            this.output = new washer(config.output);
+            Washer = require('./washers/' + config.output.name);
+            this.output = new Washer(config.output);
         } catch (e) {}
     }
 }
@@ -40,7 +44,7 @@ Job.prototype.del = function(callback) {
 // Return the file path for the job file.
 Job.getPath = function(jobName) {
     var configFile = sanitize(jobName) + '.json';
-    var filePath = path.join($$configFolder, configFile);
+    var filePath = path.join(global.configFolder, configFile);
     return filePath;
 };
 
@@ -80,7 +84,7 @@ Job.getAllJobs = function(callback) {
     }
 
     var jobs = [];
-    fs.readdir($$configFolder, function(err, files) {
+    fs.readdir(global.configFolder, function(err, files) {
         if (err || !files.length) {
             callback(jobs);
             return;
@@ -92,7 +96,7 @@ Job.getAllJobs = function(callback) {
                 return;
             }
 
-            var filePath = path.join($$configFolder, item);
+            var filePath = path.join(global.configFolder, item);
             fs.stat(filePath, function(err, stats) {
                 if (!stats.isFile()) {
                     callback();
