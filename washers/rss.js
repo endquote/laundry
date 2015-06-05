@@ -4,7 +4,7 @@ var request = require('request'); // https://www.npmjs.com/package/request
 var moment = require('moment'); // http://momentjs.com/docs/
 
 var FeedParser = require('feedparser'); // https://www.npmjs.com/package/feedparser
-var RSS = require('rss'); // https://www.npmjs.com/package/rss
+var RSSWriter = require('rss'); // https://www.npmjs.com/package/rss
 
 var Washer = require('../washer');
 var Item = require('../item');
@@ -15,9 +15,9 @@ input: converts an RSS/Atom/RDF file on the internet into Items
 output: writes an array of Items to an RSS feed on disk
 */
 
-var rss = function(config) {
+var RSS = function(config) {
     Washer.call(this, config);
-    this.name = 'rss';
+    this.name = 'RSS';
 
     this.input = {
         description: 'Loads data from an RSS feed.',
@@ -42,12 +42,12 @@ var rss = function(config) {
     };
 };
 
-rss.prototype = _.create(Washer.prototype, {
-    constructor: rss
+RSS.prototype = _.create(Washer.prototype, {
+    constructor: RSS
 });
 
 // Request the feed, parse it into items, and pass it to the output washer.
-rss.prototype.doInput = function(callback) {
+RSS.prototype.doInput = function(callback) {
     var req = request(this.url);
     var feedparser = new FeedParser();
     var items = [];
@@ -75,7 +75,7 @@ rss.prototype.doInput = function(callback) {
         var item;
 
         while (item = stream.read()) { // jshint ignore:line
-            items.push(new Item({
+            items.push(new RSS.Item({
                 title: item.title,
                 description: item.description,
                 url: item.link,
@@ -92,8 +92,8 @@ rss.prototype.doInput = function(callback) {
 };
 
 // Format items as an RSS feed and write them to disk.
-rss.prototype.doOutput = function(items, callback) {
-    var feed = new RSS({
+RSS.prototype.doOutput = function(items, callback) {
+    var feed = new RSSWriter({
         title: this.feedname,
         description: this.feedname,
         feed_url: 'http://github.com/endquote/laundry',
@@ -121,4 +121,19 @@ rss.prototype.doOutput = function(items, callback) {
     });
 };
 
-module.exports = rss;
+RSS.Item = function(config) {
+    this.title = null;
+    this.description = null;
+    this.url = null;
+    this.date = null;
+    this.author = null;
+    this.tags = null;
+
+    Item.call(this, config);
+};
+
+RSS.Item.prototype = _.create(Item.prototype, {
+    constructor: RSS.Item
+});
+
+module.exports = RSS;
