@@ -1,5 +1,4 @@
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
-var Backbone = require('Backbone'); // http://backbonejs.org/
 var _ = require('lodash'); // https://lodash.com/docs
 var request = require('request'); // https://www.npmjs.com/package/request
 var moment = require('moment'); // http://momentjs.com/docs/
@@ -10,21 +9,26 @@ var RSS = require('rss'); // https://www.npmjs.com/package/rss
 var Washer = require('../washer');
 var Item = require('../item');
 
-rss = Washer.extend({
-    defaults: {
-        name: 'rss'
-    },
+/*
+RSS washer
+input: converts an RSS/Atom/RDF file on the internet into Items
+output: writes an array of Items to an RSS feed on disk
+*/
 
-    input: {
+var rss = function(config) {
+    Washer.call(this, config);
+    this.name = 'rss';
+
+    this.input = {
         description: 'Loads data from an RSS feed.',
         settings: [{
             name: 'url',
             type: 'url',
             prompt: 'What RSS feed URL do you want to launder?'
         }]
-    },
+    };
 
-    output: {
+    this.output = {
         description: 'Writes data to an RSS feed on disk.',
         settings: [{
             name: 'file',
@@ -35,83 +39,86 @@ rss = Washer.extend({
             type: 'string',
             prompt: 'What do you want the title of the output feed to be?'
         }]
-    },
-
-    // Request the feed, parse it into items, and pass it to the output washer.
-    doInput: function(callback) {
-        var req = request(this.get('url'));
-        var feedparser = new FeedParser();
-        var items = [];
-
-        req.on('error', function(err) {
-            callback(err);
-        });
-
-        req.on('response', function(res) {
-            var stream = this;
-            if (res.statusCode != 200) {
-                callback(new Error('Bad status code'));
-            }
-
-            stream.pipe(feedparser);
-        });
-
-        feedparser.on('error', function(err) {
-            callback(err);
-        });
-
-        feedparser.on('readable', function() {
-            var stream = this;
-            var meta = this.meta;
-            var item;
-
-            while (item = stream.read()) {
-                items.push(new Item({
-                    title: item.title,
-                    description: item.description,
-                    url: item.link,
-                    date: moment(item.date),
-                    author: item.author,
-                    tags: item.categories
-                }));
-            }
-        });
-
-        feedparser.on('end', function(err) {
-            callback(err, items);
-        });
-    },
-
-    // Format items as an RSS feed and write them to disk.
-    doOutput: function(items, callback) {
-        var feed = new RSS({
-            title: this.get('feedname'),
-            description: this.get('feedname'),
-            feed_url: 'http://github.com/endquote/laundry',
-            site_url: 'http://github.com/endquote/laundry',
-            generator: 'Laundry'
-        });
-
-        items.forEach(function(item) {
-            feed.item({
-                title: item.get('title'),
-                description: item.get('description'),
-                url: item.get('url'),
-                date: item.get('date').toDate(),
-                author: item.get('author'),
-                categories: item.get('tags')
-            });
-        });
-
-        var xml = feed.xml({
-            indent: true
-        });
-
-        fs.writeFile(this.get('file'), xml, function(err) {
-            callback(err);
-        })
     }
+}
+
+rss.prototype = _.create(Washer.prototype, {
+    constructor: rss
 });
 
-_.merge(Washer.prototype.defaults, rss.prototype.defaults);
+// Request the feed, parse it into items, and pass it to the output washer.
+rss.prototype.doInput = function(callback) {
+    var req = request(this.url);
+    var feedparser = new FeedParser();
+    var items = [];
+
+    req.on('error', function(err) {
+        callback(err);
+    });
+
+    req.on('response', function(res) {
+        var stream = this;
+        if (res.statusCode != 200) {
+            callback(new Error('Bad status code'));
+        }
+
+        stream.pipe(feedparser);
+    });
+
+    feedparser.on('error', function(err) {
+        callback(err);
+    });
+
+    feedparser.on('readable', function() {
+        var stream = this;
+        var meta = this.meta;
+        var item;
+
+        while (item = stream.read()) {
+            items.push(new Item({
+                title: item.title,
+                description: item.description,
+                url: item.link,
+                date: moment(item.date),
+                author: item.author,
+                tags: item.categories
+            }));
+        }
+    });
+
+    feedparser.on('end', function(err) {
+        callback(err, items);
+    });
+}
+
+// Format items as an RSS feed and write them to disk.
+rss.prototype.doOutput = function(items, callback) {
+    var feed = new RSS({
+        title: this.feedname,
+        description: this.feedname,
+        feed_url: 'http://github.com/endquote/laundry',
+        site_url: 'http://github.com/endquote/laundry',
+        generator: 'Laundry'
+    });
+
+    items.forEach(function(item) {
+        feed.item({
+            title: item.title,
+            description: item.description,
+            url: item.url,
+            date: item.date.toDate(),
+            author: item.author,
+            categories: item.tags
+        });
+    });
+
+    var xml = feed.xml({
+        indent: true
+    });
+
+    fs.writeFile(this.file, xml, function(err) {
+        callback(err);
+    })
+}
+
 module.exports = rss;

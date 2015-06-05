@@ -1,4 +1,5 @@
 // TODO: (0) Ditch backbone for plain JS
+// TODO: (1) Different object types for each input? Outputs specify which they can deal with?
 // TODO: Set up the daemon or tick automatically?
 // TODO: Set up file logging
 // TODO: verbs: star, comment, like, download, reblog, etc

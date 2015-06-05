@@ -1,18 +1,18 @@
-var Backbone = require('Backbone'); // http://backbonejs.org/
-
 // Basic class representing an item from anywhere.
-var Item = Backbone.Model.extend({
+var Item = function(config) {
+    this.title = null;
+    this.description = null;
+    this.url = null;
+    this.date = null;
+    this.author = null;
+    this.tags = null;
+    this.verbs = null;
 
-    defaults: {
-        title: null,
-        description: null,
-        url: null,
-        date: null,
-        author: null,
-        tags: null,
-        verbs: null
+    if (config) {
+        for (var i in config) {
+            this[i] = config[i];
+        }
     }
-
-});
+}
 
 module.exports = Item;
