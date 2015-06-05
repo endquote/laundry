@@ -135,7 +135,7 @@ Laundry.prototype.create = function(jobName) {
         // Get the job
         function(rl, jobName, callback) {
             var job = allJobs.filter(function(job) {
-                return job.name.toLowerCase() == jobName.toLowerCase();
+                return job && job.name.toLowerCase() == jobName.toLowerCase();
             })[0];
             if (job) {
                 rl.write(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.\n", jobName), that._wrapOpts));
@@ -220,7 +220,7 @@ Laundry.prototype.create = function(jobName) {
                                 callback();
                             });
                         });
-                        rl.write(washer.get(item.name));
+                        rl.write(washer[item.name]);
                     }, function(err) {
                         callback(err);
                     });
@@ -300,7 +300,7 @@ Laundry.prototype.create = function(jobName) {
                                 callback();
                             });
                         });
-                        rl.write(washer.get(item.name));
+                        rl.write(washer[item.name]);
                     }, function(err) {
                         callback(err);
                     });
@@ -398,7 +398,7 @@ Laundry.prototype.edit = function(jobName) {
 };
 
 // Run a job.
-Laundry.prototype.run = function(jobName) {
+Laundry.prototype.run = function(jobName, callback) {
     if (!jobName) {
         console.log("Specify a job to run with " + chalk.bold("laundry run [job]") + ".\n");
         this.list();
@@ -406,49 +406,93 @@ Laundry.prototype.run = function(jobName) {
     }
 
     var that = this;
-
+    var allJobs = null;
     async.waterfall([
+
+            // Get all jobs.
+            function(callback) {
+                Job.getAllJobs(function(jobs) {
+                    allJobs = jobs;
+                    callback();
+                });
+            },
 
             // Find the requested job.
             function(callback) {
-                Job.getJob(jobName, function(job) {
-                    if (!job) {
-                        console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
-                        that.list();
-                        callback(jobName);
-                    } else {
-                        log.info(job.name + " - starting");
-                        callback(null, job);
-                    }
-                });
+                var job = allJobs.filter(function(job) {
+                    return job.name.toLowerCase() == jobName.toLowerCase();
+                })[0];
+                if (!job) {
+                    console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
+                    that.list();
+                    callback(jobName);
+                } else {
+                    callback(null, job);
+                }
             },
 
+            // Add any jobs which are scheduled to run after others.
             function(job, callback) {
-                log.info(job.name + "/" + job.input.name + " - authorize");
-                job.input.doAuthorize(function(err) {
-                    callback(err, job);
-                });
+                var runJobs = [job];
+                var foundJobs = false;
+                do {
+                    foundJobs = false;
+                    var runJobNames = runJobs.map(function(job, index, a) {
+                        return job.name.toLowerCase();
+                    }); // jshint ignore:line
+                    allJobs.forEach(function(job) {
+                        if (runJobs.indexOf(job) == -1) {
+                            var name = job.schedule ? job.schedule.toString() : '';
+                            name = name.toLowerCase();
+                            var index = runJobNames.indexOf(name);
+                            if (index != -1) {
+                                runJobs.splice(index + 1, 0, job);
+                                foundJobs = true;
+                            }
+                        }
+                    }); // jshint ignore:line
+                } while (foundJobs);
+                callback(null, runJobs);
             },
 
-            function(job, callback) {
-                log.info(job.name + "/" + job.input.name + " - input");
-                job.input.doInput(function(err, items) {
-                    callback(err, job, items);
-                });
-            },
+            // Run all the jobs
+            function(jobs, callback) {
+                async.eachSeries(jobs, function(job, callback) {
+                    async.waterfall([
 
-            function(job, items, callback) {
-                log.info(job.name + "/" + job.output.name + " - output");
-                job.output.doOutput(items, function(err) {
-                    callback(err, job);
+                        function(callback) {
+                            log.info(job.name + "/" + job.input.name + " - input");
+                            job.input.doInput(function(err, items) {
+                                callback(err, job, items);
+                            });
+                        },
+
+                        function(job, items, callback) {
+                            log.info(job.name + "/" + job.output.name + " - output");
+                            job.output.doOutput(items, function(err) {
+                                callback(err, job);
+                            });
+                        }
+                    ], function(err, job) {
+                        if (!err) {
+                            job.lastRun = new Date();
+                            job.save();
+                            log.info(job.name + " - complete");
+                        } else {
+                            log.error(job.name + " - error: " + err);
+                        }
+
+                        callback(err, job);
+                    });
+                }, function(err) {
+                    callback(err);
                 });
             }
         ],
-        function(err, job) {
-            if (err) {
-                log.error(job.name + " - error - " + JSON.stringify(err));
+        function(err) {
+            if (callback) {
+                callback(err);
             }
-            log.info(job.name + " - complete");
         });
 };
 
@@ -523,17 +567,19 @@ Laundry.prototype.list = function() {
 
         // TODO: Sort list alphabetically, but with "afters" ordered
         jobs.forEach(function(job) {
-            var schedule = job.schedule;
-            if (!isNaN(parseInt(schedule))) {
-                out += util.format(chalk.bold("%s") + " runs every %d minutes.", job.name, schedule);
-            } else if (schedule.indexOf(':') != -1) {
-                out += util.format(chalk.bold("%s") + " runs every day at %s.", job.name, schedule);
-            } else if (!schedule) {
-                out += util.format(chalk.bold("%s") + " runs manually.", job.name);
-            } else {
-                out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.name, schedule);
+            if (job) {
+                var schedule = job.schedule;
+                if (typeof schedule == 'number') {
+                    out += util.format(chalk.bold("%s") + " runs every %d minutes.", job.name, schedule);
+                } else if (!schedule) {
+                    out += util.format(chalk.bold("%s") + " runs manually.", job.name);
+                } else if (schedule.indexOf(':') != -1) {
+                    out += util.format(chalk.bold("%s") + " runs every day at %s.", job.name, schedule);
+                } else {
+                    out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.name, schedule);
+                }
+                out += '\n';
             }
-            out += '\n';
         });
 
         console.log(out);
@@ -542,7 +588,61 @@ Laundry.prototype.list = function() {
 
 // Run jobs according to their schedule.
 Laundry.prototype.tick = function() {
+    var now = moment();
+    var that = this;
 
+    async.waterfall([
+
+        // Get all the jobs
+        function(callback) {
+            Job.getAllJobs(function(jobs) {
+                callback(null, jobs);
+            });
+        },
+
+        // Get the jobs that are due to run on schedule
+        function(jobs, callback) {
+
+            jobs = jobs.filter(function(job) {
+                if (!job.schedule) {
+                    return false;
+                }
+
+                if (typeof(job.schedule) == 'number') {
+                    // every n minutes
+                    return !job.lastRun || now.diff(job.lastRun, 'minutes') >= job.schedule;
+
+                } else if (job.schedule.indexOf(':') != -1) {
+                    // after a specific time
+                    var time = moment({
+                        hour: job.schedule.split(':')[0],
+                        minute: job.schedule.split(':')[1]
+                    });
+                    return now.isAfter(time) && (!job.lastRun || now.diff(job.lastRun, 'days') >= 1);
+                }
+
+                return false;
+            });
+
+            callback(null, jobs);
+        },
+
+        // Run the jobs
+        function(jobs, callback) {
+            async.eachSeries(jobs, function(job, callback) {
+                that.run(job.name, callback);
+            }, function(err) {
+                if (!jobs.length) {
+                    log.info('No jobs to run.');
+                }
+                callback(err);
+            });
+        }
+    ], function(err) {
+        if (err) {
+            log.error(err);
+        }
+    });
 };
 
 // Run continuously and serve up generated static content.

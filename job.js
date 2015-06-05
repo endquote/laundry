@@ -6,13 +6,15 @@ var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sa
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var async = require('async'); // https://www.npmjs.com/package/async
+var moment = require('moment'); // http://momentjs.com/docs/
 
 function Job(config) {
     this.name = config ? config.name : null;
     this.schedule = config ? config.schedule : null;
+    this.lastRun = config && config.lastRun ? moment(config.lastRun) : null;
+    this.filter = config ? config.filter : null;
     this.input = null;
     this.output = null;
-    this.filter = null;
 
     var Washer = null;
     if (config.input) {
@@ -34,7 +36,9 @@ function Job(config) {
 
 // Save the job file to disk.
 Job.prototype.save = function(callback) {
-    fs.writeFile(Job.getPath(this.name), JSON.stringify(this.toJSON(), null, 4), callback);
+    fs.writeFile(Job.getPath(this.name), JSON.stringify(this, function(key, value) {
+        return value && value.stringify && value.stringify instanceof Function ? value.stringify() : value;
+    }, 4), callback);
 };
 
 Job.prototype.del = function(callback) {
@@ -69,7 +73,9 @@ Job.getJob = function(jobName, callback) {
             if (!err) {
                 try {
                     var config = JSON.parse(data);
-                    job = new Job(config);
+                    if (config.name) {
+                        job = new Job(config);
+                    }
                 } catch (e) {}
             }
             callback(job);

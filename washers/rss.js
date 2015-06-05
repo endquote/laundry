@@ -51,22 +51,29 @@ RSS.prototype.doInput = function(callback) {
     var req = request(this.url);
     var feedparser = new FeedParser();
     var items = [];
+    var called = false;
 
     req.on('error', function(err) {
-        callback(err);
+        if (!called) {
+            called = true;
+            callback(err);
+        }
     });
 
     req.on('response', function(res) {
         var stream = this;
         if (res.statusCode != 200) {
-            callback(new Error('Bad status code'));
+            callback(new Error('Bad URL?'));
         }
 
         stream.pipe(feedparser);
     });
 
     feedparser.on('error', function(err) {
-        callback(err);
+        if (!called) {
+            called = true;
+            callback(err);
+        }
     });
 
     feedparser.on('readable', function() {
@@ -87,7 +94,10 @@ RSS.prototype.doInput = function(callback) {
     });
 
     feedparser.on('end', function(err) {
-        callback(err, items);
+        if (!called) {
+            called = true;
+            callback(err, items);
+        }
     });
 };
 

@@ -6,6 +6,7 @@ var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 var touch = require('touch'); // https://github.com/isaacs/node-touch
+var _ = require('lodash'); // https://lodash.com/docs
 
 var Washer = function(config) {
     this.name = null;
@@ -19,8 +20,12 @@ var Washer = function(config) {
     }
 };
 
-Washer.prototype.doAuthorize = function(callback) {
-    callback(null);
+// Remove stuff from the washer that's saved to disk.
+Washer.prototype.stringify = function() {
+    var c = _.clone(this);
+    delete c.input;
+    delete c.output;
+    return c;
 };
 
 Washer.prototype.doInput = function(callback) {
