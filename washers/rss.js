@@ -1,3 +1,7 @@
+/* jslint node: true */
+/* jshint strict: true */
+'use strict';
+
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var _ = require('lodash'); // https://lodash.com/docs
 var request = require('request'); // https://www.npmjs.com/package/request

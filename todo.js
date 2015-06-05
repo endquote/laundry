@@ -1,40 +1,43 @@
-// TODO: Set up the daemon or tick automatically?
+// TODO: Implement daemon command
+// TODO: Implement filters
 // TODO: Set up file logging
-// TODO: verbs: star, comment, like, download, reblog, etc
-// TODO: deploy builds from github as single binaries, enclosejs.com
-// TODO: easy global reblog
+// TODO: "Run at startup" feature?
 
 /*
 
-rss.js
-google-base.js
-google-youtube-subscriptions.js
-google-gmail-search.js
-twitter-base.js
-twitter-timeline.js
-twitter-list.js
-instagram-base.js
-instagram-timeline.js
-instagram-notifications.js
-json.js
-sqlite.js
-email.js
-socket.io.js
-sms.js
-dropbox-base.js
-dropbox-files.js
-facebook-base.js
-facebook-notifications.js
-facebook-group.js
-filter.js
-swarm.js
-soundcloud.js
-tumblr-base.js
-tumblr-following.js
-tumblr-notifications.js
-pinterest-base.js
-pinterest-following.js
-pinterest-notifications.js
+google-base
+google-youtube-subscriptions
+google-gmail-search
+
+instagram-base
+instagram-timeline
+instagram-notifications
+
+twitter-base
+twitter-timeline
+twitter-list
+
+facebook-base
+facebook-notifications
+facebook-group
+
+tumblr-base
+tumblr-following
+tumblr-notifications
+
+soundcloud
+
+swarm
+json
+sqlite
+email
+socket.io
+sms
+dropbox-base
+dropbox-files
+pinterest-base
+pinterest-following
+pinterest-notifications
 ...
 slack
 git 

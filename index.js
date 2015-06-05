@@ -8,10 +8,25 @@ var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var log = require('winston'); // https://github.com/winstonjs/winston
 
+// Make config folder
+var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+var configFolder = path.join(home, '.laundry');
+if (!fs.existsSync(configFolder)) {
+    fs.mkdirSync(configFolder);
+    fs.mkdirSync(path.join(configFolder, 'logs'));
+}
+global.configFolder = configFolder;
+
 // Configure logging
 log.remove(log.transports.Console);
 log.add(log.transports.Console, {
     colorize: true
+});
+log.add(log.transports.DailyRotateFile, {
+    filename: path.join(configFolder, 'logs', 'laundry'),
+    json: false,
+    datePattern: '.yyyy-MM-dd.log',
+    maxFiles: 90
 });
 log.level = 'debug';
 
@@ -27,14 +42,6 @@ var job = '';
 if (args.length > 0) {
     job = args.shift().trim().toLowerCase();
 }
-
-// Make config folder
-var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-var configFolder = path.join(home, '.laundry');
-if (!fs.existsSync(configFolder)) {
-    fs.mkdirSync(configFolder);
-}
-global.configFolder = configFolder;
 
 // Do stuff
 var laundry = require('./laundry');
