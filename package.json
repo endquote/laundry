@@ -27,6 +27,7 @@
     "request": "^2.57.0",
     "rss": "^1.1.1",
     "sanitize-filename": "^1.3.0",
+    "simple-namespace": "^0.2.0",
     "touch": "0.0.3",
     "winston": "^1.0.0",
     "word-wrap": "^1.0.3"

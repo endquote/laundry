@@ -3,9 +3,11 @@
 'use strict';
 
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
+var path = require('path'); // https://nodejs.org/api/path.html
 var _ = require('lodash'); // https://lodash.com/docs
 var request = require('request'); // https://www.npmjs.com/package/request
 var moment = require('moment'); // http://momentjs.com/docs/
+var ns = require('simple-namespace'); // https://www.npmjs.com/package/simple-namespace
 
 var FeedParser = require('feedparser'); // https://www.npmjs.com/package/feedparser
 var RSSWriter = require('rss'); // https://www.npmjs.com/package/rss
@@ -19,9 +21,12 @@ input: converts an RSS/Atom/RDF file on the internet into Items
 output: writes an array of Items to an RSS feed on disk
 */
 
-var RSS = function(config) {
+ns('Washers', global);
+Washers.RSS = function(config) {
     Washer.call(this, config);
+
     this.name = 'RSS';
+    this.classFile = path.basename(__filename);
 
     this.input = {
         description: 'Loads data from an RSS feed.',
@@ -46,12 +51,12 @@ var RSS = function(config) {
     };
 };
 
-RSS.prototype = _.create(Washer.prototype, {
-    constructor: RSS
+Washers.RSS.prototype = _.create(Washer.prototype, {
+    constructor: Washers.RSS
 });
 
 // Request the feed, parse it into items, and pass it to the output washer.
-RSS.prototype.doInput = function(callback) {
+Washers.RSS.prototype.doInput = function(callback) {
     var req = request(this.url);
     var feedparser = new FeedParser();
     var items = [];
@@ -86,7 +91,7 @@ RSS.prototype.doInput = function(callback) {
         var item;
 
         while (item = stream.read()) { // jshint ignore:line
-            items.push(new RSS.Item({
+            items.push(new Washers.RSS.Item({
                 title: item.title,
                 description: item.description,
                 url: item.link,
@@ -106,7 +111,7 @@ RSS.prototype.doInput = function(callback) {
 };
 
 // Format items as an RSS feed and write them to disk.
-RSS.prototype.doOutput = function(items, callback) {
+Washers.RSS.prototype.doOutput = function(items, callback) {
     var feed = new RSSWriter({
         title: this.feedname,
         description: this.feedname,
@@ -115,16 +120,18 @@ RSS.prototype.doOutput = function(items, callback) {
         generator: 'Laundry'
     });
 
-    items.forEach(function(item) {
-        feed.item({
-            title: item.title,
-            description: item.description,
-            url: item.url,
-            date: item.date.toDate(),
-            author: item.author,
-            categories: item.tags
+    if (items) {
+        items.forEach(function(item) {
+            feed.item({
+                title: item.title,
+                description: item.description,
+                url: item.url,
+                date: item.date.toDate(),
+                author: item.author,
+                categories: item.tags
+            });
         });
-    });
+    }
 
     var xml = feed.xml({
         indent: true
@@ -135,7 +142,7 @@ RSS.prototype.doOutput = function(items, callback) {
     });
 };
 
-RSS.Item = function(config) {
+Washers.RSS.Item = function(config) {
     this.title = null;
     this.description = null;
     this.url = null;
@@ -146,8 +153,8 @@ RSS.Item = function(config) {
     Item.call(this, config);
 };
 
-RSS.Item.prototype = _.create(Item.prototype, {
-    constructor: RSS.Item
+Washers.RSS.Item.prototype = _.create(Item.prototype, {
+    constructor: Washers.RSS.Item
 });
 
-module.exports = RSS;
+module.exports = Washers.RSS;

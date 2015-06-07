@@ -25,7 +25,7 @@ function Laundry() {
         'run': 'run [job] -- run an existing job',
         'destroy': 'destroy -- destroy an existing job',
         'list': 'list -- list configured jobs',
-        'tick': 'tick -- run on an interval to execute scheduled jobs',
+        'tick': 'tick -- run on an interval to run scheduled jobs',
         'server': 'server [port] -- run continuously and serve up generated static content',
         'version': 'version -- output version info',
         'help': 'help -- this help text'
@@ -163,10 +163,10 @@ Laundry.prototype.create = function(jobName) {
         function(rl, job, callback) {
             var washersList = '';
             validWashers.forEach(function(washer) {
-                washersList += util.format(chalk.bold("%s") + " - %s", washer.name, washer.input.description);
+                washersList += util.format(chalk.bold("%s") + " - %s\n", washer.name, washer.input.description);
             });
 
-            var list = util.format("Now to decide where to launder data from. The sources we have are:\n%s\n\n", washersList);
+            var list = util.format("Now to decide where to launder data from. The sources we have are:\n%s\n", washersList);
             rl.write("\n" + wrap(list, that._wrapOpts));
 
             var washer = null;

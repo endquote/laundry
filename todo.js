@@ -1,12 +1,13 @@
 // TODO: Implement daemon command
-// TODO: Implement filters
-// TODO: Set up file logging
+// TODO: Implement filters?
 // TODO: "Run at startup" feature?
+// TODO: RSS: group by hour/day/etc
 
 /*
 
-google-base
+google
 google-youtube-subscriptions
+google-youtube-channel
 google-gmail-search
 
 instagram-base

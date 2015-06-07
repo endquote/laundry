@@ -3,6 +3,7 @@
 'use strict';
 
 var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sanitize-filename
+var _ = require('lodash'); // https://lodash.com/docs
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
 var path = require('path'); // https://nodejs.org/api/path.html
 var async = require('async'); // https://www.npmjs.com/package/async
@@ -19,7 +20,7 @@ function Job(config) {
     var Washer = null;
     if (config.input) {
         try {
-            Washer = require('./washers/' + config.input.name);
+            Washer = require('./washers/' + config.input.classFile);
             this.input = new Washer(config.input);
         } catch (e) {
             console.log(e);
@@ -28,7 +29,7 @@ function Job(config) {
 
     if (config.output) {
         try {
-            Washer = require('./washers/' + config.output.name);
+            Washer = require('./washers/' + config.output.classFile);
             this.output = new Washer(config.output);
         } catch (e) {}
     }
@@ -117,6 +118,7 @@ Job.getAllJobs = function(callback) {
             });
 
         }, function(err) {
+            jobs = _.sortBy(jobs, 'name');
             callback(jobs);
         });
     });
