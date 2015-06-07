@@ -3,9 +3,9 @@
 'use strict';
 
 var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
+var _ = require('lodash'); // https://lodash.com/docs
 var request = require('request'); // https://www.npmjs.com/package/request
 var moment = require('moment'); // http://momentjs.com/docs/
-var util = require('util'); // https://nodejs.org/docs/latest/api/util.html
 
 var FeedParser = require('feedparser'); // https://www.npmjs.com/package/feedparser
 var RSSWriter = require('rss'); // https://www.npmjs.com/package/rss
@@ -46,7 +46,9 @@ var RSS = function(config) {
     };
 };
 
-util.inherits(Washer, RSS);
+RSS.prototype = _.create(Washer.prototype, {
+    constructor: RSS
+});
 
 // Request the feed, parse it into items, and pass it to the output washer.
 RSS.prototype.doInput = function(callback) {
@@ -144,6 +146,8 @@ RSS.Item = function(config) {
     Item.call(this, config);
 };
 
-util.inherits(Item, RSS.Item);
+RSS.Item.prototype = _.create(Item.prototype, {
+    constructor: RSS.Item
+});
 
 module.exports = RSS;
