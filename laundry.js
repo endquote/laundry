@@ -143,12 +143,14 @@ Laundry.prototype.create = function(jobName) {
 
         // A: Get all the washers and filter by the ones that support input.
         function(rl, job, callback) {
-            Washer.getAllWashers(function(washers) {
-                validWashers = washers.filter(function(washer) {
-                    return washer.input;
-                });
-                callback(null, rl, job);
+            validWashers = [];
+            allWashers.toArray().forEach(function(W) {
+                var w = new W();
+                if (w.input) {
+                    validWashers.push(w);
+                }
             });
+            callback(null, rl, job);
         },
 
         // B: Ask for the input washer.
@@ -223,12 +225,14 @@ Laundry.prototype.create = function(jobName) {
 
         // A: Get all the washers and filter by the ones that support output.
         function(rl, job, callback) {
-            Washer.getAllWashers(function(washers) {
-                validWashers = washers.filter(function(washer) {
-                    return washer.output;
-                });
-                callback(null, rl, job);
+            validWashers = [];
+            allWashers.toArray().forEach(function(W) {
+                var w = new W();
+                if (w.output) {
+                    validWashers.push(w);
+                }
             });
+            callback(null, rl, job);
         },
 
         // B: Request the output washer.

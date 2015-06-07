@@ -5,5 +5,6 @@ enclose --config enclose.js --output ./bin/laundry index.js
 */
 
 module.exports = {
-    scripts: "./washers/*.js"
+    scripts: "+(washers|items)/*.js",
+    dirs: ["./washers/*.js", "./items/*.js"]
 };

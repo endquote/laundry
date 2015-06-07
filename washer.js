@@ -54,29 +54,6 @@ Washer.prototype.doOutput = function(items, callback) {
     callback(null);
 };
 
-// Get instances of all available washers.
-Washer.getAllWashers = function(callback) {
-    if (!callback) {
-        return;
-    }
-
-    var washers = [];
-    var p = path.join(__dirname, 'washers');
-    fs.readdir(p, function(err, files) {
-        files.forEach(function(file) {
-            file = path.resolve(path.join(p, file));
-            if (path.extname(file) === '.js') {
-                var W = require(file);
-                washers.push(new W());
-            }
-        });
-
-        washers = _.sortBy(washers, 'name');
-
-        callback(washers);
-    });
-};
-
 // Attempt to coerce configuration values into valid values.
 Washer.validateField = function(type, value, callback) {
     if (!type || !callback) {

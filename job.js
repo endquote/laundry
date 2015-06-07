@@ -7,25 +7,8 @@ function Job(config) {
     this.schedule = config ? config.schedule : null;
     this.lastRun = config && config.lastRun ? moment(config.lastRun) : null;
     this.filter = config ? config.filter : null;
-    this.input = null;
-    this.output = null;
-
-    var Washer = null;
-    if (config.input) {
-        try {
-            Washer = require('./washers/' + config.input.classFile);
-            this.input = new Washer(config.input);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    if (config.output) {
-        try {
-            Washer = require('./washers/' + config.output.classFile);
-            this.output = new Washer(config.output);
-        } catch (e) {}
-    }
+    this.input = config && config.input ? new allWashers[config.input.classFile.replace('.js', '')](config.input) : null;
+    this.output = config && config.output ? new allWashers[config.output.classFile.replace('.js', '')](config.output) : null;
 }
 
 // Save the job file to disk.

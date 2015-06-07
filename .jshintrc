@@ -2,6 +2,13 @@
     "globals":
     {
         "Washers": true, 
+        "Items": true,
+        "Washer": true,
+        "Item": true,
+        "Job": true,
+        "allWashers": true,
+        "allItems": true,
+        
         "_": true,
         "ns": true,
         "fs": true,

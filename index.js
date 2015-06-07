@@ -11,6 +11,20 @@ global.async = require('async'); // https://www.npmjs.com/package/async
 global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
 
+// Load internal classes into the global namespace. (Is this totally bad form?)
+global.Item = require('./item');
+global.Washer = require('./washer');
+global.Job = require('./job');
+
+global.allWashers = {};
+fs.readdirSync(path.join(__dirname, 'washers')).forEach(function(file) {
+    allWashers[file.replace('.js', '')] = require(path.join(__dirname, 'washers', file));
+});
+global.allItems = {};
+fs.readdirSync(path.join(__dirname, 'items')).forEach(function(file) {
+    allItems[file.replace('.js', '')] = require(path.join(__dirname, 'items', file));
+});
+
 // Make config folder
 var home = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 var configFolder = path.join(home, '.laundry');

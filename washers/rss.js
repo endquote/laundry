@@ -1,15 +1,8 @@
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
 var request = require('request'); // https://www.npmjs.com/package/request
-var moment = require('moment'); // http://momentjs.com/docs/
-
 var FeedParser = require('feedparser'); // https://www.npmjs.com/package/feedparser
 var RSSWriter = require('rss'); // https://www.npmjs.com/package/rss
-
-var Washer = require('../washer');
-var Item = require('../item');
 
 /*
 RSS washer
@@ -67,7 +60,7 @@ Washers.RSS.prototype.doInput = function(callback) {
 
     req.on('response', function(res) {
         var stream = this;
-        if (res.statusCode != 200) {
+        if (res.statusCode !== 200) {
             callback(new Error('Bad URL?'));
         }
 
@@ -87,7 +80,7 @@ Washers.RSS.prototype.doInput = function(callback) {
         var item;
 
         while (item = stream.read()) { // jshint ignore:line
-            items.push(new Washers.RSS.Item({
+            items.push(new Items.RSS({
                 title: item.title,
                 description: item.description,
                 url: item.link,
@@ -137,20 +130,5 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
         callback(err);
     });
 };
-
-Washers.RSS.Item = function(config) {
-    this.title = null;
-    this.description = null;
-    this.url = null;
-    this.date = null;
-    this.author = null;
-    this.tags = null;
-
-    Item.call(this, config);
-};
-
-Washers.RSS.Item.prototype = _.create(Item.prototype, {
-    constructor: Washers.RSS.Item
-});
 
 module.exports = Washers.RSS;
