@@ -10,5 +10,10 @@
         "async": true,
         "moment": true,
         "util": true
-    }
+    },
+    "curly": true,
+    "eqeqeq": true,
+    "nocomma": true,
+    "strict": true,
+    "node": true
 }

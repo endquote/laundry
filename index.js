@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
 global.log = require('winston'); // https://github.com/winstonjs/winston
@@ -14,7 +12,7 @@ global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
 
 // Make config folder
-var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+var home = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 var configFolder = path.join(home, '.laundry');
 if (!fs.existsSync(configFolder)) {
     fs.mkdirSync(configFolder);

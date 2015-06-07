@@ -1,5 +1,3 @@
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
 var readline = require('readline'); // https://nodejs.org/api/readline.html
@@ -99,7 +97,7 @@ Laundry.prototype.create = function(jobName) {
                     });
                     completions.sort();
                     completions = completions.filter(function(completion) {
-                        return completion.toLowerCase().indexOf(line) != -1;
+                        return completion.toLowerCase().indexOf(line) !== -1;
                     });
                     return [completions, line];
                 }
@@ -129,7 +127,7 @@ Laundry.prototype.create = function(jobName) {
         // Get the job
         function(rl, jobName, callback) {
             var job = allJobs.filter(function(job) {
-                return job && job.name.toLowerCase() == jobName.toLowerCase();
+                return job && job.name.toLowerCase() === jobName.toLowerCase();
             })[0];
             if (job) {
                 rl.write(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.\n", jobName), that._wrapOpts));
@@ -170,11 +168,11 @@ Laundry.prototype.create = function(jobName) {
                     rl.question(wrap("Which source do you want to use? ", that._wrapOpts), function(answer) {
                         answer = chalk.stripColor(answer).trim();
                         washer = validWashers.filter(function(washer) {
-                            return washer.name.toLowerCase() == answer.toLowerCase();
+                            return washer.name.toLowerCase() === answer.toLowerCase();
                         })[0];
                         if (washer) {
                             rl.write(wrap(util.format("Cool, we'll start with " + chalk.green.bold("%s") + ".\n", washer.name), that._wrapOpts));
-                            if (!job.input || job.input.name != washer.name) {
+                            if (!job.input || job.input.name !== washer.name) {
                                 job.input = washer;
                             }
                         } else {
@@ -250,11 +248,11 @@ Laundry.prototype.create = function(jobName) {
                     rl.question(wrap("Which target do you want to use? ", that._wrapOpts), function(answer) {
                         answer = chalk.stripColor(answer).trim();
                         washer = validWashers.filter(function(washer) {
-                            return washer.name.toLowerCase() == answer.toLowerCase();
+                            return washer.name.toLowerCase() === answer.toLowerCase();
                         })[0];
                         if (washer) {
                             rl.write(wrap(util.format("Cool, we'll send it to " + chalk.green.bold("%s") + ".\n", washer.name), that._wrapOpts));
-                            if (!job.output || job.output.name != washer.name) {
+                            if (!job.output || job.output.name !== washer.name) {
                                 job.output = washer;
                             }
                         } else {
@@ -326,7 +324,7 @@ Laundry.prototype.create = function(jobName) {
                         if (!answer) {
                             valid = true;
                             rl.write(wrap(util.format("This job will only be run manually.\n"), that._wrapOpts));
-                        } else if (answer.indexOf(':') != -1) {
+                        } else if (answer.indexOf(':') !== -1) {
                             var time = moment({
                                 hour: answer.split(':')[0],
                                 minute: answer.split(':')[1]
@@ -343,9 +341,9 @@ Laundry.prototype.create = function(jobName) {
                                 rl.write(wrap(util.format("This job will run every %d minutes.\n", answer), that._wrapOpts));
                             }
                         } else {
-                            if (answer != job.name.toLowerCase()) {
+                            if (answer !== job.name.toLowerCase()) {
                                 allJobs.forEach(function(job) {
-                                    if (job.name.toLowerCase() == answer) {
+                                    if (job.name.toLowerCase() === answer) {
                                         valid = true;
                                         answer = job.name;
                                         rl.write(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".\n", answer), that._wrapOpts));
@@ -414,7 +412,7 @@ Laundry.prototype.run = function(jobName, callback) {
             // Find the requested job.
             function(callback) {
                 var job = allJobs.filter(function(job) {
-                    return job.name.toLowerCase() == jobName.toLowerCase();
+                    return job.name.toLowerCase() === jobName.toLowerCase();
                 })[0];
                 if (!job) {
                     console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
@@ -435,11 +433,11 @@ Laundry.prototype.run = function(jobName, callback) {
                         return job.name.toLowerCase();
                     }); // jshint ignore:line
                     allJobs.forEach(function(job) {
-                        if (runJobs.indexOf(job) == -1) {
+                        if (runJobs.indexOf(job) === -1) {
                             var name = job.schedule ? job.schedule.toString() : '';
                             name = name.toLowerCase();
                             var index = runJobNames.indexOf(name);
-                            if (index != -1) {
+                            if (index !== -1) {
                                 runJobs.splice(index + 1, 0, job);
                                 foundJobs = true;
                             }
@@ -530,7 +528,7 @@ Laundry.prototype.destroy = function(jobName) {
             function(rl, job, callback) {
                 rl.question(wrap(util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name), that._wrapOpts) + "\n", function(answer) {
                     answer = chalk.stripColor(answer).trim().toLowerCase();
-                    if (answer == job.name.toLowerCase() && answer == jobName.toLowerCase()) {
+                    if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
                         job.del(function(err) {
                             rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyd."), job.name), that._wrapOpts) + "\n");
                             callback(err, rl);
@@ -563,11 +561,11 @@ Laundry.prototype.list = function() {
         jobs.forEach(function(job) {
             if (job) {
                 var schedule = job.schedule;
-                if (typeof schedule == 'number') {
+                if (typeof schedule === 'number') {
                     out += util.format(chalk.bold("%s") + " runs every %d minutes.", job.name, schedule);
                 } else if (!schedule) {
                     out += util.format(chalk.bold("%s") + " runs manually.", job.name);
-                } else if (schedule.indexOf(':') != -1) {
+                } else if (schedule.indexOf(':') !== -1) {
                     out += util.format(chalk.bold("%s") + " runs every day at %s.", job.name, schedule);
                 } else {
                     out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.name, schedule);
@@ -602,11 +600,11 @@ Laundry.prototype.tick = function() {
                     return false;
                 }
 
-                if (typeof(job.schedule) == 'number') {
+                if (typeof(job.schedule) === 'number') {
                     // every n minutes
                     return !job.lastRun || now.diff(job.lastRun, 'minutes') >= job.schedule;
 
-                } else if (job.schedule.indexOf(':') != -1) {
+                } else if (job.schedule.indexOf(':') !== -1) {
                     // after a specific time
                     var time = moment({
                         hour: job.schedule.split(':')[0],

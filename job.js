@@ -1,5 +1,3 @@
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
 var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sanitize-filename
@@ -93,7 +91,7 @@ Job.getAllJobs = function(callback) {
         }
 
         async.each(files, function(item, callback) {
-            if (path.extname(item) != '.json') {
+            if (path.extname(item) !== '.json') {
                 callback();
                 return;
             }

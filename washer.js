@@ -1,5 +1,3 @@
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
@@ -87,7 +85,7 @@ Washer.validateField = function(type, value, callback) {
 
     value = chalk.stripColor(value).trim();
 
-    if (type == 'file') {
+    if (type === 'file') {
         value = path.resolve(value);
         fs.mkdirp(path.dirname(value), function(err) {
             if (err) {
@@ -100,11 +98,11 @@ Washer.validateField = function(type, value, callback) {
             });
         });
 
-    } else if (type == 'integer') {
+    } else if (type === 'integer') {
         value = parseInt(value);
         callback(isNaN(value) ? null : value);
 
-    } else if (type == 'url') {
+    } else if (type === 'url') {
         var rx = new RegExp(/([-a-zA-Z0-9^\p{L}\p{C}\u00a1-\uffff@:%_\+.~#?&//=]{2,256}){1}(\.[a-z]{2,4}){1}(\:[0-9]*)?(\/[-a-zA-Z0-9\u00a1-\uffff\(\)@:%,_\+.~#?&//=]*)?([-a-zA-Z0-9\(\)@:%,_\+.~#?&//=]*)?/i);
         callback(rx.test(value) ? value : null);
 
