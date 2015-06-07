@@ -4,9 +4,14 @@
 /* jshint strict: true */
 'use strict';
 
-var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
-var path = require('path'); // https://nodejs.org/api/path.html
-var log = require('winston'); // https://github.com/winstonjs/winston
+global.log = require('winston'); // https://github.com/winstonjs/winston
+global._ = require('lodash'); // https://lodash.com/docs
+global.ns = require('simple-namespace'); // https://www.npmjs.com/package/simple-namespace
+global.fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
+global.path = require('path'); // https://nodejs.org/api/path.html
+global.async = require('async'); // https://www.npmjs.com/package/async
+global.moment = require('moment'); // http://momentjs.com/docs/
+global.util = require('util'); // https://nodejs.org/api/util.html
 
 // Make config folder
 var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];

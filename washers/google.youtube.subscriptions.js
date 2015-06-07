@@ -2,7 +2,6 @@
 /* jshint strict: true */
 'use strict';
 
-var _ = require('lodash'); // https://lodash.com/docs
 var path = require('path'); // https://nodejs.org/api/path.html
 var ns = require('simple-namespace'); // https://www.npmjs.com/package/simple-namespace
 

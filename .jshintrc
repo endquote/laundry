@@ -1,3 +1,14 @@
 {
-  "globals": { "Washers": true }
+    "globals":
+    {
+        "Washers": true, 
+        "_": true,
+        "ns": true,
+        "fs": true,
+        "path": true,
+        "log": true,
+        "async": true,
+        "moment": true,
+        "util": true
+    }
 }

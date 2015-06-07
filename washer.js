@@ -2,11 +2,8 @@
 /* jshint strict: true */
 'use strict';
 
-var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
-var path = require('path'); // https://nodejs.org/api/path.html
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 var touch = require('touch'); // https://github.com/isaacs/node-touch
-var _ = require('lodash'); // https://lodash.com/docs
 
 // Base class for washers. Washers can accept input from the web, parse it into general-purpose objects,
 // and return it to other washers which output those objects to other formats.

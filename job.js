@@ -3,11 +3,6 @@
 'use strict';
 
 var sanitize = require('sanitize-filename'); // https://www.npmjs.com/package/sanitize-filename
-var _ = require('lodash'); // https://lodash.com/docs
-var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
-var path = require('path'); // https://nodejs.org/api/path.html
-var async = require('async'); // https://www.npmjs.com/package/async
-var moment = require('moment'); // http://momentjs.com/docs/
 
 function Job(config) {
     this.name = config ? config.name : null;

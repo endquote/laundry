@@ -2,14 +2,8 @@
 /* jshint strict: true */
 'use strict';
 
-var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
-var path = require('path'); // https://nodejs.org/api/path.html
-var async = require('async'); // https://www.npmjs.com/package/async
-var log = require('winston'); // https://github.com/winstonjs/winston
-var util = require('util'); // https://nodejs.org/api/util.html
 var readline = require('readline'); // https://nodejs.org/api/readline.html
 var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
-var moment = require('moment'); // http://momentjs.com/docs/
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 
 var Washer = require('./washer');

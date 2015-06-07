@@ -2,12 +2,8 @@
 /* jshint strict: true */
 'use strict';
 
-var fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
-var path = require('path'); // https://nodejs.org/api/path.html
-var _ = require('lodash'); // https://lodash.com/docs
 var request = require('request'); // https://www.npmjs.com/package/request
 var moment = require('moment'); // http://momentjs.com/docs/
-var ns = require('simple-namespace'); // https://www.npmjs.com/package/simple-namespace
 
 var FeedParser = require('feedparser'); // https://www.npmjs.com/package/feedparser
 var RSSWriter = require('rss'); // https://www.npmjs.com/package/rss
