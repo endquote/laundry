@@ -21,8 +21,10 @@ Washers.RSS = function(config) {
         description: 'Loads data from an RSS feed.',
         settings: [{
             name: 'url',
-            type: 'url',
-            prompt: 'What RSS feed URL do you want to launder?'
+            prompt: 'What RSS feed URL do you want to launder?',
+            afterEntry: function(oldValue, newValue, callback) {
+                callback(!Washer.validateString(newValue));
+            }
         }]
     };
 
@@ -30,12 +32,16 @@ Washers.RSS = function(config) {
         description: 'Writes data to an RSS feed on disk.',
         settings: [{
             name: 'file',
-            type: 'file',
-            prompt: 'Where do you want to save the output?'
+            prompt: 'Where do you want to save the output?',
+            afterEntry: function(oldValue, newValue, callback) {
+                callback(!Washer.validateString(newValue));
+            }
         }, {
             name: 'feedname',
-            type: 'string',
-            prompt: 'What do you want the title of the output feed to be?'
+            prompt: 'What do you want the title of the output feed to be?',
+            afterEntry: function(oldValue, newValue, callback) {
+                callback(!Washer.validateString(newValue));
+            }
         }]
     };
 };
@@ -111,14 +117,24 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
 
     if (items) {
         items.forEach(function(item) {
-            feed.item({
-                title: item.title,
-                description: item.description,
-                url: item.url,
-                date: item.date.toDate(),
-                author: item.author,
-                categories: item.tags
-            });
+            if (item instanceof Items.Google.YouTube.Video) {
+                feed.item({
+                    title: item.title,
+                    description: item.description,
+                    url: item.url,
+                    date: item.date.toDate(),
+                    author: item.author,
+                });
+            } else if (item instanceof Items.RSS) {
+                feed.item({
+                    title: item.title,
+                    description: item.description,
+                    url: item.url,
+                    date: item.date.toDate(),
+                    author: item.author,
+                    categories: item.tags
+                });
+            }
         });
     }
 

@@ -1,5 +1,7 @@
 'use strict';
 
+// Item which describes an RSS object
+
 ns('Items', global);
 Items.RSS = function(config) {
     this.title = null;

@@ -19,8 +19,9 @@ var Washer = function(config) {
         description: 'Loads data from an RSS feed.',
         settings: [{
             name: 'url',
-            type: 'url',
-            prompt: 'What RSS feed URL do you want to launder?'
+            prompt: 'What RSS feed URL do you want to launder?',
+            beforeEntry: function(callback),
+            afterEntry: function(oldValue, newValue, callback(err))
         }]
     */
     this.input = null;
@@ -59,38 +60,37 @@ Washer.prototype.doOutput = function(items, callback) {
     callback(null);
 };
 
-// Attempt to coerce configuration values into valid values.
-Washer.validateField = function(type, value, callback) {
-    if (!type || !callback) {
-        return;
+Washer.cleanString = function(s) {
+    if (!s) {
+        s = '';
     }
+    return chalk.stripColor(s).trim();
+};
 
-    value = chalk.stripColor(value).trim();
+Washer.validateString = function(s) {
+    s = Washer.cleanString(s);
+    return s ? true : false;
+};
 
-    if (type === 'file') {
-        value = path.resolve(value);
-        fs.mkdirp(path.dirname(value), function(err) {
-            if (err) {
-                callback(null);
-                return;
-            }
+Washer.validateFile = function(file, callback) {
+    file = Washer.cleanString(file);
+    file = path.resolve(file);
+    fs.mkdirp(path.dirname(file), function(err) {
+        if (err) {
+            callback(null);
+            return;
+        }
 
-            touch(value, {}, function(err) {
-                callback(err ? null : value);
-            });
+        touch(file, {}, function(err) {
+            callback(err ? false : true);
         });
+    });
+};
 
-    } else if (type === 'integer') {
-        value = parseInt(value);
-        callback(isNaN(value) ? null : value);
-
-    } else if (type === 'url') {
-        var rx = new RegExp(/([-a-zA-Z0-9^\p{L}\p{C}\u00a1-\uffff@:%_\+.~#?&//=]{2,256}){1}(\.[a-z]{2,4}){1}(\:[0-9]*)?(\/[-a-zA-Z0-9\u00a1-\uffff\(\)@:%,_\+.~#?&//=]*)?([-a-zA-Z0-9\(\)@:%,_\+.~#?&//=]*)?/i);
-        callback(rx.test(value) ? value : null);
-
-    } else {
-        callback(value);
-    }
+Washer.validateUrl = function(url, callback) {
+    url = Washer.cleanString(url);
+    var rx = new RegExp(/([-a-zA-Z0-9^\p{L}\p{C}\u00a1-\uffff@:%_\+.~#?&//=]{2,256}){1}(\.[a-z]{2,4}){1}(\:[0-9]*)?(\/[-a-zA-Z0-9\u00a1-\uffff\(\)@:%,_\+.~#?&//=]*)?([-a-zA-Z0-9\(\)@:%,_\+.~#?&//=]*)?/i);
+    callback(rx.test(url) ? true : false);
 };
 
 module.exports = Washer;

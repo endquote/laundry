@@ -100,9 +100,10 @@ Laundry.prototype.create = function(jobName) {
                     var completions = validWashers.map(function(washer) {
                         return washer.name;
                     });
+
                     completions.sort();
                     completions = completions.filter(function(completion) {
-                        return completion.toLowerCase().indexOf(line) !== -1;
+                        return completion.toLowerCase().indexOf(line) === 0;
                     });
                     return [completions, line];
                 }
@@ -170,7 +171,7 @@ Laundry.prototype.create = function(jobName) {
 
             var washer = null;
             async.whilst(function() {
-                    return washer === null;
+                    return washer === null || washer === undefined;
                 }, function(callback) {
                     rl.question(wrap("Which source do you want to use? ", that._wrapOpts), function(answer) {
                         answer = chalk.stripColor(answer).trim();
@@ -178,7 +179,7 @@ Laundry.prototype.create = function(jobName) {
                             return washer.name.toLowerCase() === answer.toLowerCase();
                         })[0];
                         if (washer) {
-                            rl.write(wrap(util.format("Cool, we'll start with " + chalk.green.bold("%s") + ".\n", washer.name), that._wrapOpts));
+                            rl.write(wrap(util.format("Cool, we'll start with " + chalk.green.bold("%s") + ".", washer.name), that._wrapOpts) + '\n\n');
                             if (!job.input || job.input.name !== washer.name) {
                                 job.input = washer;
                             }
@@ -203,23 +204,48 @@ Laundry.prototype.create = function(jobName) {
             var washer = job.input;
             async.eachSeries(washer.input.settings, function(item, callback) {
                 var valid = false;
+
+                if (!item.beforeEntry) {
+                    item.beforeEntry = function(callback) {
+                        callback();
+                    };
+                }
+
+                if (!item.afterEntry) {
+                    item.afterEntry = function(lastValue, newValue, callback) {
+                        callback();
+                    };
+                }
+
                 async.whilst(function() {
                         return !valid;
                     },
                     function(callback) {
-                        rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
-                            Washer.validateField(item.type, answer, function(a) {
-                                answer = a;
-                                valid = answer;
-                                if (valid) {
-                                    washer[item.name] = answer;
-                                } else {
-                                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
-                                }
-                                callback();
-                            });
-                        });
-                        rl.write(washer[item.name]);
+                        // All the beforeEntry method...
+                        item.beforeEntry.apply(washer, [
+
+                            function() {
+                                // Show the prompt...
+                                rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
+                                    answer = Washer.cleanString(answer);
+                                    // All the after entry method
+                                    item.afterEntry.apply(washer, [washer[item.name], answer,
+                                        function(err) {
+                                            if (err) {
+                                                // Reject the answer
+                                                rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                                            } else {
+                                                // Save the answer
+                                                valid = true;
+                                                washer[item.name] = answer;
+                                            }
+                                            callback();
+                                        }
+                                    ]);
+                                });
+                                rl.write(washer[item.name]);
+                            }
+                        ]);
                     }, function(err) {
                         callback(err);
                     });
@@ -285,23 +311,48 @@ Laundry.prototype.create = function(jobName) {
             var washer = job.output;
             async.eachSeries(washer.output.settings, function(item, callback) {
                 var valid = false;
+
+                if (!item.beforeEntry) {
+                    item.beforeEntry = function(callback) {
+                        callback();
+                    };
+                }
+
+                if (!item.afterEntry) {
+                    item.afterEntry = function(lastValue, newValue, callback) {
+                        callback();
+                    };
+                }
+
                 async.whilst(function() {
                         return !valid;
                     },
                     function(callback) {
-                        rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
-                            Washer.validateField(item.type, answer, function(a) {
-                                answer = a;
-                                valid = answer;
-                                if (valid) {
-                                    washer[item.name] = answer;
-                                } else {
-                                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
-                                }
-                                callback();
-                            });
-                        });
-                        rl.write(washer[item.name]);
+                        // All the beforeEntry method...
+                        item.beforeEntry.apply(washer, [
+
+                            function() {
+                                // Show the prompt...
+                                rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
+                                    answer = Washer.cleanString(answer);
+                                    // All the after entry method
+                                    item.afterEntry.apply(washer, [washer[item.name], answer,
+                                        function(err) {
+                                            if (err) {
+                                                // Reject the answer
+                                                rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                                            } else {
+                                                // Save the answer
+                                                valid = true;
+                                                washer[item.name] = answer;
+                                            }
+                                            callback();
+                                        }
+                                    ]);
+                                });
+                                rl.write(washer[item.name]);
+                            }
+                        ]);
                     }, function(err) {
                         callback(err);
                     });
