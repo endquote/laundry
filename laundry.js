@@ -149,12 +149,12 @@ Laundry.prototype.create = function(jobName) {
         // A: Get all the washers and filter by the ones that support input.
         function(rl, job, callback) {
             validWashers = [];
-            allWashers.toArray().forEach(function(W) {
-                var w = new W();
+            for (var i in allWashers) {
+                var w = new allWashers[i]();
                 if (w.input) {
                     validWashers.push(w);
                 }
-            });
+            }
             callback(null, rl, job);
         },
 
@@ -231,12 +231,12 @@ Laundry.prototype.create = function(jobName) {
         // A: Get all the washers and filter by the ones that support output.
         function(rl, job, callback) {
             validWashers = [];
-            allWashers.toArray().forEach(function(W) {
-                var w = new W();
+            for (var i in allWashers) {
+                var w = new allWashers[i]();
                 if (w.output) {
                     validWashers.push(w);
                 }
-            });
+            }
             callback(null, rl, job);
         },
 
@@ -376,7 +376,6 @@ Laundry.prototype.create = function(jobName) {
                 });
         }
 
-        // TODO: (1) Set filters
     ], function(err, rl, job) {
         if (!err && job) {
             job.save();
