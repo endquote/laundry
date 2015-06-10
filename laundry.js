@@ -213,7 +213,7 @@ Laundry.prototype.create = function(jobName, callback) {
 
                 if (!item.beforeEntry) {
                     item.beforeEntry = function(callback) {
-                        callback();
+                        callback(true);
                     };
                 }
 
@@ -326,7 +326,7 @@ Laundry.prototype.create = function(jobName, callback) {
 
                 if (!item.beforeEntry) {
                     item.beforeEntry = function(callback) {
-                        callback();
+                        callback(true);
                     };
                 }
 
