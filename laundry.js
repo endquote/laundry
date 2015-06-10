@@ -92,6 +92,11 @@ Laundry.prototype.create = function(jobName) {
                 output: process.stdout,
                 completer: function(line) {
                     line = line.toLowerCase();
+                    if (!line) {
+                        return [
+                            [], line
+                        ];
+                    }
                     var completions = validWashers.map(function(washer) {
                         return washer.name;
                     });
