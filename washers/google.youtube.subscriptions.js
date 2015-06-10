@@ -25,6 +25,9 @@ Washers.Google.YouTube.Subscriptions = function(config) {
         settings: [{
             name: 'clientId',
             prompt: 'Go to https://console.developers.google.com/project. Click "Create Project" and enter a name. Under "APIs & auth" click "APIs" and activate YouTube. Under "Credentials", click "Create new Client ID". Choose "Installed Application." The client ID and secret will appear.\nWhat is the client ID?',
+            beforeEntry: function(callback) {
+                callback(this.token ? false : true);
+            },
             afterEntry: function(oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
@@ -34,6 +37,9 @@ Washers.Google.YouTube.Subscriptions = function(config) {
         }, {
             name: 'clientSecret',
             prompt: 'What is the client secret?',
+            beforeEntry: function(callback) {
+                callback(this.token ? false : true);
+            },
             afterEntry: function(oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
@@ -44,14 +50,17 @@ Washers.Google.YouTube.Subscriptions = function(config) {
             name: 'authCode',
             prompt: 'Approve access in the browser that just opened.\nWhat is the code that came back?',
             beforeEntry: function(callback) {
-                if (!this.token) {
-                    this._oauth2Client = new google.auth.OAuth2(this.clientId, this.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
-                    var url = this._oauth2Client.generateAuthUrl({
-                        access_type: 'offline',
-                        scope: 'https://www.googleapis.com/auth/youtube.readonly'
-                    });
-                    open(url);
+                if (this.token) {
+                    callback(false);
+                    return;
                 }
+
+                this._oauth2Client = new google.auth.OAuth2(this.clientId, this.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
+                var url = this._oauth2Client.generateAuthUrl({
+                    access_type: 'offline',
+                    scope: 'https://www.googleapis.com/auth/youtube.readonly'
+                });
+                open(url);
                 callback();
             },
             afterEntry: function(oldValue, newValue, callback) {

@@ -230,7 +230,13 @@ Laundry.prototype.create = function(jobName, callback) {
                         // All the beforeEntry method...
                         item.beforeEntry.apply(washer, [
 
-                            function() {
+                            function(required) {
+                                if (!required) {
+                                    valid = true;
+                                    callback();
+                                    return;
+                                }
+
                                 // Show the prompt...
                                 rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);
@@ -337,7 +343,13 @@ Laundry.prototype.create = function(jobName, callback) {
                         // All the beforeEntry method...
                         item.beforeEntry.apply(washer, [
 
-                            function() {
+                            function(required) {
+                                if (!required) {
+                                    valid = true;
+                                    callback();
+                                    return;
+                                }
+
                                 // Show the prompt...
                                 rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);

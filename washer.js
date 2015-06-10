@@ -20,7 +20,7 @@ var Washer = function(config) {
         settings: [{
             name: 'url',
             prompt: 'What RSS feed URL do you want to launder?',
-            beforeEntry: function(callback),
+            beforeEntry: function(callback(required)),
             afterEntry: function(oldValue, newValue, callback(err))
         }]
     */
