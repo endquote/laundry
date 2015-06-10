@@ -43,6 +43,11 @@ Washer.prototype.stringify = function() {
     delete c.input;
     delete c.output;
     delete c.name;
+    for (var i in c) {
+        if (i.indexOf('_') === 0) {
+            delete(c[i]);
+        }
+    }
     return c;
 };
 
