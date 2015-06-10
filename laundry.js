@@ -31,32 +31,35 @@ function Laundry() {
 
 // Is the command you're trying to run a real command?
 Laundry.prototype.isCommand = function(command) {
-    return command && this._commands[command.trim().toLowerCase()] !== null;
+    return command && this._commands[command.trim().toLowerCase()] !== undefined;
 };
 
 // Run a command.
-Laundry.prototype.doCommand = function(command, job) {
+Laundry.prototype.doCommand = function(command, job, callback) {
     if (!this.isCommand(command)) {
         return false;
     }
 
     if (job) {
-        return this[command.trim().toLowerCase()](job);
+        return this[command.trim().toLowerCase()](job, callback);
     } else {
-        return this[command.trim().toLowerCase()]();
+        return this[command.trim().toLowerCase()](callback);
     }
 };
 
 // Output version info.
-Laundry.prototype.version = function() {
+Laundry.prototype.version = function(callback) {
     var p = require('./package.json');
     var docs = '';
     docs += '\nLaundry version ' + p.version + '\n';
     console.log(docs);
+    if (callback) {
+        callback();
+    }
 };
 
 // Output help text.
-Laundry.prototype.help = function() {
+Laundry.prototype.help = function(callback) {
     this.version();
     var p = require('./package.json');
     var docs = '';
@@ -67,10 +70,13 @@ Laundry.prototype.help = function() {
 
     docs += '\nFor more info see ' + p.homepage + '\n';
     console.log(docs);
+    if (callback) {
+        callback();
+    }
 };
 
 // Create a new job.
-Laundry.prototype.create = function(jobName) {
+Laundry.prototype.create = function(jobName, callback) {
     var that = this;
     var validWashers = [];
     var allJobs = [];
@@ -434,18 +440,21 @@ Laundry.prototype.create = function(jobName) {
 
         rl.write("\n" + chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), that._wrapOpts)));
         rl.close();
+        if (callback) {
+            callback();
+        }
     });
 };
 
 // Edit an existing job.
-Laundry.prototype.edit = function(jobName) {
+Laundry.prototype.edit = function(jobName, callback) {
     if (!jobName) {
         console.log("Specify a job to edit with " + chalk.bold("laundry edit [job]") + ".\n");
         this.list();
         return;
     }
 
-    this.create(jobName);
+    this.create(jobName, callback);
 };
 
 // Run a job.
@@ -548,7 +557,7 @@ Laundry.prototype.run = function(jobName, callback) {
 };
 
 // Destroy a job.
-Laundry.prototype.destroy = function(jobName) {
+Laundry.prototype.destroy = function(jobName, callback) {
     if (!jobName) {
         console.log("Specify a job to edit with " + chalk.bold("laundry destroy [job]") + ".\n");
         this.list();
@@ -604,11 +613,14 @@ Laundry.prototype.destroy = function(jobName) {
                 rl.write("\n");
                 rl.close();
             }
+            if (callback) {
+                callback();
+            }
         });
 };
 
 // List current jobs.
-Laundry.prototype.list = function() {
+Laundry.prototype.list = function(callback) {
     var out = 'Current jobs: \n';
 
     Job.getAllJobs(function(jobs) {
@@ -634,11 +646,14 @@ Laundry.prototype.list = function() {
         });
 
         console.log(out);
+        if (callback) {
+            callback();
+        }
     });
 };
 
 // Run jobs according to their schedule.
-Laundry.prototype.tick = function() {
+Laundry.prototype.tick = function(callback) {
     var now = moment();
     var that = this;
 
@@ -692,6 +707,9 @@ Laundry.prototype.tick = function() {
     ], function(err) {
         if (err) {
             log.error(err);
+        }
+        if (callback) {
+            callback();
         }
     });
 };

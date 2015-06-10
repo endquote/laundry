@@ -2,6 +2,7 @@
 
 'use strict';
 
+var start = Date.now();
 global.log = require('winston'); // https://github.com/winstonjs/winston
 global._ = require('lodash'); // https://lodash.com/docs
 global.ns = require('simple-namespace'); // https://www.npmjs.com/package/simple-namespace
@@ -64,7 +65,11 @@ if (args.length > 0) {
 var laundry = require('./laundry');
 
 if (laundry.isCommand(command)) {
-    laundry.doCommand(command, job);
+    laundry.doCommand(command, job, onComplete);
 } else {
-    laundry.help();
+    laundry.help(onComplete);
+}
+
+function onComplete() {
+    log.debug(Date.now() - start + 'ms');
 }
