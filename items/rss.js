@@ -14,8 +14,6 @@ Items.RSS = function(config) {
     Item.call(this, config);
 };
 
-Items.RSS.prototype = _.create(global.Item.prototype, {
-    constructor: Items.RSS
-});
+Items.RSS.prototype = _.create(global.Item.prototype);
 
 module.exports = Items.RSS;

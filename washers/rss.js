@@ -17,7 +17,7 @@ Washers.RSS = function(config) {
     this.name = 'RSS';
     this.classFile = path.basename(__filename);
 
-    this.input = {
+    this.input = _.merge({
         description: 'Loads data from an RSS feed.',
         settings: [{
             name: 'url',
@@ -26,9 +26,9 @@ Washers.RSS = function(config) {
                 callback(!Washer.validateString(newValue));
             }
         }]
-    };
+    }, this.input);
 
-    this.output = {
+    this.output = _.merge({
         description: 'Writes data to an RSS feed on disk.',
         settings: [{
             name: 'file',
@@ -43,12 +43,10 @@ Washers.RSS = function(config) {
                 callback(!Washer.validateString(newValue));
             }
         }]
-    };
+    }, this.output);
 };
 
-Washers.RSS.prototype = _.create(Washer.prototype, {
-    constructor: Washers.RSS
-});
+Washers.RSS.prototype = _.create(Washer.prototype);
 
 // Request the feed, parse it into items, and pass it to the output washer.
 Washers.RSS.prototype.doInput = function(callback) {

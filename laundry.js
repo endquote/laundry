@@ -158,7 +158,7 @@ Laundry.prototype.create = function(jobName, callback) {
             validWashers = [];
             for (var i in allWashers) {
                 var w = new allWashers[i]();
-                if (w.input) {
+                if (w.input && w.name) {
                     validWashers.push(w);
                 }
             }
@@ -271,7 +271,7 @@ Laundry.prototype.create = function(jobName, callback) {
             validWashers = [];
             for (var i in allWashers) {
                 var w = new allWashers[i]();
-                if (w.output) {
+                if (w.output && w.name) {
                     validWashers.push(w);
                 }
             }

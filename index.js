@@ -13,16 +13,30 @@ global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
 
 // Load internal classes into the global namespace. (Is this totally bad form?)
-global.Item = require('./item');
-global.Washer = require('./washer');
 global.Job = require('./job');
 
+// Washer class files specified in order of inheritance
+global.Washer = require('./washer');
+var washerFiles = [
+    'rss.js',
+    'google.js',
+    'google.youtube.js',
+    'google.youtube.subscriptions.js',
+    'google.youtube.channel.js'
+];
 global.allWashers = {};
-fs.readdirSync(path.join(__dirname, 'washers')).forEach(function(file) {
+washerFiles.forEach(function(file) {
     allWashers[file.replace('.js', '')] = require(path.join(__dirname, 'washers', file));
 });
+
+// Item class files specified in order of inheritance
+global.Item = require('./item');
+var itemFiles = [
+    'rss.js',
+    'google.youtube.video.js'
+];
 global.allItems = {};
-fs.readdirSync(path.join(__dirname, 'items')).forEach(function(file) {
+itemFiles.forEach(function(file) {
     allItems[file.replace('.js', '')] = require(path.join(__dirname, 'items', file));
 });
 
@@ -47,6 +61,16 @@ log.add(log.transports.DailyRotateFile, {
     maxFiles: 90
 });
 log.level = 'debug';
+
+// Utility methods
+_.oldMerge = _.merge;
+_.merge = function(object, sources, customizer, thisArg) {
+    return _.oldMerge(object, sources, function(a, b) {
+        if (_.isArray(a)) {
+            return a.concat(b);
+        }
+    }, thisArg);
+};
 
 // Parse arguments
 var args = process.argv.slice(2);

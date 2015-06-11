@@ -13,8 +13,6 @@ Items.Google.YouTube.Video = function(config) {
     Item.call(this, config);
 };
 
-Items.Google.YouTube.Video.prototype = _.create(Item.prototype, {
-    constructor: Items.Google.YouTube.Video
-});
+Items.Google.YouTube.Video.prototype = _.create(Item.prototype);
 
 module.exports = Items.Google.YouTube.Video;

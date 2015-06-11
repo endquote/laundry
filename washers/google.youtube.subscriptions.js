@@ -9,84 +9,33 @@ var youtube = google.youtube('v3'); // https://developers.google.com/youtube/v3/
 /*
 Youtube Subscriptions washer
 input: converts videos from the user's YouTube subscriptions into items
-output: null
+output: none
 */
-
 ns('Washers.Google.YouTube', global);
 Washers.Google.YouTube.Subscriptions = function(config) {
-    Washer.call(this, config);
+    Washers.Google.YouTube.call(this, config);
 
     this.name = 'YouTube/Subscriptions';
     this.classFile = path.basename(__filename);
     this._oauth2Client = null;
 
-    this.input = {
-        description: 'Loads recent videos from your YouTube subscriptions.',
-        settings: [{
-            name: 'clientId',
-            prompt: 'Go to https://console.developers.google.com/project. Click "Create Project" and enter a name. Under "APIs & auth" click "APIs" and activate YouTube. Under "Credentials", click "Create new Client ID". Choose "Installed Application." The client ID and secret will appear.\nWhat is the client ID?',
-            beforeEntry: function(callback) {
-                callback(this.token ? false : true);
-            },
-            afterEntry: function(oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
-                }
-                callback(!Washer.validateString(newValue));
-            }
-        }, {
-            name: 'clientSecret',
-            prompt: 'What is the client secret?',
-            beforeEntry: function(callback) {
-                callback(this.token ? false : true);
-            },
-            afterEntry: function(oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
-                }
-                callback(!Washer.validateString(newValue));
-            }
-        }, {
-            name: 'authCode',
-            prompt: 'Approve access in the browser that just opened.\nWhat is the code that came back?',
-            beforeEntry: function(callback) {
-                if (this.token) {
-                    callback(false);
-                    return;
-                }
-
-                this._oauth2Client = new google.auth.OAuth2(this.clientId, this.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
-                var url = this._oauth2Client.generateAuthUrl({
-                    access_type: 'offline',
-                    scope: 'https://www.googleapis.com/auth/youtube.readonly'
-                });
-                open(url);
-                callback();
-            },
-            afterEntry: function(oldValue, newValue, callback) {
-                if (this.token) {
-                    callback(false);
-                    return;
-                }
-                if (!Washer.validateString(newValue)) {
-                    callback(true);
-                    return;
-                }
-                var that = this;
-                this._oauth2Client.getToken(newValue, function(err, token) {
-                    if (!err) {
-                        that.token = token;
-                    }
-                    callback(err);
-                });
-            }
-        }]
-    };
+    this.input = _.merge({}, this.input);
 };
 
-Washers.Google.YouTube.Subscriptions.prototype = _.create(Washer.prototype, {
-    constructor: Washers.Google.YouTube.Subscriptions
-});
+Washers.Google.YouTube.Subscriptions.prototype = _.create(Washers.Google.YouTube.prototype);
+
+Washers.Google.YouTube.Subscriptions.prototype.refreshAccessToken = function(callback) {
+    var that = this;
+    that._oauth2Client = new google.auth.OAuth2(that.clientId, that.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
+    that._oauth2Client.setCredentials(that.token);
+    that._oauth2Client.refreshAccessToken(function(err, token) {
+        if (!err) {
+            log.debug('Refreshed access token');
+            that.token = token;
+        }
+        callback(err);
+    });
+};
 
 Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
     var that = this;
@@ -95,14 +44,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
         // Refresh the auth token
         function(callback) {
-            that._oauth2Client = new google.auth.OAuth2(that.clientId, that.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
-            that._oauth2Client.setCredentials(that.token);
-            that._oauth2Client.refreshAccessToken(function(err, token) {
-                if (!err) {
-                    that.token = token;
-                }
-                callback(err);
-            });
+            that.refreshAccessToken(callback);
         },
         // Call the subscriptions API to get all of the subscriptions.
         function(callback) {
@@ -219,31 +161,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
             var parsed = [];
             videos.forEach(function(video, index, array) {
-                var url = 'https://youtube.com/watch?v=' + video.contentDetails.videoId;
-
-                // Figure out the biggest thumbnail available.
-                var thumbnails = [];
-                for (var i in video.snippet.thumbnails) {
-                    thumbnails.push(video.snippet.thumbnails[i]);
-                }
-                var thumbnail = thumbnails.sort(function(a, b) {
-                    return a.width - b.width;
-                }).pop();
-
-                // Reformat the description a bit.
-                var description = video.snippet.description;
-                description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
-                description = description.replace(/[\n\r]/gim, '<br/>');
-                description = '<p><a href="' + url + '">' + thumbnail.url + '</a></p><p>' + description + '</p>';
-
-                parsed.push(new Items.Google.YouTube.Video({
-                    url: url,
-                    thumbnail: thumbnail.url,
-                    title: video.snippet.channelTitle + ': ' + video.snippet.title,
-                    author: video.snippet.channelTitle,
-                    description: description,
-                    date: moment(video.snippet.publishedAt)
-                }));
+                parsed.push(that.parseVideo(video));
             });
 
             callback(null, parsed);
