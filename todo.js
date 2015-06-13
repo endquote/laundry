@@ -1,48 +1,50 @@
-// TODO: Implement daemon command
-// TODO: Implement filters?
-// TODO: "Run at startup" feature?
-// TODO: RSS: group by hour/day/etc
-// TODO: heroku: all storage in s3 or database, web UI instead of command line
-
 /*
 
-google-gmail-search
+remove open()
 
-instagram-base
-instagram-timeline
-instagram-notifications
+washers/input/instagram-base
+washers/input/instagram-timeline
+washers/input/instagram-notifications
 
-twitter-base
-twitter-timeline
-twitter-list
+wahsers/output/rss - grouping
+wahsers/output/rss - better default filename
+wahsers/output/rss - better default title
 
-facebook-base
-facebook-notifications
-facebook-group
+washers/input/twitter-base
+washers/input/twitter-timeline (optional retweets, optional replies, contains string)
+washers/input/twitter-list
+washers/input/twitter-notifications
 
-tumblr-base
-tumblr-following
-tumblr-notifications
+washers/input/tumblr-base
+washers/input/tumblr-following
+washers/input/tumblr-notifications
 
-soundcloud
+washers/input/google-gmail-search
 
-swarm
-json
-sqlite
-email
-socket.io
-sms
-dropbox-base
-dropbox-files
-pinterest-base
-pinterest-following
-pinterest-notifications
-...
-slack
-git 
-snapchat
-osc
+washers/input/soundcloud
 
+wahsers/input/snapchat
+
+washers/input/pinterest-base
+washers/input/pinterest-following
+washers/input/pinterest-notifications
+
+replace rss.file with a selection of storage modules
+
+storage/file
+storage/dropbox
+storage/s3
+
+replace ~/.laundry with a storage module
+
+washers/output/json
+washers/output/sqlite
+washers/output/email
+washers/output/socket.io
+washers/output/sms
+
+implement daemon command
+magical heroku deployment
 */
 
 /*
