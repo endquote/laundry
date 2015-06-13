@@ -58,6 +58,7 @@ Washers.Google = function(config) {
                     scope: 'https://www.googleapis.com/auth/youtube.readonly'
                 });
                 open(url);
+                rl.write(url + '\n');
                 callback(true);
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
