@@ -7,7 +7,7 @@ var touch = require('touch'); // https://github.com/isaacs/node-touch
 // and return it to other washers which output those objects to other formats.
 var Washer = function(config) {
 
-    // The user-facing name of the washer.
+    // The user-facing name of the washer. Leave empty to not show it as an option.
     this.name = null;
 
     // The internal name.
@@ -20,8 +20,8 @@ var Washer = function(config) {
         settings: [{
             name: 'url',
             prompt: 'What RSS feed URL do you want to launder?',
-            beforeEntry: function(callback(required)),
-            afterEntry: function(oldValue, newValue, callback(err))
+            beforeEntry: function(rl, callback(required)),
+            afterEntry: function(rl, oldValue, newValue, callback(err))
         }]
     */
     this.input = null;

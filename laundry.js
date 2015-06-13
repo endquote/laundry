@@ -212,13 +212,13 @@ Laundry.prototype.create = function(jobName, callback) {
                 var valid = false;
 
                 if (!item.beforeEntry) {
-                    item.beforeEntry = function(callback) {
+                    item.beforeEntry = function(rl, callback) {
                         callback(true);
                     };
                 }
 
                 if (!item.afterEntry) {
-                    item.afterEntry = function(lastValue, newValue, callback) {
+                    item.afterEntry = function(rl, lastValue, newValue, callback) {
                         callback();
                     };
                 }
@@ -229,7 +229,7 @@ Laundry.prototype.create = function(jobName, callback) {
                     function(callback) {
                         // All the beforeEntry method...
                         item.beforeEntry.apply(washer, [
-
+                            rl,
                             function(required) {
                                 if (!required) {
                                     valid = true;
@@ -241,7 +241,7 @@ Laundry.prototype.create = function(jobName, callback) {
                                 rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);
                                     // All the after entry method
-                                    item.afterEntry.apply(washer, [washer[item.name], answer,
+                                    item.afterEntry.apply(washer, [rl, washer[item.name], answer,
                                         function(err) {
                                             if (err) {
                                                 // Reject the answer
@@ -325,13 +325,13 @@ Laundry.prototype.create = function(jobName, callback) {
                 var valid = false;
 
                 if (!item.beforeEntry) {
-                    item.beforeEntry = function(callback) {
+                    item.beforeEntry = function(rl, callback) {
                         callback(true);
                     };
                 }
 
                 if (!item.afterEntry) {
-                    item.afterEntry = function(lastValue, newValue, callback) {
+                    item.afterEntry = function(rl, lastValue, newValue, callback) {
                         callback();
                     };
                 }
@@ -343,6 +343,7 @@ Laundry.prototype.create = function(jobName, callback) {
                         // All the beforeEntry method...
                         item.beforeEntry.apply(washer, [
 
+                            rl,
                             function(required) {
                                 if (!required) {
                                     valid = true;
@@ -354,7 +355,7 @@ Laundry.prototype.create = function(jobName, callback) {
                                 rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);
                                     // All the after entry method
-                                    item.afterEntry.apply(washer, [washer[item.name], answer,
+                                    item.afterEntry.apply(washer, [rl, washer[item.name], answer,
                                         function(err) {
                                             if (err) {
                                                 // Reject the answer

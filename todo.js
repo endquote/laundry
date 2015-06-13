@@ -2,12 +2,10 @@
 // TODO: Implement filters?
 // TODO: "Run at startup" feature?
 // TODO: RSS: group by hour/day/etc
+// TODO: heroku: all storage in s3 or database, web UI instead of command line
 
 /*
 
-google
-google-youtube-subscriptions
-google-youtube-channel
 google-gmail-search
 
 instagram-base

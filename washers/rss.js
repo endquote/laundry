@@ -22,7 +22,7 @@ Washers.RSS = function(config) {
         settings: [{
             name: 'url',
             prompt: 'What RSS feed URL do you want to launder?',
-            afterEntry: function(oldValue, newValue, callback) {
+            afterEntry: function(rl, oldValue, newValue, callback) {
                 callback(!Washer.validateString(newValue));
             }
         }]
@@ -33,13 +33,13 @@ Washers.RSS = function(config) {
         settings: [{
             name: 'file',
             prompt: 'Where do you want to save the output?',
-            afterEntry: function(oldValue, newValue, callback) {
+            afterEntry: function(rl, oldValue, newValue, callback) {
                 callback(!Washer.validateString(newValue));
             }
         }, {
             name: 'feedname',
             prompt: 'What do you want the title of the output feed to be?',
-            afterEntry: function(oldValue, newValue, callback) {
+            afterEntry: function(rl, oldValue, newValue, callback) {
                 callback(!Washer.validateString(newValue));
             }
         }]

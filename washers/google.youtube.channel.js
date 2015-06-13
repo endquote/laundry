@@ -23,7 +23,7 @@ Washers.Google.YouTube.Channel = function(config) {
         settings: [{
             name: 'channelName',
             prompt: 'What is the name of the channel to watch?',
-            afterEntry: function(oldValue, newValue, callback) {
+            afterEntry: function(rl, oldValue, newValue, callback) {
                 callback(!Washer.validateString(newValue));
             }
         }]
