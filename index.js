@@ -22,7 +22,9 @@ var washerFiles = [
     'google.js',
     'google.youtube.js',
     'google.youtube.subscriptions.js',
-    'google.youtube.channel.js'
+    'google.youtube.channel.js',
+    'instagram.js',
+    'instagram.timeline.js'
 ];
 global.allWashers = {};
 washerFiles.forEach(function(file) {
@@ -33,7 +35,8 @@ washerFiles.forEach(function(file) {
 global.Item = require('./item');
 var itemFiles = [
     'rss.js',
-    'google.youtube.video.js'
+    'google.youtube.video.js',
+    'instagram.media.js'
 ];
 global.allItems = {};
 itemFiles.forEach(function(file) {

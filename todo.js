@@ -4,14 +4,20 @@ washers/input/instagram-base
 washers/input/instagram-timeline
 washers/input/instagram-notifications
 
-wahsers/output/rss - grouping
-wahsers/output/rss - better default filename
-wahsers/output/rss - better default title
+build ig item description
+ig verbs: like, unlike
+ig scopes isn't working
+handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
+youtube verbs: like, subscribe, unsubscribe
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
 washers/input/twitter-list
 washers/input/twitter-notifications
+
+wahsers/output/rss - grouping
+wahsers/output/rss - better default filename
+wahsers/output/rss - better default title
 
 washers/input/tumblr-base
 washers/input/tumblr-following

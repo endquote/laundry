@@ -1,0 +1,121 @@
+'use strict';
+
+var request = require('request'); // https://www.npmjs.com/package/request
+
+/*
+Base class for Instagram washers containing common methods.
+input: none
+output: none
+*/
+ns('Washers', global);
+Washers.Instagram = function(config) {
+    Washer.call(this, config);
+
+    this.name = '';
+    this.classFile = path.basename(__filename);
+    this._callbackUri = 'http://laundry.endquote.com/callbacks/instagram.html';
+
+    this.input = _.merge({
+        settings: [{
+            name: 'clientId',
+            prompt: util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri),
+            beforeEntry: function(rl, prompt, callback) {
+                callback(this.token ? false : true, prompt);
+            },
+            afterEntry: function(rl, oldValue, newValue, callback) {
+                if (oldValue !== newValue) {
+                    this.token = null;
+                }
+                callback(!Washer.validateString(newValue));
+            }
+        }, {
+            name: 'clientSecret',
+            prompt: 'What is the client secret?',
+            beforeEntry: function(rl, prompt, callback) {
+                callback(this.token ? false : true, prompt);
+            },
+            afterEntry: function(rl, oldValue, newValue, callback) {
+                if (oldValue !== newValue) {
+                    this.token = null;
+                }
+                callback(!Washer.validateString(newValue));
+            }
+        }, {
+            name: 'authCode',
+            prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
+            beforeEntry: function(rl, prompt, callback) {
+                if (this.token) {
+                    callback(false, prompt);
+                    return;
+                }
+
+                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+comments+relationships+likes&client_id=%s&redirect_uri=%s&response_type=code', this.clientId, this._callbackUri);
+                var that = this;
+                require('googleapis').urlshortener('v1').url.insert({
+                    resource: {
+                        longUrl: url
+                    }
+                }, function(err, response) {
+                    if (!err) {
+                        url = response.id;
+                    }
+                    prompt = util.format(prompt, url);
+                    callback(true, prompt);
+                });
+            },
+            afterEntry: function(rl, oldValue, newValue, callback) {
+                if (this.token) {
+                    callback(false);
+                    return;
+                }
+                if (!Washer.validateString(newValue)) {
+                    callback(true);
+                    return;
+                }
+
+                this.refreshToken(newValue, function(err) {
+                    callback(err);
+                });
+            }
+        }]
+    }, this.input);
+};
+
+Washers.Instagram.prototype = _.create(Washer.prototype);
+
+Washers.Instagram.prototype.refreshToken = function(code, callback) {
+    var that = this;
+    var form = {
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
+        grant_type: 'authorization_code',
+        redirect_uri: this._callbackUri,
+        code: code ? code : this.authCode
+    };
+
+    request.post('https://api.instagram.com/oauth/access_token', {
+            form: form
+        },
+
+        function(err, response, body) {
+            if (!err && response.statusCode === 200) {
+                try {
+                    body = JSON.parse(body);
+                    if (!body.access_token) {
+                        throw body;
+                    }
+
+                    that.token = body.access_token;
+                    callback();
+                } catch (e) {
+                    log.debug(err ? err : body);
+                    callback(err ? err : body);
+                }
+            } else {
+                log.debug(err ? err : body);
+                callback(err ? err : body);
+            }
+        });
+};
+
+module.exports = Washers.Instagram;

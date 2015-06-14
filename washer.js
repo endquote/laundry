@@ -93,4 +93,9 @@ Washer.validateUrl = function(url, callback) {
     callback(rx.test(url) ? true : false);
 };
 
+Washer.validateInt = function(s) {
+    s = parseInt(s);
+    return !isNaN(s);
+};
+
 module.exports = Washer;

@@ -226,7 +226,7 @@ Laundry.prototype.create = function(jobName, callback) {
                         return !valid;
                     },
                     function(callback) {
-                        // All the beforeEntry method...
+                        // Call the beforeEntry method...
                         item.beforeEntry.apply(washer, [
                             rl,
                             item.prompt,
@@ -240,7 +240,7 @@ Laundry.prototype.create = function(jobName, callback) {
                                 // Show the prompt...
                                 rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);
-                                    // All the after entry method
+                                    // Call the after entry method
                                     item.afterEntry.apply(washer, [rl, washer[item.name], answer,
                                         function(err) {
                                             if (err) {
@@ -340,7 +340,7 @@ Laundry.prototype.create = function(jobName, callback) {
                         return !valid;
                     },
                     function(callback) {
-                        // All the beforeEntry method...
+                        // Call the beforeEntry method...
                         item.beforeEntry.apply(washer, [
                             rl,
                             item.prompt,
@@ -354,7 +354,7 @@ Laundry.prototype.create = function(jobName, callback) {
                                 // Show the prompt...
                                 rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);
-                                    // All the after entry method
+                                    // Call the after entry method
                                     item.afterEntry.apply(washer, [rl, washer[item.name], answer,
                                         function(err) {
                                             if (err) {
