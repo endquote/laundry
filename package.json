@@ -22,7 +22,6 @@
     "chalk": "^1.0.0",
     "feedparser": "^1.1.2",
     "fs-extra": "^0.18.4",
-    "glob": "^5.0.10",
     "googleapis": "^2.0.5",
     "lodash": "^3.9.3",
     "moment": "^2.10.3",
