@@ -1,7 +1,5 @@
 /*
 
-remove open()
-
 washers/input/instagram-base
 washers/input/instagram-timeline
 washers/input/instagram-notifications
@@ -45,6 +43,14 @@ washers/output/sms
 
 implement daemon command
 magical heroku deployment
+
+washers/readme.md
+items/readme.md
+storage/readme.md
+readme.md
+
+some kind of website?
+
 */
 
 /*

@@ -1,8 +1,5 @@
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
-var open = require('open'); // https://github.com/jjrdn/node-open
 var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
 var youtube = google.youtube('v3'); // https://developers.google.com/youtube/v3/docs/
 
@@ -19,7 +16,9 @@ Washers.Google.YouTube.Subscriptions = function(config) {
     this.classFile = path.basename(__filename);
     this._oauth2Client = null;
 
-    this.input = _.merge({}, this.input);
+    this.input = _.merge(this.input, {
+        description: 'Loads recent videos from your YouTube subscriptions.'
+    });
 };
 
 Washers.Google.YouTube.Subscriptions.prototype = _.create(Washers.Google.YouTube.prototype);

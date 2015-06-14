@@ -1,8 +1,5 @@
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
-var open = require('open'); // https://github.com/jjrdn/node-open
 var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
 var youtube = google.youtube('v3'); // https://developers.google.com/youtube/v3/docs/
 

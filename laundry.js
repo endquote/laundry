@@ -114,7 +114,6 @@ Laundry.prototype.create = function(jobName, callback) {
                     return [completions, line];
                 }
             });
-
             callback(null, rl);
         },
 
@@ -212,8 +211,8 @@ Laundry.prototype.create = function(jobName, callback) {
                 var valid = false;
 
                 if (!item.beforeEntry) {
-                    item.beforeEntry = function(rl, callback) {
-                        callback(true);
+                    item.beforeEntry = function(rl, prompt, callback) {
+                        callback(true, prompt);
                     };
                 }
 
@@ -230,7 +229,8 @@ Laundry.prototype.create = function(jobName, callback) {
                         // All the beforeEntry method...
                         item.beforeEntry.apply(washer, [
                             rl,
-                            function(required) {
+                            item.prompt,
+                            function(required, prompt) {
                                 if (!required) {
                                     valid = true;
                                     callback();
@@ -238,7 +238,7 @@ Laundry.prototype.create = function(jobName, callback) {
                                 }
 
                                 // Show the prompt...
-                                rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
+                                rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);
                                     // All the after entry method
                                     item.afterEntry.apply(washer, [rl, washer[item.name], answer,
@@ -325,8 +325,8 @@ Laundry.prototype.create = function(jobName, callback) {
                 var valid = false;
 
                 if (!item.beforeEntry) {
-                    item.beforeEntry = function(rl, callback) {
-                        callback(true);
+                    item.beforeEntry = function(rl, prompt, callback) {
+                        callback(true, prompt);
                     };
                 }
 
@@ -342,9 +342,9 @@ Laundry.prototype.create = function(jobName, callback) {
                     function(callback) {
                         // All the beforeEntry method...
                         item.beforeEntry.apply(washer, [
-
                             rl,
-                            function(required) {
+                            item.prompt,
+                            function(required, prompt) {
                                 if (!required) {
                                     valid = true;
                                     callback();
@@ -352,7 +352,7 @@ Laundry.prototype.create = function(jobName, callback) {
                                 }
 
                                 // Show the prompt...
-                                rl.question(wrap(item.prompt + ' ', that._wrapOpts), function(answer) {
+                                rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
                                     answer = Washer.cleanString(answer);
                                     // All the after entry method
                                     item.afterEntry.apply(washer, [rl, washer[item.name], answer,

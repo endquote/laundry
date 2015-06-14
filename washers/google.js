@@ -1,8 +1,5 @@
-/* jslint node: true */
-/* jshint strict: true */
 'use strict';
 
-var open = require('open'); // https://github.com/jjrdn/node-open
 var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
 
 /*
@@ -22,8 +19,8 @@ Washers.Google = function(config) {
         settings: [{
             name: 'clientId',
             prompt: 'Go to https://console.developers.google.com/project. Click "Create Project" and enter a name. Under "APIs & auth" click "APIs" and activate YouTube. Under "Credentials", click "Create new Client ID". Choose "Installed Application." The client ID and secret will appear.\nWhat is the client ID?',
-            beforeEntry: function(rl, callback) {
-                callback(this.token ? false : true);
+            beforeEntry: function(rl, prompt, callback) {
+                callback(this.token ? false : true, prompt);
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
@@ -34,8 +31,8 @@ Washers.Google = function(config) {
         }, {
             name: 'clientSecret',
             prompt: 'What is the client secret?',
-            beforeEntry: function(rl, callback) {
-                callback(this.token ? false : true);
+            beforeEntry: function(rl, prompt, callback) {
+                callback(this.token ? false : true, prompt);
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
@@ -45,10 +42,10 @@ Washers.Google = function(config) {
             }
         }, {
             name: 'authCode',
-            prompt: 'Approve access in the browser that just opened.\nWhat is the code that came back?',
-            beforeEntry: function(rl, callback) {
+            prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
+            beforeEntry: function(rl, prompt, callback) {
                 if (this.token) {
-                    callback(false);
+                    callback(false, prompt);
                     return;
                 }
 
@@ -57,9 +54,19 @@ Washers.Google = function(config) {
                     access_type: 'offline',
                     scope: 'https://www.googleapis.com/auth/youtube.readonly'
                 });
-                open(url);
-                rl.write(url + '\n');
-                callback(true);
+
+                var that = this;
+                google.urlshortener('v1').url.insert({
+                    resource: {
+                        longUrl: url
+                    }
+                }, function(err, response) {
+                    if (!err) {
+                        url = response.id;
+                    }
+                    prompt = util.format(prompt, url);
+                    callback(true, prompt);
+                });
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
                 if (this.token) {
