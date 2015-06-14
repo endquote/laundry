@@ -23,19 +23,6 @@ Washers.Google.YouTube.Subscriptions = function(config) {
 
 Washers.Google.YouTube.Subscriptions.prototype = _.create(Washers.Google.YouTube.prototype);
 
-Washers.Google.YouTube.Subscriptions.prototype.refreshAccessToken = function(callback) {
-    var that = this;
-    that._oauth2Client = new google.auth.OAuth2(that.clientId, that.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
-    that._oauth2Client.setCredentials(that.token);
-    that._oauth2Client.refreshAccessToken(function(err, token) {
-        if (!err) {
-            log.debug('Refreshed access token');
-            that.token = token;
-        }
-        callback(err);
-    });
-};
-
 Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
     var that = this;
 
