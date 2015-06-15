@@ -46,7 +46,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
                 },
                 function(err, medias, pagination, remaining, limit) {
                     medias.forEach(function(media) {
-                        items.push(that.parseItem(media));
+                        items.push(Items.Instagram.Media.factory(media));
                     });
 
                     log.debug(util.format('Got %d/%d items', items.length, quantity));
