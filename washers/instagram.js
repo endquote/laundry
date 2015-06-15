@@ -148,7 +148,7 @@ Washers.Instagram.prototype.parseItem = function(media) {
     if (item.likes) {
         item.description += util.format('<p>%d likes: ', item.likes.count);
         item.likes.data.forEach(function(like) {
-            item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username);
+            item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username, like.username);
         });
         item.description += '</p>';
     }
