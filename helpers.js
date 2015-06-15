@@ -9,11 +9,16 @@ function Helpers() {}
 
 // Shorten a string to be less than a given length, ending in an ellipsis, trying to break on whole words.
 Helpers.shortenString = function(s, len) {
+    s = s.trim();
+
     if (!s) {
         return '';
     }
 
-    s = s.substring(0, s.indexOf(' ', len));
+    if (s.length <= len) {
+        return s;
+    }
+
     while (s.length >= len) {
         if (s.indexOf(' ') === -1) {
             s = s.substring(0, len - 1);
