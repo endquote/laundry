@@ -45,9 +45,6 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
                     max_id: nextMax ? nextMax : ''
                 },
                 function(err, medias, pagination, remaining, limit) {
-                    err = {
-                        whoa: 'dude'
-                    };
                     medias.forEach(function(media) {
                         items.push(that.parseItem(media));
                     });
