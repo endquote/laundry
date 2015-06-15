@@ -2,9 +2,6 @@
 
 washers/input/instagram-timeline
 
-think about that dowhilst
-instagram.parseItem
-youtube.parseVideo > parseItem
 item.buildDescription for ig and youtube
 figure out ig video
 ig verbs: like, unlike
@@ -62,6 +59,7 @@ washers/output/email
 washers/output/socket.io
 washers/output/sms
 
+faster tick? -- look at job files without including everything
 implement daemon command
 magical heroku deployment
 

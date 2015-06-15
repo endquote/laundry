@@ -81,7 +81,7 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
 
             var parsed = [];
             videos.forEach(function(video, index, array) {
-                parsed.push(that.parseVideo(video));
+                parsed.push(that.parseItem(video));
             });
 
             callback(null, parsed);

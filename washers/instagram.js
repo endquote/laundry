@@ -118,4 +118,21 @@ Washers.Instagram.prototype.refreshToken = function(code, callback) {
         });
 };
 
+// Convert a media item into a laundry item.
+Washers.Instagram.prototype.parseItem = function(media) {
+    return new Items.Instagram.Media({
+        tags: media.tags,
+        type: media.type,
+        comments: media.comments,
+        date: moment.unix(media.created_time),
+        url: media.link,
+        likes: media.likes,
+        image: media.images.standard_resolution.url,
+        caption: media.caption ? media.caption.text : null,
+        author: media.user.username,
+        authorpic: media.user.profile_picture,
+        liked: media.user_has_liked
+    });
+};
+
 module.exports = Washers.Instagram;

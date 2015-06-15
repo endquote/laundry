@@ -46,21 +46,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
                 },
                 function(err, medias, pagination, remaining, limit) {
                     medias.forEach(function(media) {
-                        var item = new Items.Instagram.Media({
-                            tags: media.tags,
-                            type: media.type,
-                            comments: media.comments,
-                            date: moment.unix(media.created_time),
-                            url: media.link,
-                            likes: media.likes,
-                            image: media.images.standard_resolution.url,
-                            caption: media.caption ? media.caption.text : null,
-                            author: media.user.username,
-                            authorpic: media.user.profile_picture,
-                            liked: media.user_has_liked
-                        });
-
-                        items.push(item);
+                        items.push(that.parseItem(media));
                     });
 
                     log.debug(util.format('Got %d/%d items', items.length, quantity));

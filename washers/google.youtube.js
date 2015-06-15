@@ -21,7 +21,7 @@ Washers.Google.YouTube = function(config) {
 
 Washers.Google.YouTube.prototype = _.create(Washers.Google.prototype);
 
-Washers.Google.YouTube.prototype.parseVideo = function(video) {
+Washers.Google.YouTube.prototype.parseItem = function(video) {
     var url = 'https://youtube.com/watch?v=' + video.contentDetails.videoId;
 
     // Figure out the biggest thumbnail available.
