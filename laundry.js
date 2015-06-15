@@ -552,7 +552,9 @@ Laundry.prototype.run = function(jobName, callback) {
                             job.save();
                             log.info(job.name + " - complete");
                         } else {
-                            log.error(job.name + " - error: " + err);
+                            log.error(job.name + " - error: " + util.inspect(err, {
+                                depth: 99
+                            }));
                         }
 
                         callback(err, job);

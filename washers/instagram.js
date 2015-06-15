@@ -49,7 +49,7 @@ Washers.Instagram = function(config) {
                     return;
                 }
 
-                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+comments+relationships+likes&client_id=%s&redirect_uri=%s&response_type=code', this.clientId, this._callbackUri);
+                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships&client_id=%s&redirect_uri=%s&response_type=code', this.clientId, this._callbackUri);
                 var that = this;
                 require('googleapis').urlshortener('v1').url.insert({
                     resource: {

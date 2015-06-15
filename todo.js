@@ -2,13 +2,12 @@
 
 washers/input/instagram-timeline
 
-ig scopes isn't working
-handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
-set up email logging for errors
 less that = this?
-deploy each type of job to get email errors
 https://www.npmjs.com/package/validator
+
+set up email logging for errors
 command-line arg or config to set log level
+deploy each type of job to get email errors
 
 youtube verbs: like, subscribe, unsubscribe
 rss filtering - by item.category?
@@ -17,6 +16,9 @@ washers/input/instagram-notifications
 washers/input/instagram-user
 washers/input/instagram-search (hashtag)
 washers/input/instagram-likes (hashtag)
+
+ig scopes isn't working
+handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
