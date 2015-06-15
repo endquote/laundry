@@ -3,7 +3,6 @@
 'use strict';
 
 var start = Date.now();
-global.log = require('winston'); // https://github.com/winstonjs/winston
 global._ = require('lodash'); // https://lodash.com/docs
 global.ns = require('simple-namespace'); // https://www.npmjs.com/package/simple-namespace
 global.fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
@@ -12,6 +11,7 @@ global.async = require('async'); // https://www.npmjs.com/package/async
 global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
 global.validator = require('validator'); // https://www.npmjs.com/package/validator
+
 
 // Load internal classes into the global namespace. (Is this totally bad form?)
 global.Helpers = require('./helpers');
@@ -55,6 +55,7 @@ if (!fs.existsSync(configFolder)) {
 global.configFolder = configFolder;
 
 // Configure logging
+global.log = require('winston'); // https://github.com/winstonjs/winston
 log.remove(log.transports.Console);
 log.add(log.transports.Console, {
     colorize: true
@@ -66,16 +67,6 @@ log.add(log.transports.DailyRotateFile, {
     maxFiles: 90
 });
 log.level = 'debug';
-
-// Utility methods
-_.oldMerge = _.merge;
-_.merge = function(object, sources, customizer, thisArg) {
-    return _.oldMerge(object, sources, function(a, b) {
-        if (_.isArray(a)) {
-            return a.concat(b);
-        }
-    }, thisArg);
-};
 
 // Parse arguments
 var args = process.argv.slice(2);

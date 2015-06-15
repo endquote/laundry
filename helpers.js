@@ -77,4 +77,14 @@ validator.extend('isWhitespace', function(str) {
     return /^\s*$/.test(str);
 });
 
+// Utility methods
+_.oldMerge = _.merge;
+_.merge = function(object, sources, customizer, thisArg) {
+    return _.oldMerge(object, sources, function(a, b) {
+        if (_.isArray(a)) {
+            return a.concat(b);
+        }
+    }, thisArg);
+};
+
 module.exports = Helpers;

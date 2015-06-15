@@ -4,8 +4,6 @@ set up email logging for errors
 command-line arg or config to set log level
 deploy each type of job to get email errors
 
-rss filtering - by item.category?
-
 washers/input/instagram-notifications
 washers/input/instagram-user
 washers/input/instagram-search (hashtag)
