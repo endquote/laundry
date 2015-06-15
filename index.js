@@ -83,16 +83,16 @@ if (args.length > 0) {
     command = args.shift().trim().toLowerCase();
 }
 
-var job = '';
+var arg = '';
 if (args.length > 0) {
-    job = args.shift().trim().toLowerCase();
+    arg = args.shift().trim().toLowerCase();
 }
 
 // Do stuff
 var laundry = require('./laundry');
 
 if (laundry.isCommand(command)) {
-    laundry.doCommand(command, job, onComplete);
+    laundry.doCommand(command, arg, onComplete);
 } else {
     laundry.help(onComplete);
 }
