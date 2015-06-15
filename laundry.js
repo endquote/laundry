@@ -25,8 +25,7 @@ function Laundry() {
 
     // Options to pass to the word wrap method.
     this._wrapOpts = {
-        width: 70,
-        trim: true
+        width: 70
     };
 }
 

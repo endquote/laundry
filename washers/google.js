@@ -56,14 +56,7 @@ Washers.Google = function(config) {
                 });
 
                 var that = this;
-                google.urlshortener('v1').url.insert({
-                    resource: {
-                        longUrl: url
-                    }
-                }, function(err, response) {
-                    if (!err) {
-                        url = response.id;
-                    }
+                Helpers.shortenUrl(url, function(url) {
                     prompt = util.format(prompt, url);
                     callback(true, prompt);
                 });

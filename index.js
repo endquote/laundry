@@ -11,6 +11,7 @@ global.path = require('path'); // https://nodejs.org/api/path.html
 global.async = require('async'); // https://www.npmjs.com/package/async
 global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
+global.Helpers = require('./helpers');
 
 // Load internal classes into the global namespace. (Is this totally bad form?)
 global.Job = require('./job');

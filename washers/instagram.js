@@ -52,14 +52,7 @@ Washers.Instagram = function(config) {
 
                 var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships&client_id=%s&redirect_uri=%s&response_type=code', this.clientId, this._callbackUri);
                 var that = this;
-                require('googleapis').urlshortener('v1').url.insert({
-                    resource: {
-                        longUrl: url
-                    }
-                }, function(err, response) {
-                    if (!err) {
-                        url = response.id;
-                    }
+                Helpers.shortenUrl(url, function(url) {
                     prompt = util.format(prompt, url);
                     callback(true, prompt);
                 });
@@ -137,7 +130,7 @@ Washers.Instagram.prototype.parseItem = function(media) {
 
     item.title = util.format('%s', item.author);
     if (item.caption) {
-        item.title += ': ' + Item.shorten(item.caption, 30);
+        item.title += ': ' + Helpers.shortenString(item.caption, 30);
     }
 
     if (!item.video) {

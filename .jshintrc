@@ -6,6 +6,7 @@
         "Washer": true,
         "Item": true,
         "Job": true,
+        "Helpers": true,
         "allWashers": true,
         "allItems": true,
         
