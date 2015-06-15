@@ -2,6 +2,7 @@
 
 var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
 var youtube = google.youtube('v3'); // https://developers.google.com/youtube/v3/docs/
+var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolinker.js
 
 /*
 Base class for YouTube washers containing common methods.
@@ -38,6 +39,7 @@ Washers.Google.YouTube.prototype.parseItem = function(video) {
     description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
     description = description.replace(/[\n\r]/gim, '<br/>');
     description = '<p><a href="' + url + '"><img src="' + thumbnail.url + '"/></a></p><p>' + description + '</p>';
+    description = Autolinker.link(description);
 
     return new Items.Google.YouTube.Video({
         title: video.snippet.channelTitle + ': ' + video.snippet.title,

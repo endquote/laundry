@@ -1,6 +1,7 @@
 'use strict';
 
 var request = require('request'); // https://www.npmjs.com/package/request
+var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolinker.js
 
 /*
 Base class for Instagram washers containing common methods.
@@ -142,7 +143,7 @@ Washers.Instagram.prototype.parseItem = function(media) {
     if (!item.video) {
         item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
     } else {
-        item.description = util.format('<p><video width="640" height="640" controls><source src="%s" type="video/mp4"></video></p>', item.video);
+        item.description = util.format('<p><video poster="%s" width="640" height="640" controls><source src="%s" type="video/mp4"></video></p>', item.image, item.video);
     }
 
     if (item.caption) {
@@ -173,6 +174,7 @@ Washers.Instagram.prototype.parseItem = function(media) {
 Washers.Instagram.linkify = function(str) {
     str = str.replace(/@([\S]+)/g, '<a href="http://instagram.com/$1">@$1</a>');
     str = str.replace(/#([\S]+)/g, '<a href="https://instagram.com/explore/tags/$1/">#$1</a>');
+    str = Autolinker.link(str);
     return str;
 };
 
