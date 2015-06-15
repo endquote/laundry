@@ -1,17 +1,32 @@
 /*
 
-washers/input/instagram-base
 washers/input/instagram-timeline
-washers/input/instagram-notifications
 
-build ig item description
+think about that dowhilst
+instagram.parseItem
+youtube.parseVideo > parseItem
+item.buildDescription for ig and youtube
+figure out ig video
 ig verbs: like, unlike
 ig scopes isn't working
 handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
+set up email logging for errors
+less that = this?
+deploy each type of job to get email errors
+https://www.npmjs.com/package/validator
+command-line arg or config to set log level
+
 youtube verbs: like, subscribe, unsubscribe
+rss filtering - by item.category?
+
+washers/input/instagram-notifications
+washers/input/instagram-user
+washers/input/instagram-search (hashtag)
+washers/input/instagram-likes (hashtag)
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
+washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
 washers/input/twitter-notifications
 

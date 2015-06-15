@@ -38,13 +38,11 @@ Washers.Google.YouTube.prototype.parseVideo = function(video) {
     description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
     description = description.replace(/[\n\r]/gim, '<br/>');
     description = '<p><a href="' + url + '"><img src="' + thumbnail.url + '"/></a></p><p>' + description + '</p>';
-
     return new Items.Google.YouTube.Video({
         url: url,
         thumbnail: thumbnail.url,
         title: video.snippet.channelTitle + ': ' + video.snippet.title,
         author: video.snippet.channelTitle,
-        description: description,
         date: moment(video.snippet.publishedAt)
     });
 };

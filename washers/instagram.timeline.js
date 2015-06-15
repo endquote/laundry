@@ -3,8 +3,8 @@
 var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
 
 /*
-Youtube Timeline washer
-input: converts videos from the user's YouTube Timeline into items
+Instagram Timeline washer
+input: converts videos from the user's Instagram timeline into items
 output: none
 */
 ns('Washers.Instagram', global);
@@ -33,33 +33,33 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
         client_secret: that.clientSecret,
     };
 
-    async.waterfall([
-
-        function(callback) {
-            var quantity = 100;
-            var items = [];
-            var nextMax = null;
-            async.doWhilst(function(callback) {
-                ig.user_self_feed({
+    var quantity = 100;
+    var items = [];
+    var nextMax = null;
+    async.whilst(function() {
+            return !items.length || (items.length < quantity && nextMax);
+        }, function(callback) {
+            ig.user_self_feed({
                     sign_request: sign,
-                    count: 100,
+                    count: quantity - items.length,
                     max_id: nextMax ? nextMax : ''
-                }, function(err, medias, pagination, remaining, limit) {
+                },
+                function(err, medias, pagination, remaining, limit) {
                     medias.forEach(function(media) {
                         var item = new Items.Instagram.Media({
                             tags: media.tags,
                             type: media.type,
                             comments: media.comments,
                             date: moment.unix(media.created_time),
-                            link: media.link,
+                            url: media.link,
                             likes: media.likes,
                             image: media.images.standard_resolution.url,
                             caption: media.caption ? media.caption.text : null,
-                            username: media.user.username,
-                            userpic: media.user.profile_picture,
+                            author: media.user.username,
+                            authorpic: media.user.profile_picture,
                             liked: media.user_has_liked
                         });
-                        // build description
+
                         items.push(item);
                     });
 
@@ -67,16 +67,11 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
                     nextMax = pagination.next_max_id;
                     callback();
                 });
-            }, function() {
-                return nextMax !== null && items.length <= quantity;
-            }, function(err) {
-                items = items.slice(0, quantity);
-                callback(null, items);
-            });
-        }
-    ], function(err, result) {
-        callback(err, result);
-    });
+        },
+
+        function(err) {
+            callback(err, items);
+        });
 };
 
 module.exports = Washers.Instagram.Timeline;

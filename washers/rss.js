@@ -115,24 +115,14 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
 
     if (items) {
         items.forEach(function(item) {
-            if (item instanceof Items.Google.YouTube.Video) {
-                feed.item({
-                    title: item.title,
-                    description: item.description,
-                    url: item.url,
-                    date: item.date.toDate(),
-                    author: item.author,
-                });
-            } else if (item instanceof Items.RSS) {
-                feed.item({
-                    title: item.title,
-                    description: item.description,
-                    url: item.url,
-                    date: item.date.toDate(),
-                    author: item.author,
-                    categories: item.tags
-                });
-            }
+            feed.item({
+                title: item.title,
+                description: item.buildDescription(),
+                url: item.url,
+                date: item.date.toDate(),
+                author: item.author,
+                categories: item.tags
+            });
         });
     }
 
