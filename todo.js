@@ -2,6 +2,8 @@
 
 washers/input/instagram-timeline
 
+url shortnener isn't working?
+shorter ig titles, ellipses
 parseItem -> item constructor?
 less that = this?
 https://www.npmjs.com/package/validator
@@ -10,7 +12,6 @@ set up email logging for errors
 command-line arg or config to set log level
 deploy each type of job to get email errors
 
-youtube verbs: like, subscribe, unsubscribe
 rss filtering - by item.category?
 
 washers/input/instagram-notifications
