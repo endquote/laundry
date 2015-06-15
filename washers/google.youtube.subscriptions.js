@@ -83,7 +83,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
             }
 
             async.eachLimit(subscriptionIds, 10, function(subscriptionId, callback) {
-                if (that.cache[subscriptionId].channel) {
+                if (that.cache[subscriptionId].playlist) {
                     callback();
                     return;
                 }
