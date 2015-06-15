@@ -120,7 +120,7 @@ Washers.Instagram.prototype.refreshToken = function(code, callback) {
 
 // Convert a media item into a laundry item.
 Washers.Instagram.prototype.parseItem = function(media) {
-    return new Items.Instagram.Media({
+    var item = new Items.Instagram.Media({
         tags: media.tags,
         type: media.type,
         comments: media.comments,
@@ -128,11 +128,39 @@ Washers.Instagram.prototype.parseItem = function(media) {
         url: media.link,
         likes: media.likes,
         image: media.images.standard_resolution.url,
+        video: media.videos ? media.videos.standard_resolution.url : null,
         caption: media.caption ? media.caption.text : null,
         author: media.user.username,
         authorpic: media.user.profile_picture,
-        liked: media.user_has_liked
     });
+
+    item.title = util.format('%s: %s', item.author, item.caption);
+    if (!item.video) {
+        item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
+    } else {
+        item.description = util.format('<p><a href="%s"><video width="640" height="640" controls><source src="%s" type="video/mp4"></video></a></p>', item.url, item.video);
+    }
+
+    if (item.caption) {
+        item.description += util.format('<p>%s</p>', item.caption);
+    }
+
+    if (item.likes) {
+        item.description += util.format('<p>%d likes: ', item.likes.count);
+        item.likes.data.forEach(function(like) {
+            item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username);
+        });
+        item.description += '</p>';
+    }
+
+    if (item.comments) {
+        item.description += util.format('<p>%d comments:</p>', item.comments.count);
+        item.comments.data.forEach(function(comment) {
+            item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>', comment.from.username, comment.from.username, comment.text);
+        });
+    }
+
+    return item;
 };
 
 module.exports = Washers.Instagram;

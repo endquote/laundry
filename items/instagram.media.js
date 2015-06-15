@@ -10,15 +10,10 @@ Items.Instagram.Media = function(config) {
     this.image = null;
     this.caption = null;
     this.authorpic = null;
-    this.liked = false;
 
     Item.call(this, config);
 };
 
 Items.Instagram.Media.prototype = _.create(global.Item.prototype);
-
-Items.Instagram.Media.prototype.buildDescription = function() {
-    this.description = '';
-};
 
 module.exports = Items.Instagram.Media;

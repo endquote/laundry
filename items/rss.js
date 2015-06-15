@@ -4,13 +4,6 @@
 
 ns('Items', global);
 Items.RSS = function(config) {
-    this.title = null;
-    this.description = null;
-    this.url = null;
-    this.date = null;
-    this.author = null;
-    this.tags = null;
-
     Item.call(this, config);
 };
 

@@ -33,7 +33,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
         client_secret: that.clientSecret,
     };
 
-    var quantity = 100;
+    var quantity = 150;
     var items = [];
     var nextMax = null;
     async.whilst(function() {

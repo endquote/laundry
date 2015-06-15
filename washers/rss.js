@@ -117,7 +117,7 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
         items.forEach(function(item) {
             feed.item({
                 title: item.title,
-                description: item.buildDescription(),
+                description: item.description,
                 url: item.url,
                 date: item.date.toDate(),
                 author: item.author,

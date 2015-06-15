@@ -2,9 +2,6 @@
 
 washers/input/instagram-timeline
 
-item.buildDescription for ig and youtube
-figure out ig video
-ig verbs: like, unlike
 ig scopes isn't working
 handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
 set up email logging for errors
@@ -45,6 +42,7 @@ washers/input/pinterest-base
 washers/input/pinterest-following
 washers/input/pinterest-notifications
 
+parseItem -> item constructor?
 replace rss.file with a selection of storage modules
 
 storage/file

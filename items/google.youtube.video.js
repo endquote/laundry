@@ -11,6 +11,4 @@ Items.Google.YouTube.Video = function(config) {
 
 Items.Google.YouTube.Video.prototype = _.create(Item.prototype);
 
-Items.Google.YouTube.Video.prototype.buildDescription = function() {};
-
 module.exports = Items.Google.YouTube.Video;
