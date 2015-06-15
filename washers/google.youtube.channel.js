@@ -21,7 +21,8 @@ Washers.Google.YouTube.Channel = function(config) {
             name: 'channelName',
             prompt: 'What is the name of the channel to watch?',
             afterEntry: function(rl, oldValue, newValue, callback) {
-                callback(!Washer.validateString(newValue));
+                // TODO: Validate that channel is real?
+                callback(validator.isWhitespace(newValue));
             }
         }]
     });

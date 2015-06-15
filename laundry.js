@@ -228,7 +228,7 @@ Laundry.prototype.create = function(jobName, callback) {
 
                                 // Show the prompt...
                                 rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
-                                    answer = Washer.cleanString(answer);
+                                    answer = Helpers.cleanString(answer);
                                     // Call the after entry method
                                     item.afterEntry.apply(washer, [rl, washer[item.name], answer,
                                         function(err) {
@@ -279,7 +279,7 @@ Laundry.prototype.create = function(jobName, callback) {
 
             var washer = null;
             async.whilst(function() {
-                    return washer === null;
+                    return washer === null || washer === undefined;
                 }, function(callback) {
                     rl.question(wrap("Which target do you want to use? ", that._wrapOpts), function(answer) {
                         answer = chalk.stripColor(answer).trim();
@@ -342,7 +342,7 @@ Laundry.prototype.create = function(jobName, callback) {
 
                                 // Show the prompt...
                                 rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
-                                    answer = Washer.cleanString(answer);
+                                    answer = Helpers.cleanString(answer);
                                     // Call the after entry method
                                     item.afterEntry.apply(washer, [rl, washer[item.name], answer,
                                         function(err) {

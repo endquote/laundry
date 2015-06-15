@@ -1,6 +1,8 @@
 'use strict';
 
 var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
+var touch = require('touch'); // https://github.com/isaacs/node-touch
+var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 
 // Misc static helper functions.
 function Helpers() {}
@@ -40,5 +42,34 @@ Helpers.shortenUrl = function(url, callback) {
         callback(err ? url : response.id);
     });
 };
+
+// Given a file path, try to write to it.
+Helpers.validateFile = function(file, callback) {
+    file = Helpers.cleanString(file);
+    file = path.resolve(file);
+    fs.mkdirp(path.dirname(file), function(err) {
+        if (err) {
+            callback(null);
+            return;
+        }
+
+        touch(file, {}, function(err) {
+            callback(err ? false : true);
+        });
+    });
+};
+
+// Remove chalk stuff from a string.
+Helpers.cleanString = function(s) {
+    if (!s) {
+        s = '';
+    }
+    return chalk.stripColor(s).trim();
+};
+
+// Test for empty strings.
+validator.extend('isWhitespace', function(str) {
+    return /^\s*$/.test(str);
+});
 
 module.exports = Helpers;

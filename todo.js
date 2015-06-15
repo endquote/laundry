@@ -4,7 +4,6 @@ washers/input/instagram-timeline
 
 parseItem -> item constructor?
 less that = this?
-https://www.npmjs.com/package/validator
 
 set up email logging for errors
 command-line arg or config to set log level
@@ -60,6 +59,7 @@ washers/output/socket.io
 washers/output/sms
 
 faster tick? -- look at job files without including everything
+nicer callback pages
 implement daemon command
 magical heroku deployment
 

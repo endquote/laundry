@@ -11,9 +11,10 @@ global.path = require('path'); // https://nodejs.org/api/path.html
 global.async = require('async'); // https://www.npmjs.com/package/async
 global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
-global.Helpers = require('./helpers');
+global.validator = require('validator'); // https://www.npmjs.com/package/validator
 
 // Load internal classes into the global namespace. (Is this totally bad form?)
+global.Helpers = require('./helpers');
 global.Job = require('./job');
 
 // Washer class files specified in order of inheritance

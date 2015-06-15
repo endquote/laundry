@@ -17,7 +17,8 @@
         "log": true,
         "async": true,
         "moment": true,
-        "util": true
+        "util": true,
+        "validator": true
     },
     "curly": true,
     "eqeqeq": true,

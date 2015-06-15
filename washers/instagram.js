@@ -27,7 +27,7 @@ Washers.Instagram = function(config) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
-                callback(!Washer.validateString(newValue));
+                callback(validator.isWhitespace(newValue));
             }
         }, {
             name: 'clientSecret',
@@ -39,7 +39,7 @@ Washers.Instagram = function(config) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
-                callback(!Washer.validateString(newValue));
+                callback(validator.isWhitespace(newValue));
             }
         }, {
             name: 'authCode',
@@ -62,7 +62,7 @@ Washers.Instagram = function(config) {
                     callback(false);
                     return;
                 }
-                if (!Washer.validateString(newValue)) {
+                if (validator.isWhitespace(newValue)) {
                     callback(true);
                     return;
                 }
