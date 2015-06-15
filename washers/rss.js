@@ -108,8 +108,8 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
     var feed = new RSSWriter({
         title: this.feedname,
         description: this.feedname,
-        feed_url: 'http://github.com/endquote/laundry',
-        site_url: 'http://github.com/endquote/laundry',
+        feed_url: 'http://laundry.endquote.com',
+        site_url: 'http://laundry.endquote.com',
         generator: 'Laundry'
     });
 
