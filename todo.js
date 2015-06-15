@@ -1,14 +1,8 @@
 /*
 
-washers/input/instagram-timeline
-
-parseItem -> item constructor?
-less that = this?
-
 set up email logging for errors
 command-line arg or config to set log level
 deploy each type of job to get email errors
-license file
 
 rss filtering - by item.category?
 
