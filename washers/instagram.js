@@ -150,6 +150,20 @@ Washers.Instagram.prototype.parseItem = function(media) {
         item.description += util.format('<p>%s</p>', Washers.Instagram.linkify(item.caption));
     }
 
+    /*
+    // trying to like/unlike doesn't work :(
+
+    item.description += util.format('<form method="post" action="http://instagram.com/web/likes/%d/%s/"><input type="submit" value="%s"/></form>',
+        media.id.split('_')[0],
+        media.user_has_liked ? 'unlike' : 'like',
+        media.user_has_liked ? 'unlike' : 'like');
+
+    item.description += util.format('<p><a href="http://instagram.com/web/likes/%d/%s/">%s</a></p>',
+        media.id.split('_')[0],
+        media.user_has_liked ? 'unlike' : 'like',
+        media.user_has_liked ? 'unlike' : 'like');
+    */
+
     if (item.likes.data.length) {
         item.description += util.format('<p>%d likes: ', item.likes.count);
         item.likes.data.forEach(function(like, index, list) {

@@ -41,6 +41,10 @@ Washers.Google.YouTube.prototype.parseItem = function(video) {
     description = '<p><a href="' + url + '"><img src="' + thumbnail.url + '"/></a></p><p>' + description + '</p>';
     description = Autolinker.link(description);
 
+    // Would be cool to get this working, but you have to POST to it in a specific way...
+    // https://www.youtube.com/watch_actions_ajax?action_like_video=1&video_id=3FOzD4Sfgag
+    // https://www.youtube.com/watch_actions_ajax?action_dislike_video=1&video_id=3FOzD4Sfgag
+
     return new Items.Google.YouTube.Video({
         title: video.snippet.channelTitle + ': ' + video.snippet.title,
         description: description,

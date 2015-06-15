@@ -3,7 +3,6 @@
 washers/input/instagram-timeline
 
 url shortnener isn't working?
-shorter ig titles, ellipses
 parseItem -> item constructor?
 less that = this?
 https://www.npmjs.com/package/validator
