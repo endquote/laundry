@@ -18,4 +18,20 @@ var Item = function(config) {
     }
 };
 
+// Shorten a string to be less than a given length, ending in an ellipsis, trying to break on whole words.
+Item.shorten = function(s, len) {
+    s = s.substring(0, s.indexOf(' ', len));
+    while (s.length >= len) {
+        if (s.indexOf(' ') === -1) {
+            s = s.substring(0, len - 1);
+            break;
+        } else {
+            s = s.substring(0, s.lastIndexOf(' '));
+        }
+
+    }
+    s += '…';
+    return s;
+};
+
 module.exports = Item;

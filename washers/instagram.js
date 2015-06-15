@@ -137,7 +137,7 @@ Washers.Instagram.prototype.parseItem = function(media) {
 
     item.title = util.format('%s', item.author);
     if (item.caption) {
-        item.title += ': ' + item.caption.substr(0, 50);
+        item.title += ': ' + Item.shorten(item.caption, 30);
     }
 
     if (!item.video) {
