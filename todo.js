@@ -2,6 +2,7 @@
 
 washers/input/instagram-timeline
 
+parseItem -> item constructor?
 less that = this?
 https://www.npmjs.com/package/validator
 
@@ -44,7 +45,6 @@ washers/input/pinterest-base
 washers/input/pinterest-following
 washers/input/pinterest-notifications
 
-parseItem -> item constructor?
 replace rss.file with a selection of storage modules
 
 storage/file
