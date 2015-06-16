@@ -40,6 +40,7 @@ Helpers.shortenUrl = function(url, callback) {
     }
 
     google.urlshortener('v1').url.insert({
+        key: 'AIzaSyA0K_cjd5UE4j04KK8t_En_x_Y-razJIE8',
         resource: {
             longUrl: url
         }
