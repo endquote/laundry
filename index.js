@@ -28,7 +28,8 @@ var washerFiles = [
     'instagram.js',
     'instagram.timeline.js',
     'instagram.user.js',
-    'instagram.tag.js'
+    'instagram.tag.js',
+    'instagram.likes.js'
 ];
 global.allWashers = {};
 washerFiles.forEach(function(file) {
