@@ -37,10 +37,6 @@ Washers.Instagram.User.prototype.doInput = function(callback) {
         access_token: that.token
     });
 
-    var sign = {
-        client_secret: that.clientSecret,
-    };
-
     var quantity = 50;
     var items = [];
     var nextMax = null;
@@ -55,7 +51,9 @@ Washers.Instagram.User.prototype.doInput = function(callback) {
             }
 
             ig.user_search(that.userName, {
-                    sign_request: sign,
+                    sign_request: {
+                        client_secret: that.clientSecret,
+                    },
                     count: 1
                 },
                 function(err, users, remaining, limit) {
@@ -73,7 +71,9 @@ Washers.Instagram.User.prototype.doInput = function(callback) {
                     return !items.length || (items.length < quantity && nextMax);
                 }, function(callback) {
                     ig.user_media_recent(that.userId, {
-                            sign_request: sign,
+                            sign_request: {
+                                client_secret: that.clientSecret,
+                            },
                             count: quantity - items.length,
                             max_id: nextMax ? nextMax : ''
                         },

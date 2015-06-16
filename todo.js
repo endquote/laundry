@@ -1,6 +1,5 @@
 /*
 
-washers/input/instagram-user
 washers/input/instagram-search (hashtag)
 washers/input/instagram-likes
 washers/input/instagram-notifications (no api for this, but could poll likes/comments on recent photos, follows, cache and compare changes)

@@ -3,25 +3,31 @@
 var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
 
 /*
-Instagram Timeline washer
-input: converts media from the user's Instagram timeline into items
+Instagram Tag washer
+input: converts media from an Instagram tag into items
 output: none
 */
 ns('Washers.Instagram', global);
-Washers.Instagram.Timeline = function(config) {
+Washers.Instagram.Tag = function(config) {
     Washers.Instagram.call(this, config);
 
-    this.name = 'Instagram/Timeline';
+    this.name = 'Instagram/Tag';
     this.classFile = path.basename(__filename);
-
     this.input = _.merge(this.input, {
-        description: 'Loads recent images from your Instagram timeline.'
+        description: 'Loads recent images from Instagram with a given tag.',
+        settings: [{
+            name: 'tag',
+            prompt: 'What tag do you want to watch?',
+            afterEntry: function(rl, oldValue, newValue, callback) {
+                callback(validator.isWhitespace(newValue));
+            }
+        }]
     });
 };
 
-Washers.Instagram.Timeline.prototype = _.create(Washers.Instagram.prototype);
+Washers.Instagram.Tag.prototype = _.create(Washers.Instagram.prototype);
 
-Washers.Instagram.Timeline.prototype.doInput = function(callback) {
+Washers.Instagram.Tag.prototype.doInput = function(callback) {
     var that = this;
 
     ig.use({
@@ -34,7 +40,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
     async.whilst(function() {
             return !items.length || (items.length < quantity && nextMax);
         }, function(callback) {
-            ig.user_self_feed({
+            ig.tag_media_recent(that.tag, {
                     sign_request: {
                         client_secret: that.clientSecret,
                     },
@@ -59,4 +65,4 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
         });
 };
 
-module.exports = Washers.Instagram.Timeline;
+module.exports = Washers.Instagram.Tag;
