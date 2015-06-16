@@ -86,8 +86,8 @@ Items.Instagram.Media.factory = function(media) {
 
 // Link usernames, tags, and urls.
 Items.Instagram.Media.linkify = function(str) {
-    str = str.replace(/@([\S]+)/g, '<a href="http://instagram.com/$1">@$1</a>');
-    str = str.replace(/#([\S]+)/g, '<a href="https://instagram.com/explore/tags/$1/">#$1</a>');
+    str = str.replace(/@([\w]+)/g, '<a href="http://instagram.com/$1">@$1</a>');
+    str = str.replace(/#([\w]+)/g, '<a href="https://instagram.com/explore/tags/$1/">#$1</a>');
     str = Autolinker.link(str);
     return str;
 };

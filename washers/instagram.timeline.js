@@ -4,7 +4,7 @@ var ig = require('instagram-node').instagram(); // https://github.com/totemstech
 
 /*
 Instagram Timeline washer
-input: converts videos from the user's Instagram timeline into items
+input: converts media from the user's Instagram timeline into items
 output: none
 */
 ns('Washers.Instagram', global);
@@ -13,7 +13,6 @@ Washers.Instagram.Timeline = function(config) {
 
     this.name = 'Instagram/Timeline';
     this.classFile = path.basename(__filename);
-    this._oauth2Client = null;
 
     this.input = _.merge(this.input, {
         description: 'Loads recent images from your Instagram timeline.'
@@ -45,16 +44,18 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
                     max_id: nextMax ? nextMax : ''
                 },
                 function(err, medias, pagination, remaining, limit) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
                     medias.forEach(function(media) {
                         items.push(Items.Instagram.Media.factory(media));
                     });
-
                     log.debug(util.format('Got %d/%d items', items.length, quantity));
                     nextMax = pagination.next_max_id;
                     callback(err);
                 });
         },
-
         function(err) {
             callback(err, items);
         });

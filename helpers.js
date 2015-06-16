@@ -26,8 +26,8 @@ Helpers.shortenString = function(s, len) {
         } else {
             s = s.substring(0, s.lastIndexOf(' '));
         }
-
     }
+
     s += '…';
     return s;
 };

@@ -26,7 +26,8 @@ var washerFiles = [
     'google.youtube.subscriptions.js',
     'google.youtube.channel.js',
     'instagram.js',
-    'instagram.timeline.js'
+    'instagram.timeline.js',
+    'instagram.user.js'
 ];
 global.allWashers = {};
 washerFiles.forEach(function(file) {

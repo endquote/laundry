@@ -1,16 +1,20 @@
 /*
 
+washers/input/instagram-user
+washers/input/instagram-search (hashtag)
+washers/input/instagram-likes
+washers/input/instagram-notifications (no api for this, but could poll likes/comments on recent photos, follows, cache and compare changes)
+
+ig scopes isn't working
+handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
+
 set up email logging for errors
 command-line arg or config to set log level
 deploy each type of job to get email errors
 
-washers/input/instagram-notifications
-washers/input/instagram-user
-washers/input/instagram-search (hashtag)
-washers/input/instagram-likes (hashtag)
-
-ig scopes isn't working
-handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
+washers/input/tumblr-base
+washers/input/tumblr-following
+washers/input/tumblr-notifications
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
@@ -21,10 +25,6 @@ washers/input/twitter-notifications
 wahsers/output/rss - grouping
 wahsers/output/rss - better default filename
 wahsers/output/rss - better default title
-
-washers/input/tumblr-base
-washers/input/tumblr-following
-washers/input/tumblr-notifications
 
 washers/input/google-gmail-search
 
@@ -61,6 +61,8 @@ storage/readme.md
 readme.md
 
 some kind of website?
+
+washers/input/linkedin?
 
 */
 
