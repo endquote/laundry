@@ -1,10 +1,7 @@
 /*
 
-washers/input/instagram-likes
-washers/input/instagram-notifications (no api for this, but could poll likes/comments on recent photos, follows, cache and compare changes)
-
-ig scopes isn't working
-handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
+run job after create? don't create if error?
+share auth details between washers on the same service
 
 set up email logging for errors
 command-line arg or config to set log level
@@ -12,13 +9,13 @@ deploy each type of job to get email errors
 
 washers/input/tumblr-base
 washers/input/tumblr-following
-washers/input/tumblr-notifications
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
 washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
-washers/input/twitter-notifications
+
+better menu for more than a screenful of washers?
 
 wahsers/output/rss - grouping
 wahsers/output/rss - better default filename
@@ -32,6 +29,13 @@ wahsers/input/snapchat
 
 washers/input/pinterest-base
 washers/input/pinterest-following
+
+washers/input/instagram -- ig scopes isn't working
+washers/input/instagram -- handle: meta of your responses will contain an “error_type=OAuthAccessTokenError”
+
+washers/input/instagram-notifications (no api for this, but could poll likes/comments on recent photos, follows, cache and compare changes)
+washers/input/tumblr-notifications
+washers/input/twitter-notifications
 washers/input/pinterest-notifications
 
 replace rss.file with a selection of storage modules
