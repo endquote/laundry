@@ -1,6 +1,6 @@
 'use strict';
 
-var tumblr = require('tumblr.js');
+var tumblr = require('tumblr.js'); // https://www.npmjs.com/package/tumblr.js
 
 /*
 Tumblr Dashboard washer
@@ -22,6 +22,8 @@ Washers.Tumblr.Dashboard = function(config) {
 Washers.Tumblr.Dashboard.prototype = _.create(Washers.Tumblr.prototype);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
+
+    // https://www.tumblr.com/docs/en/api/v2
     var client = tumblr.createClient({
         consumer_key: this.consumerKey,
         consumer_secret: this.consumerSecret,
@@ -35,7 +37,8 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     var limit = 20;
     async.doWhilst(function(callback) {
         client.dashboard({
-            limit: Math.min(limit, quantity - posts.length)
+            limit: Math.min(limit, quantity - posts.length),
+            since_id: posts.length ? posts[posts.length - 1].id : 0
         }, function(err, data) {
             if (err) {
                 callback(err);
@@ -43,6 +46,10 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
             }
 
             posts = posts.concat(data.posts);
+            data.posts.forEach(function(post) {
+                console.log(post.id);
+            });
+
             log.debug(util.format('Got %d/%d posts', posts.length, quantity));
             lastResponse = data;
             callback();

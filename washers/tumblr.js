@@ -24,6 +24,7 @@ Washers.Tumblr = function(config) {
     this.classFile = path.basename(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/tumblr.html';
 
+    // Helpful for auth flow: http://t1mg.com/tumblr-api-oauth-in-node/
     this.input = _.merge({
         settings: [{
             name: 'consumerKey',
