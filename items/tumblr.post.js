@@ -29,8 +29,6 @@ Items.Tumblr.Post.factory = function(post) {
     item.sourceTitle = post.source_title;
     item.liked = post.liked;
 
-    console.log(item.postType);
-
     if (item.postType === 'text') {
         if (item.title) {
             item.title += util.format(': %s', Helpers.shortenString(S(item.title).stripTags(), 30));
