@@ -1,14 +1,14 @@
 /*
 
-run job after create? don't create if error?
+washers/input/tumblr-base
+washers/input/tumblr-following
+
 share auth details between washers on the same service
+global configuration, for things like email errors?
+run job after create? don't create if error?
 
 set up email logging for errors
 command-line arg or config to set log level
-deploy each type of job to get email errors
-
-washers/input/tumblr-base
-washers/input/tumblr-following
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
