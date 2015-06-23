@@ -34,7 +34,6 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     var posts = [];
     var lastResponse = null;
     var limit = 20;
-    var totalPosts = 0;
     async.doWhilst(function(callback) {
         // https://www.tumblr.com/docs/en/api/v2
         client.dashboard({
@@ -49,7 +48,6 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
 
             data.posts.forEach(function(post) {
                 posts.push(Items.Tumblr.Post.factory(post));
-                totalPosts = post.total_posts;
             });
 
             log.debug(util.format('Got %d/%d posts', posts.length, quantity));
@@ -57,7 +55,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
             callback();
         });
     }, function() {
-        return lastResponse.posts.length === limit && posts.length < quantity && posts.length < totalPosts;
+        return lastResponse.posts.length === limit && posts.length < quantity;
     }, function(err) {
         callback(err, posts);
     });
