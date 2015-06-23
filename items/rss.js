@@ -10,14 +10,7 @@ Items.RSS = function(config) {
 Items.RSS.prototype = _.create(global.Item.prototype);
 
 Items.RSS.factory = function(item) {
-    return new Items.RSS({
-        title: item.title,
-        description: item.description,
-        url: item.link,
-        date: moment(item.date),
-        author: item.author,
-        tags: item.categories
-    });
+    return new Items.RSS(Item.factory(item));
 };
 
 module.exports = Items.RSS;

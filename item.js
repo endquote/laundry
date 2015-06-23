@@ -18,4 +18,15 @@ var Item = function(config) {
     }
 };
 
+Item.factory = function(item) {
+    return new Item({
+        title: item.title,
+        description: item.description,
+        url: item.link,
+        date: moment(item.date),
+        author: item.author,
+        tags: item.categories
+    });
+};
+
 module.exports = Item;

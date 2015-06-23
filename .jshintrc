@@ -18,7 +18,8 @@
         "async": true,
         "moment": true,
         "util": true,
-        "validator": true
+        "validator": true,
+        "S": true
     },
     "curly": true,
     "eqeqeq": true,

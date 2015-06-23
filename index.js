@@ -11,6 +11,7 @@ global.async = require('async'); // https://www.npmjs.com/package/async
 global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
 global.validator = require('validator'); // https://www.npmjs.com/package/validator
+global.S = require('string'); // http://stringjs.com
 
 
 // Load internal classes into the global namespace. (Is this totally bad form?)
@@ -43,7 +44,8 @@ global.Item = require('./item');
 var itemFiles = [
     'rss.js',
     'google.youtube.video.js',
-    'instagram.media.js'
+    'instagram.media.js',
+    'tumblr.post.js'
 ];
 global.allItems = {};
 itemFiles.forEach(function(file) {

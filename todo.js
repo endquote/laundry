@@ -46,6 +46,7 @@ storage/s3
 
 replace ~/.laundry with a storage module
 
+washers/output/pinboard
 washers/output/json
 washers/output/sqlite
 washers/output/email

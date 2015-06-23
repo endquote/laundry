@@ -23,7 +23,6 @@ Washers.Tumblr.Dashboard.prototype = _.create(Washers.Tumblr.prototype);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
 
-    // https://www.tumblr.com/docs/en/api/v2
     var client = tumblr.createClient({
         consumer_key: this.consumerKey,
         consumer_secret: this.consumerSecret,
@@ -31,23 +30,26 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
         token_secret: this.accessTokenSecret
     });
 
-    var quantity = 160;
+    var quantity = 40;
     var posts = [];
     var lastResponse = null;
     var limit = 20;
+    var totalPosts = 0;
     async.doWhilst(function(callback) {
+        // https://www.tumblr.com/docs/en/api/v2
         client.dashboard({
             limit: Math.min(limit, quantity - posts.length),
-            since_id: posts.length ? posts[posts.length - 1].id : 0
+            since_id: posts.length ? posts[posts.length - 1].id : null,
+            type: 'photo' // text, quote, link, answer, video, audio, photo, chat
         }, function(err, data) {
             if (err) {
                 callback(err);
                 return;
             }
 
-            posts = posts.concat(data.posts);
             data.posts.forEach(function(post) {
-                console.log(post.id);
+                posts.push(Items.Tumblr.Post.factory(post));
+                totalPosts = post.total_posts;
             });
 
             log.debug(util.format('Got %d/%d posts', posts.length, quantity));
@@ -55,7 +57,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
             callback();
         });
     }, function() {
-        return lastResponse.posts.length === limit && posts.length <= quantity;
+        return lastResponse.posts.length === limit && posts.length < quantity && posts.length < totalPosts;
     }, function(err) {
         callback(err, posts);
     });
