@@ -33,13 +33,13 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     var quantity = 40;
     var posts = [];
     var lastResponse = null;
-    var limit = 20;
+    var limit = 100;
     async.doWhilst(function(callback) {
         // https://www.tumblr.com/docs/en/api/v2
         client.dashboard({
             limit: Math.min(limit, quantity - posts.length),
             since_id: posts.length ? posts[posts.length - 1].id : null,
-            type: 'photo' // text, quote, link, answer, video, audio, photo, chat
+            type: null // text, quote, link, answer, video, audio, photo, chat
         }, function(err, data) {
             if (err) {
                 callback(err);
