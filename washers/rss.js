@@ -86,14 +86,7 @@ Washers.RSS.prototype.doInput = function(callback) {
         var item;
 
         while (item = stream.read()) { // jshint ignore:line
-            items.push(new Items.RSS({
-                title: item.title,
-                description: item.description,
-                url: item.link,
-                date: moment(item.date),
-                author: item.author,
-                tags: item.categories
-            }));
+            items.push(Items.RSS.factory(item));
         }
     });
 
