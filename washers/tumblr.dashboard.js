@@ -35,12 +35,17 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     var lastResponse = null;
     var limit = 100;
     async.doWhilst(function(callback) {
-        // https://www.tumblr.com/docs/en/api/v2
-        client.dashboard({
+
+        var opts = {
             limit: Math.min(limit, quantity - posts.length),
-            since_id: posts.length ? posts[posts.length - 1].id : null,
-            type: null // text, quote, link, answer, video, audio, photo, chat
-        }, function(err, data) {
+            since_id: posts.length ? posts[posts.length - 1].id : null
+        };
+
+        // This implements a filter even if null.
+        //opts.type = null; // text, quote, link, answer, video, audio, photo, chat
+
+        // https://www.tumblr.com/docs/en/api/v2
+        client.dashboard(opts, function(err, data) {
             if (err) {
                 callback(err);
                 return;
