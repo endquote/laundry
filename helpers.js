@@ -9,7 +9,7 @@ function Helpers() {}
 
 // Shorten a string to be less than a given length, ending in an ellipsis, trying to break on whole words.
 Helpers.shortenString = function(s, len) {
-    s = s.trim();
+    s = S(s.trim()).stripPunctuation();
 
     if (!s) {
         return '';
