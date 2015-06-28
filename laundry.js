@@ -154,149 +154,37 @@ Laundry.prototype.create = function(jobName, callback) {
             }
         },
 
-        // B: Ask for the input washer.
+        // Ask for the input washer.
         function(rl, job, callback) {
             mode = 'input';
-            that._askForWasher(rl, job, mode, callback);
-        },
-
-        // C: Configure the input washer.
-        function(rl, job, callback) {
-            mode = null;
-            var config = {};
-            var washer = job.input;
-
-            that._inheritSettings(washer, 'input', allJobs);
-
-            async.eachSeries(washer.input.settings, function(item, callback) {
-                var valid = false;
-
-                if (!item.beforeEntry) {
-                    item.beforeEntry = function(rl, prompt, callback) {
-                        callback(true, prompt);
-                    };
-                }
-
-                if (!item.afterEntry) {
-                    item.afterEntry = function(rl, lastValue, newValue, callback) {
-                        callback();
-                    };
-                }
-
-                async.whilst(function() {
-                        return !valid;
-                    },
-                    function(callback) {
-                        // Call the beforeEntry method...
-                        item.beforeEntry.apply(washer, [
-                            rl,
-                            item.prompt,
-                            function(required, prompt) {
-                                if (!required) {
-                                    valid = true;
-                                    callback();
-                                    return;
-                                }
-
-                                // Show the prompt...
-                                rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
-                                    answer = Helpers.cleanString(answer);
-                                    // Call the after entry method
-                                    item.afterEntry.apply(washer, [rl, washer[item.name], answer,
-                                        function(err) {
-                                            if (err) {
-                                                // Reject the answer
-                                                rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
-                                            } else {
-                                                // Save the answer
-                                                valid = true;
-                                                washer[item.name] = answer;
-                                            }
-                                            callback();
-                                        }
-                                    ]);
-                                });
-                                rl.write(washer[item.name]);
-                            }
-                        ]);
-                    }, function(err) {
-                        callback(err);
-                    });
-            }, function(err) {
-                callback(err, rl, job);
+            that._askForWasher(rl, job, mode, function() {
+                callback(null, rl, job);
             });
         },
 
-        // B: Request the output washer.
-        function(rl, job, callback) {
-            mode = 'output';
-            that._askForWasher(rl, job, mode, callback);
-        },
-
-        // C: Configure the output washer.
+        // Configure the input washer.
         function(rl, job, callback) {
             mode = null;
-            var config = {};
-            var washer = job.output;
+            that._inheritSettings(job.input, 'input', allJobs);
+            that._configureWasher(rl, job.input, 'input', function() {
+                callback(null, rl, job);
+            });
+        },
 
-            that._inheritSettings(washer, 'output', allJobs);
+        // Request the output washer.
+        function(rl, job, callback) {
+            mode = 'output';
+            that._askForWasher(rl, job, mode, function() {
+                callback(null, rl, job);
+            });
+        },
 
-            async.eachSeries(washer.output.settings, function(item, callback) {
-                var valid = false;
-
-                if (!item.beforeEntry) {
-                    item.beforeEntry = function(rl, prompt, callback) {
-                        callback(true, prompt);
-                    };
-                }
-
-                if (!item.afterEntry) {
-                    item.afterEntry = function(rl, lastValue, newValue, callback) {
-                        callback();
-                    };
-                }
-
-                async.whilst(function() {
-                        return !valid;
-                    },
-                    function(callback) {
-                        // Call the beforeEntry method...
-                        item.beforeEntry.apply(washer, [
-                            rl,
-                            item.prompt,
-                            function(required, prompt) {
-                                if (!required) {
-                                    valid = true;
-                                    callback();
-                                    return;
-                                }
-
-                                // Show the prompt...
-                                rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
-                                    answer = Helpers.cleanString(answer);
-                                    // Call the after entry method
-                                    item.afterEntry.apply(washer, [rl, washer[item.name], answer,
-                                        function(err) {
-                                            if (err) {
-                                                // Reject the answer
-                                                rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
-                                            } else {
-                                                // Save the answer
-                                                valid = true;
-                                                washer[item.name] = answer;
-                                            }
-                                            callback();
-                                        }
-                                    ]);
-                                });
-                                rl.write(washer[item.name]);
-                            }
-                        ]);
-                    }, function(err) {
-                        callback(err);
-                    });
-            }, function(err) {
-                callback(err, rl, job);
+        // Configure the output washer.
+        function(rl, job, callback) {
+            mode = null;
+            that._inheritSettings(job.output, 'output', allJobs);
+            that._configureWasher(rl, job.output, 'output', function() {
+                callback(null, rl, job);
             });
         },
 
@@ -432,7 +320,7 @@ Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
             }
         },
         function(err) {
-            callback(err, rl, job);
+            callback(err);
         });
 };
 
@@ -459,6 +347,68 @@ Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
                 }
             });
         });
+    });
+};
+
+// Given a washer and an input/output mode, configure settings on the washer.
+Laundry.prototype._configureWasher = function(rl, washer, mode, callback) {
+    var that = this;
+    async.eachSeries(washer[mode].settings, function(item, callback) {
+        var valid = false;
+
+        if (!item.beforeEntry) {
+            item.beforeEntry = function(rl, prompt, callback) {
+                callback(true, prompt);
+            };
+        }
+
+        if (!item.afterEntry) {
+            item.afterEntry = function(rl, lastValue, newValue, callback) {
+                callback();
+            };
+        }
+
+        async.whilst(function() {
+                return !valid;
+            },
+            function(callback) {
+                // Call the beforeEntry method...
+                item.beforeEntry.apply(washer, [
+                    rl,
+                    item.prompt,
+                    function(required, prompt) {
+                        if (!required) {
+                            valid = true;
+                            callback();
+                            return;
+                        }
+
+                        // Show the prompt...
+                        rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
+                            answer = Helpers.cleanString(answer);
+                            // Call the after entry method
+                            item.afterEntry.apply(washer, [rl, washer[item.name], answer,
+                                function(err) {
+                                    if (err) {
+                                        // Reject the answer
+                                        rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                                    } else {
+                                        // Save the answer
+                                        valid = true;
+                                        washer[item.name] = answer;
+                                    }
+                                    callback();
+                                }
+                            ]);
+                        });
+                        rl.write(washer[item.name]);
+                    }
+                ]);
+            }, function(err) {
+                callback(err);
+            });
+    }, function(err) {
+        callback(err);
     });
 };
 
