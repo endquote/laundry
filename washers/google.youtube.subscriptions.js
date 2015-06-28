@@ -36,6 +36,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
         function(callback) {
             that.refreshAccessToken(callback);
         },
+
         // Call the subscriptions API to get all of the subscriptions.
         function(callback) {
 

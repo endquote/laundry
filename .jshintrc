@@ -25,5 +25,6 @@
     "eqeqeq": true,
     "nocomma": true,
     "strict": true,
-    "node": true
+    "node": true,
+    "loopfunc": true
 }

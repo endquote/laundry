@@ -1,9 +1,5 @@
 'use strict';
 
-var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
-var youtube = google.youtube('v3'); // https://developers.google.com/youtube/v3/docs/
-var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolinker.js
-
 /*
 Base class for YouTube washers containing common methods.
 input: none

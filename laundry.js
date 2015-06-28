@@ -196,6 +196,9 @@ Laundry.prototype.create = function(jobName, callback) {
             validWashers = [];
             var config = {};
             var washer = job.input;
+
+            that._inheritSettings(washer, 'input', allJobs);
+
             async.eachSeries(washer.input.settings, function(item, callback) {
                 var valid = false;
 
@@ -310,6 +313,9 @@ Laundry.prototype.create = function(jobName, callback) {
             validWashers = [];
             var config = {};
             var washer = job.output;
+
+            that._inheritSettings(washer, 'output', allJobs);
+
             async.eachSeries(washer.output.settings, function(item, callback) {
                 var valid = false;
 
@@ -445,6 +451,32 @@ Laundry.prototype.create = function(jobName, callback) {
         if (callback) {
             callback();
         }
+    });
+};
+
+// Given an input or output washer, find other jobs using a similar one and inherit settings from it.
+Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
+    var newWasher = washer.classFile.substr(0, washer.classFile.lastIndexOf('.js'));
+    var inheritWashers = [];
+    do {
+        newWasher = newWasher.substr(0, newWasher.lastIndexOf('.'));
+        var oldJobs = allJobs.filter(function(oldJob) {
+            return oldJob[mode].classFile.indexOf(newWasher) !== -1 && oldJob[mode].classFile !== washer.classFile;
+        });
+        oldJobs.forEach(function(job) {
+            if (inheritWashers.indexOf(job[mode]) === -1) {
+                inheritWashers.push(job[mode]);
+            }
+        });
+    } while (newWasher.indexOf('.') !== -1);
+    inheritWashers.forEach(function(oldWasher) {
+        oldWasher[mode].settings.forEach(function(oldSetting) {
+            washer[mode].settings.forEach(function(newSetting) {
+                if (oldSetting.name === newSetting.name) {
+                    washer[newSetting.name] = oldWasher[newSetting.name];
+                }
+            });
+        });
     });
 };
 
@@ -723,4 +755,4 @@ Laundry.prototype.server = function(port) {
 
 };
 
-module.exports = exports = new Laundry();
+module.exports = new Laundry();
