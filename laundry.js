@@ -132,8 +132,8 @@ Laundry.prototype.create = function(jobName, callback) {
         // Ask for the input washer.
         function(rl, job, callback) {
             mode = 'input';
-            that._askForWasher(rl, job, mode, function() {
-                callback(null, rl, job);
+            that._askForWasher(rl, job, mode, function(err) {
+                callback(err, rl, job);
             });
         },
 
@@ -141,16 +141,16 @@ Laundry.prototype.create = function(jobName, callback) {
         function(rl, job, callback) {
             mode = null;
             that._inheritSettings(job.input, 'input', allJobs);
-            that._configureWasher(rl, job.input, 'input', function() {
-                callback(null, rl, job);
+            that._configureWasher(rl, job.input, 'input', function(err) {
+                callback(err, rl, job);
             });
         },
 
         // Request the output washer.
         function(rl, job, callback) {
             mode = 'output';
-            that._askForWasher(rl, job, mode, function() {
-                callback(null, rl, job);
+            that._askForWasher(rl, job, mode, function(err) {
+                callback(err, rl, job);
             });
         },
 
@@ -158,8 +158,8 @@ Laundry.prototype.create = function(jobName, callback) {
         function(rl, job, callback) {
             mode = null;
             that._inheritSettings(job.output, 'output', allJobs);
-            that._configureWasher(rl, job.output, 'output', function() {
-                callback(null, rl, job);
+            that._configureWasher(rl, job.output, 'output', function(err) {
+                callback(err, rl, job);
             });
         },
 
