@@ -85,8 +85,10 @@ Laundry.prototype.create = function(jobName, callback) {
     }
 
     var that = this;
-    var validWashers = [];
     var allJobs = [];
+
+    // input, output, or null -- used to control the completion behavior
+    var mode = null;
 
     async.waterfall([
 
@@ -110,6 +112,17 @@ Laundry.prototype.create = function(jobName, callback) {
                             [], line
                         ];
                     }
+
+                    var validWashers = [];
+                    if (mode) {
+                        for (var i in allWashers) {
+                            var w = new allWashers[i]();
+                            if (w[mode] && w.name) {
+                                validWashers.push(w);
+                            }
+                        }
+                    }
+
                     var completions = validWashers.map(function(washer) {
                         return washer.name;
                     });
@@ -141,59 +154,15 @@ Laundry.prototype.create = function(jobName, callback) {
             }
         },
 
-        // A: Get all the washers and filter by the ones that support input.
-        function(rl, job, callback) {
-            validWashers = [];
-            for (var i in allWashers) {
-                var w = new allWashers[i]();
-                if (w.input && w.name) {
-                    validWashers.push(w);
-                }
-            }
-            callback(null, rl, job);
-        },
-
         // B: Ask for the input washer.
         function(rl, job, callback) {
-            var washersList = '';
-            validWashers.forEach(function(washer) {
-                washersList += util.format(chalk.bold("%s") + " - %s\n", washer.name, washer.input.description);
-            });
-
-            var list = util.format("Now to decide where to launder data from. The sources we have are:\n%s\n", washersList);
-            rl.write("\n" + wrap(list, that._wrapOpts));
-
-            var washer = null;
-            async.whilst(function() {
-                    return washer === null || washer === undefined;
-                }, function(callback) {
-                    rl.question(wrap("Which source do you want to use? ", that._wrapOpts), function(answer) {
-                        answer = chalk.stripColor(answer).trim();
-                        washer = validWashers.filter(function(washer) {
-                            return washer.name.toLowerCase() === answer.toLowerCase();
-                        })[0];
-                        if (washer) {
-                            rl.write(wrap(util.format("Cool, we'll start with " + chalk.green.bold("%s") + ".", washer.name), that._wrapOpts) + '\n\n');
-                            if (!job.input || job.input.name !== washer.name) {
-                                job.input = washer;
-                            }
-                        } else {
-                            rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), that._wrapOpts));
-                        }
-                        callback();
-                    });
-                    if (job.input) {
-                        rl.write(job.input.name);
-                    }
-                },
-                function(err) {
-                    callback(err, rl, job);
-                });
+            mode = 'input';
+            that._askForWasher(rl, job, mode, callback);
         },
 
         // C: Configure the input washer.
         function(rl, job, callback) {
-            validWashers = [];
+            mode = null;
             var config = {};
             var washer = job.input;
 
@@ -258,59 +227,15 @@ Laundry.prototype.create = function(jobName, callback) {
             });
         },
 
-        // A: Get all the washers and filter by the ones that support output.
-        function(rl, job, callback) {
-            validWashers = [];
-            for (var i in allWashers) {
-                var w = new allWashers[i]();
-                if (w.output && w.name) {
-                    validWashers.push(w);
-                }
-            }
-            callback(null, rl, job);
-        },
-
         // B: Request the output washer.
         function(rl, job, callback) {
-            var washersList = '';
-            validWashers.forEach(function(washer) {
-                washersList += util.format(chalk.bold("%s") + " - %s", washer.name, washer.output.description);
-            });
-
-            var list = util.format("Now to decide where to send data to. The options we have are:\n%s\n\n", washersList);
-            rl.write("\n" + wrap(list, that._wrapOpts));
-
-            var washer = null;
-            async.whilst(function() {
-                    return washer === null || washer === undefined;
-                }, function(callback) {
-                    rl.question(wrap("Which target do you want to use? ", that._wrapOpts), function(answer) {
-                        answer = chalk.stripColor(answer).trim();
-                        washer = validWashers.filter(function(washer) {
-                            return washer.name.toLowerCase() === answer.toLowerCase();
-                        })[0];
-                        if (washer) {
-                            rl.write(wrap(util.format("Cool, we'll send it to " + chalk.green.bold("%s") + ".\n", washer.name), that._wrapOpts));
-                            if (!job.output || job.output.name !== washer.name) {
-                                job.output = washer;
-                            }
-                        } else {
-                            rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), that._wrapOpts));
-                        }
-                        callback();
-                    });
-                    if (job.output) {
-                        rl.write(job.output.name);
-                    }
-                },
-                function(err) {
-                    callback(err, rl, job);
-                });
+            mode = 'output';
+            that._askForWasher(rl, job, mode, callback);
         },
 
         // C: Configure the output washer.
         function(rl, job, callback) {
-            validWashers = [];
+            mode = null;
             var config = {};
             var washer = job.output;
 
@@ -377,7 +302,7 @@ Laundry.prototype.create = function(jobName, callback) {
 
         // Configure scheduling.
         function(rl, job, callback) {
-            validWashers = [];
+            mode = null;
 
             var prompt = '';
             prompt += "Now to set when this job will run.\n";
@@ -452,6 +377,63 @@ Laundry.prototype.create = function(jobName, callback) {
             callback();
         }
     });
+};
+
+// Prompt the user for an input or output washer.
+Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
+    var that = this;
+
+    var validWashers = [];
+    for (var i in allWashers) {
+        var w = new allWashers[i]();
+        if (w[mode] && w.name) {
+            validWashers.push(w);
+        }
+    }
+
+    var washersList = '';
+    validWashers.forEach(function(washer) {
+        washersList += util.format(chalk.bold("%s") + " - %s\n", washer.name, washer[mode].description);
+    });
+
+    var prompt = "Now to decide where to launder data from. The sources we have are:\n%s\n";
+    var confirm = "Cool, we'll start with " + chalk.green.bold("%s") + ".";
+    var question = "Which source do you want to use? ";
+    if (mode === 'output') {
+        prompt = "Now to decide where to send data to. The options we have are:\n%s\n\n";
+        confirm = "Cool, we'll send it to " + chalk.green.bold("%s") + ".\n";
+        question = "Which target do you want to use? ";
+    }
+
+    var list = util.format(prompt, washersList);
+    rl.write("\n" + wrap(list, that._wrapOpts));
+
+    var washer = null;
+    async.whilst(function() {
+            return washer === null || washer === undefined;
+        }, function(callback) {
+            rl.question(wrap(question, that._wrapOpts), function(answer) {
+                answer = chalk.stripColor(answer).trim();
+                washer = validWashers.filter(function(washer) {
+                    return washer.name.toLowerCase() === answer.toLowerCase();
+                })[0];
+                if (washer) {
+                    rl.write(wrap(util.format(confirm, washer.name), that._wrapOpts) + '\n\n');
+                    if (!job[mode] || job[mode].name !== washer.name) {
+                        job[mode] = washer;
+                    }
+                } else {
+                    rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), that._wrapOpts));
+                }
+                callback();
+            });
+            if (job[mode]) {
+                rl.write(job[mode].name);
+            }
+        },
+        function(err) {
+            callback(err, rl, job);
+        });
 };
 
 // Given an input or output washer, find other jobs using a similar one and inherit settings from it.
