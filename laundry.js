@@ -106,32 +106,7 @@ Laundry.prototype.create = function(jobName, callback) {
                 input: process.stdin,
                 output: process.stdout,
                 completer: function(line) {
-                    line = line.toLowerCase();
-                    if (!line) {
-                        return [
-                            [], line
-                        ];
-                    }
-
-                    var validWashers = [];
-                    if (mode) {
-                        for (var i in allWashers) {
-                            var w = new allWashers[i]();
-                            if (w[mode] && w.name) {
-                                validWashers.push(w);
-                            }
-                        }
-                    }
-
-                    var completions = validWashers.map(function(washer) {
-                        return washer.name;
-                    });
-
-                    completions.sort();
-                    completions = completions.filter(function(completion) {
-                        return completion.toLowerCase().indexOf(line) === 0;
-                    });
-                    return [completions, line];
+                    return that._tabComplete(mode, line);
                 }
             });
             callback(null, rl);
@@ -265,6 +240,37 @@ Laundry.prototype.create = function(jobName, callback) {
             callback();
         }
     });
+};
+
+// Tab completion function to complete washer names in the console. Weird.
+// https://nodejs.org/api/readline.html#readline_readline_createinterface_options
+Laundry.prototype._tabComplete = function(mode, line) {
+    line = line.toLowerCase();
+    if (!line) {
+        return [
+            [], line
+        ];
+    }
+
+    var validWashers = [];
+    if (mode) {
+        for (var i in allWashers) {
+            var w = new allWashers[i]();
+            if (w[mode] && w.name) {
+                validWashers.push(w);
+            }
+        }
+    }
+
+    var completions = validWashers.map(function(washer) {
+        return washer.name;
+    });
+
+    completions.sort();
+    completions = completions.filter(function(completion) {
+        return completion.toLowerCase().indexOf(line) === 0;
+    });
+    return [completions, line];
 };
 
 // Prompt the user for an input or output washer.
