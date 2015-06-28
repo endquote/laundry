@@ -166,67 +166,9 @@ Laundry.prototype.create = function(jobName, callback) {
         // Configure scheduling.
         function(rl, job, callback) {
             mode = null;
-
-            var prompt = '';
-            prompt += "Now to set when this job will run.\n";
-            prompt += "- Leave blank to run only when 'laundry run [job]' is called.\n";
-            prompt += "- Enter a number to run after so many minutes. Entering 60 will run the job every hour.\n";
-            prompt += "- Enter a time to run at a certain time every day, like '9:30' or '13:00'.\n";
-            prompt += "- Enter the name of another job to run after that job runs.\n\n";
-            rl.write("\n" + wrap(prompt, that._wrapOpts));
-
-            var valid = false;
-            async.whilst(function() {
-                    return !valid;
-                },
-                function(callback) {
-                    rl.question(wrap("How do you want the job to be scheduled? ", that._wrapOpts), function(answer) {
-                        answer = chalk.stripColor(answer).trim().toLowerCase();
-
-                        if (!answer) {
-                            valid = true;
-                            rl.write(wrap(util.format("This job will only be run manually.\n"), that._wrapOpts));
-                        } else if (answer.indexOf(':') !== -1) {
-                            var time = moment({
-                                hour: answer.split(':')[0],
-                                minute: answer.split(':')[1]
-                            });
-                            valid = time.isValid();
-                            if (valid) {
-                                answer = time.hour() + ':' + time.minute();
-                                rl.write(wrap(util.format("This job will run every day at %s.\n", answer), that._wrapOpts));
-                            }
-                        } else if (!isNaN(parseInt(answer))) {
-                            answer = parseInt(answer);
-                            valid = answer > 0;
-                            if (valid) {
-                                rl.write(wrap(util.format("This job will run every %d minutes.\n", answer), that._wrapOpts));
-                            }
-                        } else {
-                            if (answer !== job.name.toLowerCase()) {
-                                allJobs.forEach(function(job) {
-                                    if (job.name.toLowerCase() === answer) {
-                                        valid = true;
-                                        answer = job.name;
-                                        rl.write(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".\n", answer), that._wrapOpts));
-                                    }
-                                });
-                            }
-                        }
-
-                        if (valid) {
-                            job.schedule = answer;
-                        } else {
-                            rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
-                        }
-                        callback();
-                    });
-                    if (job.schedule) {
-                        rl.write(job.schedule.toString());
-                    }
-                }, function(err) {
-                    callback(err, rl, job);
-                });
+            that._scheduleJob(rl, job, allJobs, function(err) {
+                callback(err, rl, job);
+            });
         }
 
     ], function(err, rl, job) {
@@ -416,6 +358,70 @@ Laundry.prototype._configureWasher = function(rl, washer, mode, callback) {
     }, function(err) {
         callback(err);
     });
+};
+
+Laundry.prototype._scheduleJob = function(rl, job, allJobs, callback) {
+    var that = this;
+    var prompt = '';
+    prompt += "Now to set when this job will run.\n";
+    prompt += "- Leave blank to run only when 'laundry run [job]' is called.\n";
+    prompt += "- Enter a number to run after so many minutes. Entering 60 will run the job every hour.\n";
+    prompt += "- Enter a time to run at a certain time every day, like '9:30' or '13:00'.\n";
+    prompt += "- Enter the name of another job to run after that job runs.\n\n";
+    rl.write("\n" + wrap(prompt, that._wrapOpts));
+
+    var valid = false;
+    async.whilst(function() {
+            return !valid;
+        },
+        function(callback) {
+            rl.question(wrap("How do you want the job to be scheduled? ", that._wrapOpts), function(answer) {
+                answer = chalk.stripColor(answer).trim().toLowerCase();
+
+                if (!answer) {
+                    valid = true;
+                    rl.write(wrap(util.format("This job will only be run manually.\n"), that._wrapOpts));
+                } else if (answer.indexOf(':') !== -1) {
+                    var time = moment({
+                        hour: answer.split(':')[0],
+                        minute: answer.split(':')[1]
+                    });
+                    valid = time.isValid();
+                    if (valid) {
+                        answer = time.hour() + ':' + time.minute();
+                        rl.write(wrap(util.format("This job will run every day at %s.\n", answer), that._wrapOpts));
+                    }
+                } else if (!isNaN(parseInt(answer))) {
+                    answer = parseInt(answer);
+                    valid = answer > 0;
+                    if (valid) {
+                        rl.write(wrap(util.format("This job will run every %d minutes.\n", answer), that._wrapOpts));
+                    }
+                } else {
+                    if (answer !== job.name.toLowerCase()) {
+                        allJobs.forEach(function(job) {
+                            if (job.name.toLowerCase() === answer) {
+                                valid = true;
+                                answer = job.name;
+                                rl.write(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".\n", answer), that._wrapOpts));
+                            }
+                        });
+                    }
+                }
+
+                if (valid) {
+                    job.schedule = answer;
+                } else {
+                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                }
+                callback();
+            });
+            if (job.schedule) {
+                rl.write(job.schedule.toString());
+            }
+        }, function(err) {
+            callback(err, rl, job);
+        });
 };
 
 // Edit an existing job.
