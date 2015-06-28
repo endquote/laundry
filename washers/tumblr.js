@@ -13,10 +13,7 @@ Washers.Tumblr = function(config) {
     this.consumerKey = null;
     this.consumerSecret = null;
     this.authVerifier = null;
-    this.authToken = null;
-    this.authTokenSecret = null;
-    this.accessToken = null;
-    this.accessTokenSecret = null;
+    this.token = null;
 
     Washer.call(this, config);
 
@@ -34,8 +31,7 @@ Washers.Tumblr = function(config) {
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
-                    this.accessToken = this.accessTokenSecret = null;
-                    this.authToken = this.authTokenSecret = null;
+                    this.token = null;
                 }
                 callback(validator.isWhitespace(newValue));
             }
@@ -47,8 +43,7 @@ Washers.Tumblr = function(config) {
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
-                    this.accessToken = this.accessTokenSecret = null;
-                    this.authToken = this.authTokenSecret = null;
+                    this.token = null;
                 }
                 callback(validator.isWhitespace(newValue));
             }
@@ -72,8 +67,10 @@ Washers.Tumblr = function(config) {
                     'HMAC-SHA1'
                 );
                 this._oauth.getOAuthRequestToken(null, function(err, oauth_token, oauth_token_secret, results) {
-                    that.authToken = oauth_token;
-                    that.authTokenSecret = oauth_token_secret;
+                    that.token = {
+                        oauthToken: oauth_token,
+                        oauthTokenSecret: oauth_token_secret
+                    };
                     var url = util.format('http://www.tumblr.com/oauth/authorize?oauth_token=%s', oauth_token);
                     Helpers.shortenUrl(url, function(url) {
                         prompt = util.format(prompt, url);
@@ -93,13 +90,13 @@ Washers.Tumblr = function(config) {
                 }
 
                 var that = this;
-                this._oauth.getOAuthAccessToken(this.authToken, this.authTokenSecret, newValue, function(err, oauth_access_token, oauth_access_token_secret, results) {
+                this._oauth.getOAuthAccessToken(this.token.oauthToken, this.token.oauthTokenSecret, newValue, function(err, oauth_access_token, oauth_access_token_secret, results) {
                     if (err) {
                         callback(true);
                         return;
                     }
-                    that.accessToken = oauth_access_token;
-                    that.accessTokenSecret = oauth_access_token_secret;
+                    that.token.accessToken = oauth_access_token;
+                    that.token.accessTokenSecret = oauth_access_token_secret;
                     callback(false);
                 });
             }

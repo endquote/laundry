@@ -26,8 +26,8 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     var client = tumblr.createClient({
         consumer_key: this.consumerKey,
         consumer_secret: this.consumerSecret,
-        token: this.accessToken,
-        token_secret: this.accessTokenSecret
+        token: this.token.accessToken,
+        token_secret: this.token.accessTokenSecret
     });
 
     var quantity = 40;
