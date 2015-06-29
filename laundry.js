@@ -481,7 +481,7 @@ Laundry.prototype.run = function(jobName, callback) {
                 if (jobName === 'all') {
                     runJobs = allJobs.filter(function(job1) {
                         return allJobs.filter(function(job2) {
-                            return job1.schedule.toLowerCase() === job2.name.toLowerCase();
+                            return job1.schedule.toString().toLowerCase() === job2.name.toLowerCase();
                         }).length === 0;
                     });
                 }
