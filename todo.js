@@ -1,7 +1,5 @@
 /*
 
-global allJobs?
-
 global configuration, for things like email errors, log level? "laundry config"
 run job after create? don't create if error?
 set up email logging for errors

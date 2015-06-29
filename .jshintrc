@@ -9,6 +9,7 @@
         "Helpers": true,
         "allWashers": true,
         "allItems": true,
+        "allJobs": true,
         
         "_": true,
         "ns": true,

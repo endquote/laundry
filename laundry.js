@@ -85,20 +85,11 @@ Laundry.prototype.create = function(jobName, callback) {
     }
 
     var that = this;
-    var allJobs = [];
 
     // input, output, or null -- used to control the completion behavior
     var mode = null;
 
     async.waterfall([
-
-        // Get all the jobs, for scheduling.
-        function(callback) {
-            Job.getAllJobs(function(jobs) {
-                allJobs = jobs;
-                callback();
-            });
-        },
 
         // Set up the console.
         function(callback) {
@@ -458,16 +449,7 @@ Laundry.prototype.run = function(jobName, callback) {
     }
 
     var that = this;
-    var allJobs = null;
     async.waterfall([
-
-            // Get all jobs.
-            function(callback) {
-                Job.getAllJobs(function(jobs) {
-                    allJobs = jobs;
-                    callback();
-                });
-            },
 
             // Find the requested job.
             function(callback) {
@@ -617,33 +599,30 @@ Laundry.prototype.destroy = function(jobName, callback) {
 Laundry.prototype.list = function(callback) {
     var out = 'Current jobs: \n';
 
-    Job.getAllJobs(function(jobs) {
-        if (!jobs.length) {
-            out = 'There are no jobs configured. Use "laundry create" to make one.';
-        }
+    if (!allJobs.length) {
+        out = 'There are no jobs configured. Use "laundry create" to make one.';
+    }
 
-        // TODO: Sort list alphabetically, but with "afters" ordered
-        jobs.forEach(function(job) {
-            if (job) {
-                var schedule = job.schedule;
-                if (typeof schedule === 'number') {
-                    out += util.format(chalk.bold("%s") + " runs every %d minutes.", job.name, schedule);
-                } else if (!schedule) {
-                    out += util.format(chalk.bold("%s") + " runs manually.", job.name);
-                } else if (schedule.indexOf(':') !== -1) {
-                    out += util.format(chalk.bold("%s") + " runs every day at %s.", job.name, schedule);
-                } else {
-                    out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.name, schedule);
-                }
-                out += '\n';
+    allJobs.forEach(function(job) {
+        if (job) {
+            var schedule = job.schedule;
+            if (typeof schedule === 'number') {
+                out += util.format(chalk.bold("%s") + " runs every %d minutes.", job.name, schedule);
+            } else if (!schedule) {
+                out += util.format(chalk.bold("%s") + " runs manually.", job.name);
+            } else if (schedule.indexOf(':') !== -1) {
+                out += util.format(chalk.bold("%s") + " runs every day at %s.", job.name, schedule);
+            } else {
+                out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.name, schedule);
             }
-        });
-
-        console.log(out);
-        if (callback) {
-            callback();
+            out += '\n';
         }
     });
+
+    console.log(out);
+    if (callback) {
+        callback();
+    }
 };
 
 // Run jobs according to their schedule.

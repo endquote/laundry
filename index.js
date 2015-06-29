@@ -75,26 +75,34 @@ log.add(log.transports.DailyRotateFile, {
 });
 log.level = 'debug';
 
-// Parse arguments
-var args = process.argv.slice(2);
+// Load all the jobs all the commands need this anyway.
+Job.getAllJobs(function(jobs) {
+    global.allJobs = jobs;
+    onStart();
+});
 
-var command = '';
-if (args.length > 0) {
-    command = args.shift().trim().toLowerCase();
-}
+function onStart() {
+    // Parse arguments
+    var args = process.argv.slice(2);
 
-var arg = '';
-if (args.length > 0) {
-    arg = args.shift().trim().toLowerCase();
-}
+    var command = '';
+    if (args.length > 0) {
+        command = args.shift().trim().toLowerCase();
+    }
 
-// Do stuff
-var laundry = require('./laundry');
+    var arg = '';
+    if (args.length > 0) {
+        arg = args.shift().trim().toLowerCase();
+    }
 
-if (laundry.isCommand(command)) {
-    laundry.doCommand(command, arg, onComplete);
-} else {
-    laundry.help(onComplete);
+    // Do stuff
+    var laundry = require('./laundry');
+
+    if (laundry.isCommand(command)) {
+        laundry.doCommand(command, arg, onComplete);
+    } else {
+        laundry.help(onComplete);
+    }
 }
 
 function onComplete() {
