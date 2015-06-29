@@ -274,26 +274,40 @@ Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
 
 // Given an input or output washer, find other jobs using a similar one and inherit settings from it.
 Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
-    var newWasher = washer.classFile.substr(0, washer.classFile.lastIndexOf('.js'));
-    var inheritWashers = [];
-    do {
-        newWasher = newWasher.substr(0, newWasher.lastIndexOf('.'));
-        var oldJobs = allJobs.filter(function(oldJob) {
-            return oldJob[mode].classFile.indexOf(newWasher) !== -1 && oldJob[mode].classFile !== washer.classFile;
-        });
-        oldJobs.forEach(function(job) {
-            if (inheritWashers.indexOf(job[mode]) === -1) {
-                inheritWashers.push(job[mode]);
-            }
-        });
-    } while (newWasher.indexOf('.') !== -1);
-    inheritWashers.forEach(function(oldWasher) {
-        oldWasher[mode].settings.forEach(function(oldSetting) {
-            washer[mode].settings.forEach(function(newSetting) {
-                if (oldSetting.name === newSetting.name) {
-                    washer[newSetting.name] = oldWasher[newSetting.name];
+    var washerClass = washer.classFile.replace('.js', '');
+
+    // Collect the base classes that the washer inherits from.
+    var baseClasses = [];
+    while (washerClass.indexOf('.') !== -1) {
+        washerClass = washerClass.substr(0, washerClass.lastIndexOf('.'));
+        baseClasses.push(washerClass);
+    }
+
+    // Collect the settings in those base classes.
+    var settings = ['token'];
+    baseClasses.forEach(function(baseClass) {
+        var w = new allWashers[baseClass]();
+        if (w[mode]) {
+            w[mode].settings.forEach(function(setting) {
+                if (settings.indexOf(setting.name) === -1) {
+                    settings.push(setting.name);
                 }
             });
+        }
+    });
+
+    // Collect the jobs which use this same washer or any of its base classes.
+    var relatedJobs = allJobs.filter(function(job) {
+        var jobClass = job[mode].classFile.replace('.js', '');
+        return baseClasses.filter(function(baseClass) {
+            return jobClass.indexOf(baseClass) !== -1;
+        }).length;
+    });
+
+    // Merge settings from the related job into this new washer.
+    relatedJobs.forEach(function(job) {
+        settings.forEach(function(setting) {
+            washer[setting] = job[mode][setting];
         });
     });
 };

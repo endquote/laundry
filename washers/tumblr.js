@@ -27,7 +27,7 @@ Washers.Tumblr = function(config) {
             name: 'consumerKey',
             prompt: util.format('Go to https://www.tumblr.com/oauth/register. For the callback URL enter %s. Fill in whatever for the other fields. Click "Register".\nWhat is the "OAuth Consumer Key"?\n', this._callbackUri),
             beforeEntry: function(rl, prompt, callback) {
-                callback(this.accessToken && this.accessTokenSecret ? false : true, prompt);
+                callback(this.token ? false : true, prompt);
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
@@ -39,7 +39,7 @@ Washers.Tumblr = function(config) {
             name: 'consumerSecret',
             prompt: 'Click "Show secret key". Scary, right? What is the secret key?\n',
             beforeEntry: function(rl, prompt, callback) {
-                callback(this.accessToken && this.accessTokenSecret ? false : true, prompt);
+                callback(this.token ? false : true, prompt);
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
@@ -51,7 +51,7 @@ Washers.Tumblr = function(config) {
             name: 'authVerifier',
             prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
             beforeEntry: function(rl, prompt, callback) {
-                if (this.accessToken && this.accessTokenSecret) {
+                if (this.token) {
                     callback(false, prompt);
                     return;
                 }
