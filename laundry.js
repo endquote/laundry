@@ -14,7 +14,7 @@ function Laundry() {
     this._commands = {
         'create': 'create [job] -- configure a new job',
         'edit': 'edit [job] -- edit the configuration of an existing job',
-        'run': 'run [job] -- run an existing job',
+        'run': 'run [job] -- run an existing job (or "run all" to do that)',
         'destroy': 'destroy [job] -- destroy an existing job',
         'list': 'list -- list configured jobs',
         'tick': 'tick -- run on an interval to run scheduled jobs',
@@ -78,7 +78,7 @@ Laundry.prototype.help = function(callback) {
 
 // Create a new job.
 Laundry.prototype.create = function(jobName, callback) {
-    if (!jobName) {
+    if (!jobName || jobName.toLowerCase() === 'all') {
         console.log("Specify a name for the job with " + chalk.bold("laundry create [job]") + ".\n");
         this.list(callback);
         return;
@@ -448,13 +448,21 @@ Laundry.prototype.run = function(jobName, callback) {
         return;
     }
 
+    jobName = jobName.toLowerCase();
+
     var that = this;
     async.waterfall([
 
             // Find the requested job.
             function(callback) {
+                // Skip if it's all jobs.
+                if (jobName === 'all') {
+                    callback(null, null);
+                    return;
+                }
+
                 var job = allJobs.filter(function(job) {
-                    return job.name.toLowerCase() === jobName.toLowerCase();
+                    return job.name.toLowerCase() === jobName;
                 })[0];
                 if (!job) {
                     console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
@@ -468,6 +476,16 @@ Laundry.prototype.run = function(jobName, callback) {
             // Add any jobs which are scheduled to run after others.
             function(job, callback) {
                 var runJobs = [job];
+
+                // If all jobs, select everything that isn't scheduled to run after something else.
+                if (jobName === 'all') {
+                    runJobs = allJobs.filter(function(job1) {
+                        return allJobs.filter(function(job2) {
+                            return job1.schedule.toLowerCase() === job2.name.toLowerCase();
+                        }).length === 0;
+                    });
+                }
+
                 var foundJobs = false;
                 do {
                     foundJobs = false;
