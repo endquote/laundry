@@ -13,7 +13,6 @@ global.util = require('util'); // https://nodejs.org/api/util.html
 global.validator = require('validator'); // https://www.npmjs.com/package/validator
 global.S = require('string'); // http://stringjs.com
 
-
 // Load internal classes into the global namespace. (Is this totally bad form?)
 global.Helpers = require('./helpers');
 global.Job = require('./job');
@@ -53,7 +52,7 @@ itemFiles.forEach(function(file) {
 });
 
 // Make config folder
-var home = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 var configFolder = path.join(home, '.laundry');
 if (!fs.existsSync(configFolder)) {
     fs.mkdirSync(configFolder);
@@ -71,7 +70,7 @@ log.add(log.transports.DailyRotateFile, {
     filename: path.join(configFolder, 'logs', 'laundry'),
     json: false,
     datePattern: '.yyyy-MM-dd.log',
-    maxFiles: 90
+    maxFiles: 7
 });
 log.level = 'debug';
 

@@ -2,7 +2,7 @@
 
 global configuration, for things like email errors, log level? "laundry config"
 run job after create? don't create if error?
-set up email logging for errors
+set up email logging for errors?
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
