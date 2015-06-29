@@ -12,7 +12,7 @@ Washers.Instagram.Tag = function(config) {
     Washers.Instagram.call(this, config);
 
     this.name = 'Instagram/Tag';
-    this.classFile = path.basename(__filename);
+    this.className = path.basename(__filename.replace('.js', ''));
     this.input = _.merge(this.input, {
         description: 'Loads recent images from Instagram with a given tag.',
         settings: [{

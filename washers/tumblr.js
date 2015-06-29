@@ -18,7 +18,7 @@ Washers.Tumblr = function(config) {
     Washer.call(this, config);
 
     this.name = '';
-    this.classFile = path.basename(__filename);
+    this.className = path.basename(__filename.replace('.js', ''));
     this._callbackUri = 'http://laundry.endquote.com/callbacks/tumblr.html';
 
     // Helpful for auth flow: http://t1mg.com/tumblr-api-oauth-in-node/

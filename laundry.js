@@ -274,7 +274,7 @@ Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
 
 // Given an input or output washer, find other jobs using a similar one and inherit settings from it.
 Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
-    var washerClass = washer.classFile.replace('.js', '');
+    var washerClass = washer.className;
 
     // Collect the base classes that the washer inherits from.
     var baseClasses = [];
@@ -298,7 +298,7 @@ Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
 
     // Collect the jobs which use this same washer or any of its base classes.
     var relatedJobs = allJobs.filter(function(job) {
-        var jobClass = job[mode].classFile.replace('.js', '');
+        var jobClass = job[mode].className;
         return baseClasses.filter(function(baseClass) {
             return jobClass.indexOf(baseClass) !== -1;
         }).length;

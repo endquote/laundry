@@ -14,7 +14,7 @@ Washers.Instagram.User = function(config) {
     Washers.Instagram.call(this, config);
 
     this.name = 'Instagram/User';
-    this.classFile = path.basename(__filename);
+    this.className = path.basename(__filename.replace('.js', ''));
 
     this.input = _.merge(this.input, {
         description: 'Loads recent images from an Instagram account.',

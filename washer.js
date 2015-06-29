@@ -8,7 +8,7 @@ var Washer = function(config) {
     this.name = null;
 
     // The internal name.
-    this.classFile = path.basename(__filename);
+    this.className = path.basename(__filename.replace('.js', ''));
 
     // An object describing the input function of this washer, if any. It contains a user-facing
     // description of the functionality, and an array of settings required to configure it.
