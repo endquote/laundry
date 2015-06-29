@@ -19,7 +19,7 @@ Washers.Tumblr.Dashboard = function(config) {
     });
 };
 
-Washers.Tumblr.Dashboard.prototype = _.create(Washers.Tumblr.prototype);
+Washers.Tumblr.Dashboard.prototype = Object.create(Washers.Tumblr.prototype);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
 

@@ -15,7 +15,7 @@ Items.Instagram.Media = function(config) {
     Item.call(this, config);
 };
 
-Items.Instagram.Media.prototype = _.create(global.Item.prototype);
+Items.Instagram.Media.prototype = Object.create(global.Item.prototype);
 
 // Convert a media object from the API into a media item.
 Items.Instagram.Media.factory = function(media) {

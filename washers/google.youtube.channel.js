@@ -27,7 +27,7 @@ Washers.Google.YouTube.Channel = function(config) {
     });
 };
 
-Washers.Google.YouTube.Channel.prototype = _.create(Washers.Google.YouTube.prototype);
+Washers.Google.YouTube.Channel.prototype = Object.create(Washers.Google.YouTube.prototype);
 
 Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
     var that = this;

@@ -11,7 +11,7 @@ Items.Tumblr.Post = function(config) {
     Item.call(this, config);
 };
 
-Items.Tumblr.Post.prototype = _.create(global.Item.prototype);
+Items.Tumblr.Post.prototype = Object.create(global.Item.prototype);
 
 // Convert a post from the API into a media item.
 Items.Tumblr.Post.factory = function(post) {

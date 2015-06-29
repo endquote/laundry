@@ -48,7 +48,7 @@ Washers.RSS = function(config) {
     }, this.output);
 };
 
-Washers.RSS.prototype = _.create(Washer.prototype);
+Washers.RSS.prototype = Object.create(Washer.prototype);
 
 // Request the feed, parse it into items, and pass it to the output washer.
 Washers.RSS.prototype.doInput = function(callback) {

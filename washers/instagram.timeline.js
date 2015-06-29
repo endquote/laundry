@@ -19,7 +19,7 @@ Washers.Instagram.Timeline = function(config) {
     });
 };
 
-Washers.Instagram.Timeline.prototype = _.create(Washers.Instagram.prototype);
+Washers.Instagram.Timeline.prototype = Object.create(Washers.Instagram.prototype);
 
 Washers.Instagram.Timeline.prototype.doInput = function(callback) {
     var that = this;

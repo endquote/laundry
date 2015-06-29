@@ -25,7 +25,7 @@ Washers.Instagram.Tag = function(config) {
     });
 };
 
-Washers.Instagram.Tag.prototype = _.create(Washers.Instagram.prototype);
+Washers.Instagram.Tag.prototype = Object.create(Washers.Instagram.prototype);
 
 Washers.Instagram.Tag.prototype.doInput = function(callback) {
     var that = this;

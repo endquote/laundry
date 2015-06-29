@@ -19,7 +19,7 @@ Washers.Instagram.Likes = function(config) {
     });
 };
 
-Washers.Instagram.Likes.prototype = _.create(Washers.Instagram.prototype);
+Washers.Instagram.Likes.prototype = Object.create(Washers.Instagram.prototype);
 
 Washers.Instagram.Likes.prototype.doInput = function(callback) {
     var that = this;

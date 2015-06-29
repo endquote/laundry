@@ -1,6 +1,5 @@
 /*
 
-object.create instead of _.create()?
 global allJobs?
 
 global configuration, for things like email errors, log level? "laundry config"

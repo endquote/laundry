@@ -25,7 +25,7 @@ Washers.Google.YouTube.Subscriptions = function(config) {
     });
 };
 
-Washers.Google.YouTube.Subscriptions.prototype = _.create(Washers.Google.YouTube.prototype);
+Washers.Google.YouTube.Subscriptions.prototype = Object.create(Washers.Google.YouTube.prototype);
 
 Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
     var that = this;

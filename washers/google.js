@@ -82,7 +82,7 @@ Washers.Google = function(config) {
     }, this.input);
 };
 
-Washers.Google.prototype = _.create(Washer.prototype);
+Washers.Google.prototype = Object.create(Washer.prototype);
 
 Washers.Google.prototype.refreshAccessToken = function(callback) {
     var that = this;

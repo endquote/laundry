@@ -7,7 +7,7 @@ Items.RSS = function(config) {
     Item.call(this, config);
 };
 
-Items.RSS.prototype = _.create(global.Item.prototype);
+Items.RSS.prototype = Object.create(global.Item.prototype);
 
 Items.RSS.factory = function(item) {
     return new Items.RSS(Item.factory(item));

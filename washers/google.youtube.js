@@ -16,6 +16,6 @@ Washers.Google.YouTube = function(config) {
     this.input = _.merge({}, this.input);
 };
 
-Washers.Google.YouTube.prototype = _.create(Washers.Google.prototype);
+Washers.Google.YouTube.prototype = Object.create(Washers.Google.prototype);
 
 module.exports = Washers.Google.YouTube;

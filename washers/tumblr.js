@@ -104,6 +104,6 @@ Washers.Tumblr = function(config) {
     }, this.input);
 };
 
-Washers.Tumblr.prototype = _.create(Washer.prototype);
+Washers.Tumblr.prototype = Object.create(Washer.prototype);
 
 module.exports = Washers.Tumblr;

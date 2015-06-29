@@ -10,7 +10,7 @@ Items.Google.YouTube.Video = function(config) {
     Item.call(this, config);
 };
 
-Items.Google.YouTube.Video.prototype = _.create(Item.prototype);
+Items.Google.YouTube.Video.prototype = Object.create(Item.prototype);
 
 // Convert a video from the api response into a laundry item.
 Items.Google.YouTube.Video.factory = function(video) {

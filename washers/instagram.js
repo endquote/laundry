@@ -74,7 +74,7 @@ Washers.Instagram = function(config) {
     }, this.input);
 };
 
-Washers.Instagram.prototype = _.create(Washer.prototype);
+Washers.Instagram.prototype = Object.create(Washer.prototype);
 
 Washers.Instagram.prototype.refreshToken = function(code, callback) {
     var that = this;
