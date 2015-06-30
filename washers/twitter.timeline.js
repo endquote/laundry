@@ -28,9 +28,11 @@ Washers.Twitter.Timeline.prototype.doInput = function(callback) {
         count: 200
     }, function(err, tweets, response) {
         tweets.forEach(function(tweet) {
-            posts.push(Items.Twitter.Tweet.factory(tweet));
+            var item = Items.Twitter.Tweet.factory(tweet);
+            if (!item.isReply && !item.isQuote && !item.isRetweet) {
+                posts.push(item);
+            }
         });
-
         callback(err, posts);
     });
 };

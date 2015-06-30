@@ -1,9 +1,10 @@
 /*
 
 put replace '.js' in a function
-
-washers/input/twitter-base
-washers/input/twitter-timeline (optional retweets, optional replies, contains string)
+washers/input/twitter-timeline
+	ignore retweets
+	ignore replies
+washers/input/twitter-hashtag (unless it's already there)
 washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
 

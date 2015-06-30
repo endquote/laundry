@@ -10,6 +10,7 @@ Items.Twitter.Tweet = function(config) {
     this.isReply = null;
     this.isQuote = null;
     this.retweets = 0;
+    this.isRetweet = false;
     this.isRetweeted = false;
 
     Item.call(this, config);
@@ -30,6 +31,7 @@ Items.Twitter.Tweet.factory = function(tweet) {
         isReply: tweet.in_reply_to_screen_name ? true : false,
         isQuote: tweet.quoted_status_id ? true : false,
         retweets: tweet.retweet_count,
+        isRetweet: tweet.retweeted_status ? true : false,
         isRetweeted: tweet.retweeted
     });
 
