@@ -33,11 +33,11 @@ Items.Twitter.Tweet.factory = function(tweet) {
         isRetweeted: tweet.retweeted
     });
 
-    item.title = item.author + Helpers.shortenString(tweet.text, 30);
+    item.title = item.author + ': ' + Helpers.shortenString(tweet.text, 30);
 
     if (tweet.entities.media) {
         tweet.entities.media.forEach(function(media) {
-            tweet.text = tweet.text.split().slice(media.indices[0], media.indices[1]);
+            tweet.text = tweet.text.slice(media.indices[0], media.indices[1]);
         });
     }
 
