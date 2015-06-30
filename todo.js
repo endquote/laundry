@@ -1,17 +1,14 @@
 /*
 
-global configuration, for things like email errors, log level? "laundry config"
-run job after create? don't create if error?
-set up email logging for errors?
+put replace '.js' in a function
 
 washers/input/twitter-base
 washers/input/twitter-timeline (optional retweets, optional replies, contains string)
 washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
 
-better menu for more than a screenful of washers?
+figure out output grouping
 
-wahsers/output/rss - grouping
 wahsers/output/rss - better default filename
 wahsers/output/rss - better default title
 
@@ -31,6 +28,12 @@ washers/input/instagram-notifications (no api for this, but could poll likes/com
 washers/input/tumblr-notifications
 washers/input/twitter-notifications
 washers/input/pinterest-notifications
+
+better menu for more than a screenful of washers?
+
+global configuration, for things like email errors, log level? "laundry config"
+run job after create? don't create if error?
+set up email logging for errors?
 
 replace rss.file with a selection of storage modules
 

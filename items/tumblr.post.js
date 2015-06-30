@@ -6,12 +6,12 @@ Items.Tumblr.Post = function(config) {
     this.reblogKey = null;
     this.sourceUrl = null;
     this.sourceTitle = null;
-    this.liked = null;
+    this.liked = false;
 
     Item.call(this, config);
 };
 
-Items.Tumblr.Post.prototype = Object.create(global.Item.prototype);
+Items.Tumblr.Post.prototype = Object.create(Item.prototype);
 
 // Convert a post from the API into a media item.
 Items.Tumblr.Post.factory = function(post) {

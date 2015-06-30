@@ -31,6 +31,7 @@ Washers.Instagram.User = function(config) {
 Washers.Instagram.User.prototype = Object.create(Washers.Instagram.prototype);
 
 Washers.Instagram.User.prototype.doInput = function(callback) {
+    this.beforeInput();
     var that = this;
 
     ig.use({

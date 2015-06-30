@@ -28,6 +28,7 @@ Washers.Instagram.Tag = function(config) {
 Washers.Instagram.Tag.prototype = Object.create(Washers.Instagram.prototype);
 
 Washers.Instagram.Tag.prototype.doInput = function(callback) {
+    this.beforeInput();
     var that = this;
 
     ig.use({

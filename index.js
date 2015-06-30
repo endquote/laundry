@@ -46,7 +46,8 @@ var itemFiles = [
     'rss.js',
     'google.youtube.video.js',
     'instagram.media.js',
-    'tumblr.post.js'
+    'tumblr.post.js',
+    'twitter.tweet.js'
 ];
 global.allItems = {};
 itemFiles.forEach(function(file) {

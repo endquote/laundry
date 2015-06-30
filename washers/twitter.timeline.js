@@ -1,7 +1,5 @@
 'use strict';
 
-var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
-
 /*
 Twitter Timeline washer
 input: converts media from the user's Twitter timeline into items
@@ -22,7 +20,19 @@ Washers.Twitter.Timeline = function(config) {
 Washers.Twitter.Timeline.prototype = Object.create(Washers.Twitter.prototype);
 
 Washers.Twitter.Timeline.prototype.doInput = function(callback) {
+    this.beforeInput();
 
+    var posts = [];
+
+    this.client.get('statuses/home_timeline', {
+        count: 200
+    }, function(err, tweets, response) {
+        tweets.forEach(function(tweet) {
+            posts.push(Items.Twitter.Tweet.factory(tweet));
+        });
+
+        callback(err, posts);
+    });
 };
 
 module.exports = Washers.Twitter.Timeline;

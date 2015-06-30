@@ -22,6 +22,7 @@ Washers.Instagram.Likes = function(config) {
 Washers.Instagram.Likes.prototype = Object.create(Washers.Instagram.prototype);
 
 Washers.Instagram.Likes.prototype.doInput = function(callback) {
+    this.beforeInput();
     var that = this;
 
     ig.use({

@@ -1,7 +1,5 @@
 'use strict';
 
-var tumblr = require('tumblr.js'); // https://www.npmjs.com/package/tumblr.js
-
 /*
 Tumblr Dashboard washer
 input: converts media from the user's Tumblr Dashboard into items
@@ -22,18 +20,12 @@ Washers.Tumblr.Dashboard = function(config) {
 Washers.Tumblr.Dashboard.prototype = Object.create(Washers.Tumblr.prototype);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
-
-    var client = tumblr.createClient({
-        consumer_key: this.consumerKey,
-        consumer_secret: this.consumerSecret,
-        token: this.token.accessToken,
-        token_secret: this.token.accessTokenSecret
-    });
-
+    this.beforeInput();
     var quantity = 40;
     var posts = [];
     var lastResponse = null;
     var limit = 100;
+    var that = this;
     async.doWhilst(function(callback) {
 
         var opts = {
@@ -45,7 +37,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
         //opts.type = null; // text, quote, link, answer, video, audio, photo, chat
 
         // https://www.tumblr.com/docs/en/api/v2
-        client.dashboard(opts, function(err, data) {
+        that.client.dashboard(opts, function(err, data) {
             if (err) {
                 callback(err);
                 return;

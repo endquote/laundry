@@ -15,7 +15,7 @@ Items.Instagram.Media = function(config) {
     Item.call(this, config);
 };
 
-Items.Instagram.Media.prototype = Object.create(global.Item.prototype);
+Items.Instagram.Media.prototype = Object.create(Item.prototype);
 
 // Convert a media object from the API into a media item.
 Items.Instagram.Media.factory = function(media) {
@@ -34,7 +34,7 @@ Items.Instagram.Media.factory = function(media) {
         authorpic: media.user.profile_picture,
     });
 
-    item.title = util.format('%s', item.author);
+    item.title = item.author;
     if (item.caption) {
         item.title += ': ' + Helpers.shortenString(item.caption, 30);
     }

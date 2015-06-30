@@ -1,6 +1,7 @@
 'use strict';
 
 var OAuth = require('oauth'); // https://www.npmjs.com/package/oauth
+var tumblr = require('tumblr.js'); // https://www.npmjs.com/package/tumblr.js
 
 /*
 Base class for Tumblr washers containing common methods.
@@ -105,5 +106,14 @@ Washers.Tumblr = function(config) {
 };
 
 Washers.Tumblr.prototype = Object.create(Washer.prototype);
+
+Washers.Tumblr.prototype.beforeInput = function() {
+    this.client = tumblr.createClient({
+        consumer_key: this.consumerKey,
+        consumer_secret: this.consumerSecret,
+        token: this.token.accessToken,
+        token_secret: this.token.accessTokenSecret
+    });
+};
 
 module.exports = Washers.Tumblr;

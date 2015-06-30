@@ -1,6 +1,7 @@
 'use strict';
 
 var OAuth = require('oauth'); // https://www.npmjs.com/package/oauth
+var Twitter = require('twitter'); // https://www.npmjs.com/package/twitter
 
 /*
 Base class for Twitter washers containing common methods.
@@ -105,5 +106,14 @@ Washers.Twitter = function(config) {
 };
 
 Washers.Twitter.prototype = Object.create(Washer.prototype);
+
+Washers.Twitter.prototype.beforeInput = function() {
+    this.client = new Twitter({
+        consumer_key: this.consumerKey,
+        consumer_secret: this.consumerSecret,
+        access_token_key: this.token.accessToken,
+        access_token_secret: this.token.accessTokenSecret
+    });
+};
 
 module.exports = Washers.Twitter;

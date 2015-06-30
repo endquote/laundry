@@ -49,11 +49,17 @@ Washer.prototype.stringify = function() {
     return c;
 };
 
+Washer.prototype.beforeInput = function() {};
+
 Washer.prototype.doInput = function(callback) {
+    this.beforeInput();
     callback(null, []);
 };
 
+Washer.prototype.beforeOutput = function() {};
+
 Washer.prototype.doOutput = function(items, callback) {
+    this.beforeOutput();
     callback(null);
 };
 

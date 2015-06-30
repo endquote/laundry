@@ -30,6 +30,7 @@ Washers.Google.YouTube.Channel = function(config) {
 Washers.Google.YouTube.Channel.prototype = Object.create(Washers.Google.YouTube.prototype);
 
 Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
+    this.beforeInput();
     var that = this;
 
     async.waterfall([

@@ -52,6 +52,7 @@ Washers.RSS.prototype = Object.create(Washer.prototype);
 
 // Request the feed, parse it into items, and pass it to the output washer.
 Washers.RSS.prototype.doInput = function(callback) {
+    this.beforeInput();
     var req = request(this.url);
     var feedparser = new FeedParser();
     var items = [];
@@ -100,6 +101,7 @@ Washers.RSS.prototype.doInput = function(callback) {
 
 // Format items as an RSS feed and write them to disk.
 Washers.RSS.prototype.doOutput = function(items, callback) {
+    this.beforeOutput();
     var feed = new RSSWriter({
         title: this.feedname,
         description: this.feedname,
