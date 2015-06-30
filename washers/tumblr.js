@@ -66,11 +66,9 @@ Washers.Tumblr = function(config) {
                     null,
                     'HMAC-SHA1'
                 );
-                this._oauth.getOAuthRequestToken(null, function(err, oauth_token, oauth_token_secret, results) {
-                    that.token = {
-                        oauthToken: oauth_token,
-                        oauthTokenSecret: oauth_token_secret
-                    };
+                this._oauth.getOAuthRequestToken(function(err, oauth_token, oauth_token_secret, results) {
+                    that.oauthToken = oauth_token;
+                    that.oauthTokenSecret = oauth_token_secret;
                     var url = util.format('http://www.tumblr.com/oauth/authorize?oauth_token=%s', oauth_token);
                     Helpers.shortenUrl(url, function(url) {
                         prompt = util.format(prompt, url);
@@ -79,7 +77,7 @@ Washers.Tumblr = function(config) {
                 });
             },
             afterEntry: function(rl, oldValue, newValue, callback) {
-                if (this.accessToken && this.accessTokenSecret) {
+                if (this.token) {
                     callback(false);
                     return;
                 }
@@ -90,13 +88,15 @@ Washers.Tumblr = function(config) {
                 }
 
                 var that = this;
-                this._oauth.getOAuthAccessToken(this.token.oauthToken, this.token.oauthTokenSecret, newValue, function(err, oauth_access_token, oauth_access_token_secret, results) {
+                this._oauth.getOAuthAccessToken(this.oauthToken, this.oauthTokenSecret, newValue, function(err, oauth_access_token, oauth_access_token_secret, results) {
                     if (err) {
                         callback(true);
                         return;
                     }
-                    that.token.accessToken = oauth_access_token;
-                    that.token.accessTokenSecret = oauth_access_token_secret;
+                    that.token = {
+                        accessToken: oauth_access_token,
+                        accessTokenSecret: oauth_access_token_secret
+                    };
                     callback(false);
                 });
             }
