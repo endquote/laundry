@@ -30,6 +30,8 @@ washers/input/tumblr-notifications
 washers/input/twitter-notifications
 washers/input/pinterest-notifications
 
+apple music connect?
+
 better menu for more than a screenful of washers?
 
 global configuration, for things like email errors, log level? "laundry config"

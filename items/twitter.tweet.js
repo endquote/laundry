@@ -35,13 +35,13 @@ Items.Twitter.Tweet.factory = function(tweet) {
         isRetweeted: tweet.retweeted
     });
 
-    item.title = item.author + ': ' + Helpers.shortenString(tweet.text, 30);
-
     if (tweet.entities.media) {
         tweet.entities.media.forEach(function(media) {
-            tweet.text = tweet.text.slice(media.indices[0], media.indices[1]);
+            tweet.text = tweet.text.replace(media.url, '');
         });
     }
+
+    item.title = item.author + ': ' + Helpers.shortenString(tweet.text, 30);
 
     item.description = util.format('<p>%s</p>', tweet.text);
     item.description = item.description.replace(/@([\w]+)/g, '<a href="https://twitter.com/$1">@$1</a>');
