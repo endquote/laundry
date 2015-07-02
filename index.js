@@ -33,7 +33,8 @@ var washerFiles = [
     'tumblr.js',
     'tumblr.dashboard.js',
     'twitter.js',
-    'twitter.timeline.js'
+    'twitter.timeline.js',
+    'twitter.timeline.user.js'
 ];
 global.allWashers = {};
 washerFiles.forEach(function(file) {

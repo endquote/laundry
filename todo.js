@@ -1,9 +1,6 @@
 /*
 
-washers/input/twitter-timeline
-	favorite links?
 washers/input/twitter-hashtag (unless it's already there)
-washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
 
 is youtube caching unsubscribed channels?

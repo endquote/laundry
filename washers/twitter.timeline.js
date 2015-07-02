@@ -27,7 +27,7 @@ Washers.Twitter.Timeline = function(config) {
             afterEntry: function(rl, oldValue, newValue, callback) {
                 newValue = newValue.toLowerCase();
                 callback(newValue !== 'y' && newValue !== 'n');
-            },
+            }
         }]
     });
 };
@@ -36,13 +36,16 @@ Washers.Twitter.Timeline.prototype = Object.create(Washers.Twitter.prototype);
 
 Washers.Twitter.Timeline.prototype.doInput = function(callback) {
     this.beforeInput();
+    this.requestTweets('statuses/home_timeline', {
+        count: 200
+    }, callback);
+};
 
+Washers.Twitter.Timeline.prototype.requestTweets = function(api, options, callback) {
     var that = this;
     var posts = [];
 
-    this.client.get('statuses/home_timeline', {
-        count: 200
-    }, function(err, tweets, response) {
+    this.client.get(api, options, function(err, tweets, response) {
         tweets.forEach(function(tweet) {
             var item = Items.Twitter.Tweet.factory(tweet);
             var include = true;
