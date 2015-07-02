@@ -108,7 +108,7 @@ Washers.Tumblr = function(config) {
 Washers.Tumblr.prototype = Object.create(Washer.prototype);
 
 Washers.Tumblr.prototype.beforeInput = function() {
-    this.client = tumblr.createClient({
+    this._client = tumblr.createClient({
         consumer_key: this.consumerKey,
         consumer_secret: this.consumerSecret,
         token: this.token.accessToken,

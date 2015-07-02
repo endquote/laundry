@@ -37,7 +37,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
         //opts.type = null; // text, quote, link, answer, video, audio, photo, chat
 
         // https://www.tumblr.com/docs/en/api/v2
-        that.client.dashboard(opts, function(err, data) {
+        that._client.dashboard(opts, function(err, data) {
             if (err) {
                 callback(err);
                 return;
