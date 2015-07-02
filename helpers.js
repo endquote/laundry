@@ -74,7 +74,7 @@ Helpers.cleanString = function(s) {
 };
 
 Helpers.classNameFromFile = function(file) {
-    return file.replace('.js');
+    return path.basename(file.replace('.js', ''));
 };
 
 // Test for empty strings.
