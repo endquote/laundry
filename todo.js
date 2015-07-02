@@ -1,13 +1,12 @@
 /*
 
 washers/input/twitter-timeline
-	ignore retweets
-	ignore replies
-	expand t.co urls // https://dev.twitter.com/overview/t.co
 	favorite links?
 washers/input/twitter-hashtag (unless it's already there)
 washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
+
+is youtube caching unsubscribed channels?
 
 figure out output grouping -- don't generate an entry until after the time (hour, etc) has passed
 

@@ -13,7 +13,22 @@ Washers.Twitter.Timeline = function(config) {
     this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
-        description: 'Loads recent posts from your Twitter timeline.'
+        description: 'Loads recent posts from your Twitter timeline.',
+        settings: [{
+            name: 'excludeReplies',
+            prompt: 'Do you want to exclude replies? (y/n)',
+            afterEntry: function(rl, oldValue, newValue, callback) {
+                newValue = newValue.toLowerCase();
+                callback(newValue !== 'y' && newValue !== 'n');
+            },
+        }, {
+            name: 'excludeRetweets',
+            prompt: 'Do you want to exclude retweets and quotes? (y/n)',
+            afterEntry: function(rl, oldValue, newValue, callback) {
+                newValue = newValue.toLowerCase();
+                callback(newValue !== 'y' && newValue !== 'n');
+            },
+        }]
     });
 };
 
@@ -22,6 +37,7 @@ Washers.Twitter.Timeline.prototype = Object.create(Washers.Twitter.prototype);
 Washers.Twitter.Timeline.prototype.doInput = function(callback) {
     this.beforeInput();
 
+    var that = this;
     var posts = [];
 
     this.client.get('statuses/home_timeline', {
@@ -29,7 +45,14 @@ Washers.Twitter.Timeline.prototype.doInput = function(callback) {
     }, function(err, tweets, response) {
         tweets.forEach(function(tweet) {
             var item = Items.Twitter.Tweet.factory(tweet);
-            if (!item.isReply && !item.isQuote && !item.isRetweet) {
+            var include = true;
+            if (that.excludeReplies === 'y' && item.isReply) {
+                include = false;
+            }
+            if (that.excludeRetweets === 'y' && (item.isRetweet || item.isQuote)) {
+                include = false;
+            }
+            if (include) {
                 posts.push(item);
             }
         });

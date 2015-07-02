@@ -43,7 +43,7 @@ Items.Twitter.Tweet.factory = function(tweet) {
 
     if (tweet.entities.urls) {
         tweet.entities.urls.forEach(function(link) {
-            tweet.text = tweet.text.replace(link.url, util.format('<a href="%s">%s</a>', link.expanded_url, link.display_url));
+            tweet.text = tweet.text.replace(link.url, util.format('<a href="%s">%s</a>', link.expanded_url, link.expanded_url));
         });
     }
 
