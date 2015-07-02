@@ -15,7 +15,7 @@ Washers.RSS = function(config) {
     Washer.call(this, config);
 
     this.name = 'RSS';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge({
         description: 'Loads data from an RSS feed.',

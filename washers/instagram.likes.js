@@ -12,7 +12,7 @@ Washers.Instagram.Likes = function(config) {
     Washers.Instagram.call(this, config);
 
     this.name = 'Instagram/Likes';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads media you\'ve liked on Instagram.'

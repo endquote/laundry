@@ -9,7 +9,6 @@ washers/input/twitter-hashtag (unless it's already there)
 washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
 
-don't strip punctuation from titles after all
 put replace '.js' in a function
 figure out output grouping -- don't generate an entry until after the time (hour, etc) has passed
 

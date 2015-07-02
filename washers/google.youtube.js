@@ -10,7 +10,7 @@ Washers.Google.YouTube = function(config) {
     Washers.Google.call(this, config);
 
     this.name = '';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
     this._oauth2Client = null;
 
     this.input = _.merge({}, this.input);

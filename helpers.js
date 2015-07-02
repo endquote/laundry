@@ -73,6 +73,10 @@ Helpers.cleanString = function(s) {
     return chalk.stripColor(s).trim();
 };
 
+Helpers.classNameFromFile = function(file) {
+    return file.replace('.js');
+};
+
 // Test for empty strings.
 validator.extend('isWhitespace', function(str) {
     return /^\s*$/.test(str);

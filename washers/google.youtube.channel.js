@@ -13,7 +13,7 @@ Washers.Google.YouTube.Channel = function(config) {
     Washers.Google.YouTube.call(this, config);
 
     this.name = 'YouTube/Channel';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent videos from a YouTube channel.',

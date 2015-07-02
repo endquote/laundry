@@ -10,7 +10,7 @@ Washers.Twitter.Timeline = function(config) {
     Washers.Twitter.call(this, config);
 
     this.name = 'Twitter/Timeline';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from your Twitter timeline.'

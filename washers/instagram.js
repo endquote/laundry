@@ -12,7 +12,7 @@ Washers.Instagram = function(config) {
     Washer.call(this, config);
 
     this.name = '';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/instagram.html';
 
     this.input = _.merge({

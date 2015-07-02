@@ -17,7 +17,7 @@ Washers.Google.YouTube.Subscriptions = function(config) {
     Washers.Google.YouTube.call(this, config);
 
     this.name = 'YouTube/Subscriptions';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
     this._oauth2Client = null;
 
     this.input = _.merge(this.input, {

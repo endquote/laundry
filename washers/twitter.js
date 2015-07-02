@@ -19,7 +19,7 @@ Washers.Twitter = function(config) {
     Washer.call(this, config);
 
     this.name = '';
-    this.className = path.basename(__filename.replace('.js', ''));
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge({
         settings: [{
