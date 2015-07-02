@@ -41,12 +41,17 @@ Items.Twitter.Tweet.factory = function(tweet) {
         });
     }
 
+    if (tweet.entities.urls) {
+        tweet.entities.urls.forEach(function(link) {
+            tweet.text = tweet.text.replace(link.url, util.format('<a href="%s">%s</a>', link.expanded_url, link.display_url));
+        });
+    }
+
     item.title = item.author + ': ' + Helpers.shortenString(tweet.text, 30);
 
     item.description = util.format('<p>%s</p>', tweet.text);
     item.description = item.description.replace(/@([\w]+)/g, '<a href="https://twitter.com/$1">@$1</a>');
     item.description = item.description.replace(/#([\w]+)/g, '<a href="https://twitter.com/hashtag/$1">#$1</a>');
-    item.description = Autolinker.link(item.description);
 
     if (tweet.entities.media) {
         tweet.entities.media.forEach(function(media) {
