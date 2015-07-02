@@ -1,14 +1,17 @@
 /*
 
-put replace '.js' in a function
 washers/input/twitter-timeline
 	ignore retweets
 	ignore replies
+	expand t.co urls // https://dev.twitter.com/overview/t.co
+	favorite links?
 washers/input/twitter-hashtag (unless it's already there)
 washers/input/twitter-user (unless it's already there)
 washers/input/twitter-list
 
-figure out output grouping
+don't strip punctuation from titles after all
+put replace '.js' in a function
+figure out output grouping -- don't generate an entry until after the time (hour, etc) has passed
 
 wahsers/output/rss - better default filename
 wahsers/output/rss - better default title
@@ -29,6 +32,8 @@ washers/input/instagram-notifications (no api for this, but could poll likes/com
 washers/input/tumblr-notifications
 washers/input/twitter-notifications
 washers/input/pinterest-notifications
+
+washers/input/merge -- collect N rss feeds and merge them into one, removing duplicates (theverge)
 
 apple music connect?
 
