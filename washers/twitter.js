@@ -108,7 +108,7 @@ Washers.Twitter = function(config) {
 Washers.Twitter.prototype = Object.create(Washer.prototype);
 
 Washers.Twitter.prototype.beforeInput = function() {
-    this.client = new Twitter({
+    this._client = new Twitter({
         consumer_key: this.consumerKey,
         consumer_secret: this.consumerSecret,
         access_token_key: this.token.accessToken,

@@ -30,7 +30,9 @@ Washers.Twitter.Timeline.User.prototype.doInput = function(callback) {
     this.beforeInput();
     this.requestTweets('statuses/user_timeline', {
         count: 200,
-        screen_name: this.username
+        screen_name: this.username,
+        exclude_replies: this.excludeReplies === 'y',
+        include_rts: this.excludeRetweets !== 'y'
     }, callback);
 };
 

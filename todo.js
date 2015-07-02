@@ -1,9 +1,8 @@
 /*
 
-washers/input/twitter-list
-
+add higher post counts/paging to twitter, stop using include_/exclude_ opts
 is youtube caching unsubscribed channels?
-
+if a job is running for a long time, don't run it again if its interval comes up (isRunning flag, make sure to unset on error?)
 figure out output grouping -- don't generate an entry until after the time (hour, etc) has passed
 
 wahsers/output/rss - better default filename
