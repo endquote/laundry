@@ -1,7 +1,7 @@
 'use strict';
 
 /*
-Twitter Timeline washer
+Twitter user timeline washer
 input: converts media from a user's Twitter timeline into items
 output: none
 */

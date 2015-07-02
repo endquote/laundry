@@ -1,6 +1,5 @@
 /*
 
-washers/input/twitter-hashtag (unless it's already there)
 washers/input/twitter-list
 
 is youtube caching unsubscribed channels?

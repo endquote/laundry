@@ -46,6 +46,9 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(api, options, callba
     var posts = [];
 
     this.client.get(api, options, function(err, tweets, response) {
+        if (tweets.statuses) {
+            tweets = tweets.statuses;
+        }
         tweets.forEach(function(tweet) {
             var item = Items.Twitter.Tweet.factory(tweet);
             var include = true;
