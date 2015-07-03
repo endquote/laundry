@@ -36,10 +36,8 @@ Washers.Twitter.Timeline.List.prototype = Object.create(Washers.Twitter.Timeline
 Washers.Twitter.Timeline.List.prototype.doInput = function(callback) {
     this.beforeInput();
     this.requestTweets('lists/statuses', {
-        count: 200,
         owner_screen_name: this.listOwner,
-        slug: this.listName,
-        include_rts: this.excludeRetweets !== 'y'
+        slug: this.listName
     }, callback);
 };
 

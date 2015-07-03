@@ -29,10 +29,7 @@ Washers.Twitter.Timeline.User.prototype = Object.create(Washers.Twitter.Timeline
 Washers.Twitter.Timeline.User.prototype.doInput = function(callback) {
     this.beforeInput();
     this.requestTweets('statuses/user_timeline', {
-        count: 200,
-        screen_name: this.username,
-        exclude_replies: this.excludeReplies === 'y',
-        include_rts: this.excludeRetweets !== 'y'
+        screen_name: this.username
     }, callback);
 };
 
