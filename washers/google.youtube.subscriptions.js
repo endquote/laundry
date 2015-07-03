@@ -10,10 +10,6 @@ output: none
 */
 ns('Washers.Google.YouTube', global);
 Washers.Google.YouTube.Subscriptions = function(config) {
-
-    // Save the mapping between subscription, channel, and playlist.
-    this.cache = {};
-
     Washers.Google.YouTube.call(this, config);
 
     this.name = 'YouTube/Subscriptions';
@@ -41,6 +37,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
         // Call the subscriptions API to get all of the subscriptions.
         function(callback) {
 
+            var subscriptions = [];
             var nextPageToken = null;
 
             async.doWhilst(function(callback) {
@@ -60,71 +57,60 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
                     nextPageToken = result.nextPageToken;
                     result.items.forEach(function(subscription, index, array) {
-                        if (!that.cache[subscription.id]) {
-                            that.cache[subscription.id] = {
-                                channel: subscription.snippet.resourceId.channelId
-                            };
-                        }
+                        subscriptions.push({
+                            subscription: subscription
+                        });
                     });
 
-                    log.debug('Got ' + result.items.length + ' subscriptions');
+                    log.debug('Got ' + subscriptions.length + ' subscriptions');
                     callback();
                 });
             }, function() {
                 return nextPageToken;
             }, function(err) {
-                callback(err);
+                callback(err, subscriptions);
             });
         },
 
         // For each subscription, find the channel, for the channel, find the upload playlist.
-        function(callback) {
-            var subscriptionIds = [];
-            for (var i in that.cache) {
-                subscriptionIds.push(i);
-            }
-
-            async.eachLimit(subscriptionIds, 10, function(subscriptionId, callback) {
-                if (that.cache[subscriptionId].playlist) {
-                    callback();
-                    return;
-                }
+        function(subscriptions, callback) {
+            async.eachLimit(subscriptions, 10, function(subscription, callback) {
+                var index = subscriptions.indexOf(subscription);
+                var channelId = subscription.subscription.snippet.resourceId.channelId;
+                subscriptions[index].channelId = channelId;
 
                 // https://developers.google.com/youtube/v3/docs/channels/list
-                log.debug('Getting playlist for channel ' + that.cache[subscriptionId].channel);
+                log.debug('Getting playlist for channel ' + channelId);
                 youtube.channels.list({
                     part: 'contentDetails',
                     auth: that._oauth2Client,
-                    id: that.cache[subscriptionId].channel
+                    id: channelId
                 }, function(err, result) {
                     if (err) {
                         callback(err);
                         return;
                     }
 
-                    that.cache[subscriptionId].playlist = result.items[0].contentDetails.relatedPlaylists.uploads;
+                    var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
+                    subscriptions[index].playlistId = playlistId;
                     callback();
                 });
             }, function(err) {
-                callback(err);
+                callback(err, subscriptions);
             });
         },
 
         // For each subscription, get the latest videos on the upload playlist.
-        function(callback) {
-            var subscriptionIds = [];
-            for (var i in that.cache) {
-                subscriptionIds.push(i);
-            }
+        function(subscriptions, callback) {
+            async.eachLimit(subscriptions, 10, function(subscription, callback) {
+                var index = subscriptions.indexOf(subscription);
 
-            var videos = [];
-            async.eachLimit(subscriptionIds, 10, function(subscriptionId, callback) {
                 // https://developers.google.com/youtube/v3/docs/playlistItems/list
-                log.debug('Getting videos for playlist ' + that.cache[subscriptionId].playlist);
+                log.debug('Getting videos for playlist ' + subscription.playlistId);
                 youtube.playlistItems.list({
                     part: 'id,contentDetails,snippet',
                     auth: that._oauth2Client,
-                    playlistId: that.cache[subscriptionId].playlist,
+                    playlistId: subscription.playlistId,
                     maxResults: 5
                 }, function(err, result) {
                     if (err) {
@@ -132,17 +118,21 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
                         return;
                     }
 
-                    videos = videos.concat(result.items);
+                    subscriptions[index].videos = result.items;
                     callback();
                 });
             }, function(err) {
-                callback(err, videos);
+                callback(err, subscriptions);
             });
         },
 
         // Parse the subscriptions list into a list of videos in order.
-        function(videos, callback) {
+        function(subscriptions, callback) {
             var maxVideos = 50;
+            var videos = [];
+            subscriptions.forEach(function(subscription, index, array) {
+                videos = videos.concat(subscription.videos);
+            });
 
             log.debug('Reducing ' + videos.length + ' videos to ' + maxVideos);
 
