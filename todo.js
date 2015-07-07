@@ -1,16 +1,18 @@
 /*
 
-if a job is running for a long time, don't run it again if its interval comes up (isRunning flag, make sure to unset on error?)
-figure out output grouping -- don't generate an entry until after the time (hour, etc) has passed
+instagram should inherit like twitter does
+include files according to filename length
 
 wahsers/output/rss - better default filename
 wahsers/output/rss - better default title
 
-washers/input/google-gmail-search
+washers/input/bitbucket -- commits from org
 
 washers/input/soundcloud
 
-wahsers/input/snapchat
+wahsers/input/snapchat -- no api/npm, https://github.com/mgp25/SC-API/wiki/API-v2-Research
+
+washers/input/google-gmail-search
 
 washers/input/pinterest-base
 washers/input/pinterest-following
@@ -25,13 +27,15 @@ washers/input/pinterest-notifications
 
 washers/input/merge -- collect N rss feeds and merge them into one, removing duplicates (theverge)
 
-apple music connect?
-
 better menu for more than a screenful of washers?
 
 global configuration, for things like email errors, log level? "laundry config"
 run job after create? don't create if error?
 set up email logging for errors?
+
+if a job is running for a long time, don't run it again if its interval comes up (isRunning flag, make sure to unset on error?)
+washers/output/rss.grouped - add one post per job run, might need to refactor descriptions
+run jobs per the clock? 60 as close to the hour as possible, etc
 
 replace rss.file with a selection of storage modules
 

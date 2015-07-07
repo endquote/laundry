@@ -1,6 +1,7 @@
 'use strict';
 
 var request = require('request'); // https://www.npmjs.com/package/request
+var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
 
 /*
 Base class for Instagram washers containing common methods.
