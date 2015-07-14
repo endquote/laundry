@@ -1,18 +1,12 @@
 /*
 
-instagram should inherit like twitter does
-include files according to filename length
-
 wahsers/output/rss - better default filename
 wahsers/output/rss - better default title
 
 washers/input/bitbucket -- commits from org
-
 washers/input/soundcloud
-
-wahsers/input/snapchat -- no api/npm, https://github.com/mgp25/SC-API/wiki/API-v2-Research
-
 washers/input/google-gmail-search
+washers/input/vimeo - their output is weird
 
 washers/input/pinterest-base
 washers/input/pinterest-following
@@ -24,6 +18,7 @@ washers/input/instagram-notifications (no api for this, but could poll likes/com
 washers/input/tumblr-notifications
 washers/input/twitter-notifications
 washers/input/pinterest-notifications
+washers/input/vimeo-notifications
 
 washers/input/merge -- collect N rss feeds and merge them into one, removing duplicates (theverge)
 
@@ -36,6 +31,7 @@ set up email logging for errors?
 if a job is running for a long time, don't run it again if its interval comes up (isRunning flag, make sure to unset on error?)
 washers/output/rss.grouped - add one post per job run, might need to refactor descriptions
 run jobs per the clock? 60 as close to the hour as possible, etc
+arg to /not/ do inheritance in case you want different tokens?
 
 replace rss.file with a selection of storage modules
 

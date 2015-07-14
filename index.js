@@ -17,43 +17,27 @@ global.S = require('string'); // http://stringjs.com
 global.Helpers = require('./helpers');
 global.Job = require('./job');
 
-// Washer class files specified in order of inheritance
+// Load washer class files in order of filename length, which also matches the inheritance order.
 global.Washer = require('./washer');
-var washerFiles = [
-    'rss.js',
-    'google.js',
-    'google.youtube.js',
-    'google.youtube.subscriptions.js',
-    'google.youtube.channel.js',
-    'instagram.js',
-    'instagram.timeline.js',
-    'instagram.timeline.user.js',
-    'instagram.timeline.hashtag.js',
-    'instagram.timeline.likes.js',
-    'tumblr.js',
-    'tumblr.dashboard.js',
-    'twitter.js',
-    'twitter.timeline.js',
-    'twitter.timeline.user.js',
-    'twitter.timeline.hashtag.js',
-    'twitter.timeline.list.js'
-];
 global.allWashers = {};
-washerFiles.forEach(function(file) {
+fs.readdirSync(path.join(__dirname, 'washers')).sort(function(a, b) {
+    if (a.length === b.length) {
+        return 0;
+    }
+    return a.length < b.length ? -1 : 1;
+}).forEach(function(file) {
     allWashers[file.replace('.js', '')] = require(path.join(__dirname, 'washers', file));
 });
 
-// Item class files specified in order of inheritance
+// Load item class files in order of filename length, which also matches the inheritance order.
 global.Item = require('./item');
-var itemFiles = [
-    'rss.js',
-    'google.youtube.video.js',
-    'instagram.media.js',
-    'tumblr.post.js',
-    'twitter.tweet.js'
-];
 global.allItems = {};
-itemFiles.forEach(function(file) {
+fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
+    if (a.length === b.length) {
+        return 0;
+    }
+    return a.length < b.length ? -1 : 1;
+}).forEach(function(file) {
     allItems[file.replace('.js', '')] = require(path.join(__dirname, 'items', file));
 });
 
