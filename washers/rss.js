@@ -22,7 +22,7 @@ Washers.RSS = function(config) {
         settings: [{
             name: 'url',
             prompt: 'What RSS feed URL do you want to launder?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 callback(!validator.isURL(newValue));
             }
         }]
@@ -33,7 +33,11 @@ Washers.RSS = function(config) {
         settings: [{
             name: 'file',
             prompt: 'Where do you want to save the output?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
+                var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+                callback(true, prompt, path.join(home, job.name + '.xml'));
+            },
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 Helpers.validateFile(newValue, function(isValid) {
                     callback(!isValid);
                 });
@@ -41,7 +45,10 @@ Washers.RSS = function(config) {
         }, {
             name: 'feedname',
             prompt: 'What do you want the title of the output feed to be?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
+                callback(true, prompt, job.name);
+            },
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 callback(validator.isWhitespace(newValue));
             }
         }]

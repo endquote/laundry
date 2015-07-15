@@ -132,7 +132,7 @@ Laundry.prototype.create = function(jobName, callback) {
         function(rl, job, callback) {
             mode = null;
             that._inheritSettings(job.input, 'input', allJobs);
-            that._configureWasher(rl, job.input, 'input', function(err) {
+            that._configureWasher(rl, job, 'input', function(err) {
                 callback(err, rl, job);
             });
         },
@@ -149,7 +149,7 @@ Laundry.prototype.create = function(jobName, callback) {
         function(rl, job, callback) {
             mode = null;
             that._inheritSettings(job.output, 'output', allJobs);
-            that._configureWasher(rl, job.output, 'output', function(err) {
+            that._configureWasher(rl, job, 'output', function(err) {
                 callback(err, rl, job);
             });
         },
@@ -304,19 +304,20 @@ Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
 };
 
 // Given a washer and an input/output mode, configure settings on the washer.
-Laundry.prototype._configureWasher = function(rl, washer, mode, callback) {
+Laundry.prototype._configureWasher = function(rl, job, mode, callback) {
     var that = this;
+    var washer = job[mode];
     async.eachSeries(washer[mode].settings, function(item, callback) {
         var valid = false;
 
         if (!item.beforeEntry) {
-            item.beforeEntry = function(rl, prompt, callback) {
-                callback(true, prompt);
+            item.beforeEntry = function(rl, job, prompt, callback) {
+                callback(true, prompt, '');
             };
         }
 
         if (!item.afterEntry) {
-            item.afterEntry = function(rl, lastValue, newValue, callback) {
+            item.afterEntry = function(rl, job, lastValue, newValue, callback) {
                 callback();
             };
         }
@@ -328,8 +329,9 @@ Laundry.prototype._configureWasher = function(rl, washer, mode, callback) {
                 // Call the beforeEntry method...
                 item.beforeEntry.apply(washer, [
                     rl,
+                    job,
                     item.prompt,
-                    function(required, prompt) {
+                    function(required, prompt, suggest) {
                         if (!required) {
                             valid = true;
                             callback();
@@ -340,7 +342,7 @@ Laundry.prototype._configureWasher = function(rl, washer, mode, callback) {
                         rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
                             answer = Helpers.cleanString(answer);
                             // Call the after entry method
-                            item.afterEntry.apply(washer, [rl, washer[item.name], answer,
+                            item.afterEntry.apply(washer, [rl, job, washer[item.name], answer,
                                 function(err) {
                                     if (err) {
                                         // Reject the answer
@@ -354,7 +356,7 @@ Laundry.prototype._configureWasher = function(rl, washer, mode, callback) {
                                 }
                             ]);
                         });
-                        rl.write(washer[item.name]);
+                        rl.write(washer[item.name] ? washer[item.name] : suggest);
                     }
                 ]);
             }, function(err) {

@@ -17,7 +17,7 @@ Washers.Twitter.Timeline.Hashtag = function(config) {
         settings: [{
             name: 'hashtag',
             prompt: 'What hashtag do you want to follow?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 newValue = newValue.replace('#', '');
                 callback(validator.isWhitespace(newValue));
             }

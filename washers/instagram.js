@@ -20,10 +20,10 @@ Washers.Instagram = function(config) {
         settings: [{
             name: 'clientId',
             prompt: util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri),
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -32,10 +32,10 @@ Washers.Instagram = function(config) {
         }, {
             name: 'clientSecret',
             prompt: 'What is the client secret?',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -44,7 +44,7 @@ Washers.Instagram = function(config) {
         }, {
             name: 'authCode',
             prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 if (this.token) {
                     callback(false, prompt);
                     return;
@@ -57,7 +57,7 @@ Washers.Instagram = function(config) {
                     callback(true, prompt);
                 });
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (this.token) {
                     callback(false);
                     return;

@@ -19,10 +19,10 @@ Washers.Google = function(config) {
         settings: [{
             name: 'clientId',
             prompt: 'Go to https://console.developers.google.com/project. Click "Create Project" and enter a name. Under "APIs & auth" click "APIs" and activate YouTube. Under "Credentials", click "Create new Client ID". Choose "Installed Application." The client ID and secret will appear.\nWhat is the client ID?',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -31,10 +31,10 @@ Washers.Google = function(config) {
         }, {
             name: 'clientSecret',
             prompt: 'What is the client secret?',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -43,7 +43,7 @@ Washers.Google = function(config) {
         }, {
             name: 'authCode',
             prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job,prompt, callback) {
                 if (this.token) {
                     callback(false, prompt);
                     return;
@@ -61,7 +61,7 @@ Washers.Google = function(config) {
                     callback(true, prompt);
                 });
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (this.token) {
                     callback(false);
                     return;

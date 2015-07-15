@@ -20,14 +20,14 @@ Washers.Twitter.Timeline = function(config) {
         settings: [{
             name: 'excludeReplies',
             prompt: 'Do you want to exclude replies? (y/n)',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 newValue = newValue.toLowerCase();
                 callback(newValue !== 'y' && newValue !== 'n');
             },
         }, {
             name: 'excludeRetweets',
             prompt: 'Do you want to exclude retweets and quotes? (y/n)',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 newValue = newValue.toLowerCase();
                 callback(newValue !== 'y' && newValue !== 'n');
             }

@@ -27,10 +27,10 @@ Washers.Tumblr = function(config) {
         settings: [{
             name: 'consumerKey',
             prompt: util.format('Go to https://www.tumblr.com/oauth/register. For the callback URL enter %s. Fill in whatever for the other fields. Click "Register".\nWhat is the "OAuth Consumer Key"?\n', this._callbackUri),
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -39,10 +39,10 @@ Washers.Tumblr = function(config) {
         }, {
             name: 'consumerSecret',
             prompt: 'Click "Show secret key". Scary, right? What is the secret key?\n',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -51,7 +51,7 @@ Washers.Tumblr = function(config) {
         }, {
             name: 'authVerifier',
             prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 if (this.token) {
                     callback(false, prompt);
                     return;
@@ -77,7 +77,7 @@ Washers.Tumblr = function(config) {
                     });
                 });
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (this.token) {
                     callback(false);
                     return;

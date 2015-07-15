@@ -25,10 +25,10 @@ Washers.Twitter = function(config) {
         settings: [{
             name: 'consumerKey',
             prompt: 'Go to https://apps.twitter.com/app/new, enter whatever for the name, description and website. Click "Keys and Access Tokens".\nWhat is the consumer key?',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -37,10 +37,10 @@ Washers.Twitter = function(config) {
         }, {
             name: 'consumerSecret',
             prompt: 'What is the consumer secret?\n',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (oldValue !== newValue) {
                     this.token = null;
                 }
@@ -49,7 +49,7 @@ Washers.Twitter = function(config) {
         }, {
             name: 'authVerifier',
             prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 if (this.token) {
                     callback(false, prompt);
                     return;
@@ -76,7 +76,7 @@ Washers.Twitter = function(config) {
                     });
                 });
             },
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (this.token) {
                     console.log('got token?');
                     callback(false);

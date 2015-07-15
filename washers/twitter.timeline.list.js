@@ -17,14 +17,14 @@ Washers.Twitter.Timeline.List = function(config) {
         settings: [{
             name: 'listOwner',
             prompt: 'Who owns the list?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 newValue = newValue.replace('@', '');
                 callback(validator.isWhitespace(newValue));
             }
         }, {
             name: 'listName',
             prompt: 'What list do you want to follow?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 callback(validator.isWhitespace(newValue));
             }
         }]

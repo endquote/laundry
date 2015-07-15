@@ -1,9 +1,6 @@
 /*
 
-no getAllJobs/getJob, just load them all in index.js
-
-wahsers/output/rss - better default filename
-wahsers/output/rss - better default title
+better readline? https://www.npmjs.com/package/readline-sync
 
 washers/input/bitbucket -- commits from org
 washers/input/soundcloud

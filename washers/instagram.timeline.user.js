@@ -21,7 +21,7 @@ Washers.Instagram.Timeline.User = function(config) {
         settings: [{
             name: 'username',
             prompt: 'What account do you want to watch?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (validator.isWhitespace(newValue)) {
                     callback(true);
                     return;

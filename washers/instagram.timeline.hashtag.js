@@ -18,7 +18,7 @@ Washers.Instagram.Timeline.Hashtag = function(config) {
         settings: [{
             name: 'tag',
             prompt: 'What tag do you want to watch?',
-            afterEntry: function(rl, oldValue, newValue, callback) {
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
                 newValue = newValue.replace('#', '');
                 callback(validator.isWhitespace(newValue));
             }

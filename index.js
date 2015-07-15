@@ -60,9 +60,8 @@ fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
     allItems[file.replace('.js', '')] = require(path.join(__dirname, 'items', file));
 });
 
-global.allJobs = [];
-
 // Load all the jobs, all the commands need this anyway.
+global.allJobs = [];
 fs.readdirSync(configFolder).forEach(function(jobFile) {
     if (path.extname(jobFile) !== '.json') {
         return;
@@ -91,7 +90,6 @@ if (args.length > 0) {
 
 // Do stuff
 var laundry = require('./laundry');
-
 if (laundry.isCommand(command)) {
     laundry.doCommand(command, arg, onComplete);
 } else {
