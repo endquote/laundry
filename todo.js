@@ -1,8 +1,7 @@
 /*
 
-better readline? https://www.npmjs.com/package/readline-sync
+API wrappers are pretty lame
 
-washers/input/bitbucket -- commits from org
 washers/input/soundcloud
 washers/input/google-gmail-search
 washers/input/vimeo - their output is weird
@@ -30,6 +29,7 @@ set up email logging for errors?
 if a job is running for a long time, don't run it again if its interval comes up (isRunning flag, make sure to unset on error?)
 washers/output/rss.grouped - add one post per job run, might need to refactor descriptions
 run jobs per the clock? 60 as close to the hour as possible, etc
+accept cron schedules, convert other schedules to cron internally
 arg to /not/ do inheritance in case you want different tokens?
 
 replace rss.file with a selection of storage modules
@@ -50,6 +50,7 @@ washers/output/sms
 faster tick? -- look at job files without including everything
 nicer callback pages
 implement daemon command
+when in daemon mode, twitter (others?) should use streaming APIs
 magical heroku deployment
 
 washers/readme.md
@@ -60,21 +61,5 @@ readme.md
 some kind of website?
 
 washers/input/linkedin?
-
-*/
-
-/*
-
-announce: @waxpancake, @pinboard
-
-Fork Feedbin:
-Remove duplicates
-Header design
-Allow scripts for verbs
-Subscribe to OPML?
-
-Blog
-Kirby, Hexo, Jekyll, Octopress
-modernstatic.com
 
 */
