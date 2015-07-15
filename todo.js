@@ -1,5 +1,7 @@
 /*
 
+no getAllJobs/getJob, just load them all in index.js
+
 wahsers/output/rss - better default filename
 wahsers/output/rss - better default title
 

@@ -565,15 +565,16 @@ Laundry.prototype.destroy = function(jobName, callback) {
 
             // Find the requested job.
             function(callback) {
-                Job.getJob(jobName, function(job) {
-                    if (!job) {
-                        console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
-                        that.list();
-                        callback(jobName);
-                    } else {
-                        callback(null, job);
-                    }
-                });
+                var job = allJobs.filter(function(j) {
+                    return j.name.toLowerCase() === jobName.toLowerCase();
+                })[0];
+                if (!job) {
+                    console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
+                    that.list();
+                    callback(jobName);
+                } else {
+                    callback(null, job);
+                }
             },
 
             // Set up the console.
@@ -650,17 +651,10 @@ Laundry.prototype.tick = function(callback) {
 
     async.waterfall([
 
-        // Get all the jobs
-        function(callback) {
-            Job.getAllJobs(function(jobs) {
-                callback(null, jobs);
-            });
-        },
-
         // Get the jobs that are due to run on schedule
-        function(jobs, callback) {
+        function(callback) {
 
-            jobs = jobs.filter(function(job) {
+            var jobs = allJobs.filter(function(job) {
                 if (!job.schedule) {
                     return false;
                 }

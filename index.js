@@ -3,6 +3,8 @@
 'use strict';
 
 var start = Date.now();
+
+// Loading lots of utiltiies into global.
 global._ = require('lodash'); // https://lodash.com/docs
 global.ns = require('simple-namespace'); // https://www.npmjs.com/package/simple-namespace
 global.fs = require('fs-extra'); // https://www.npmjs.com/package/fs.extra
@@ -12,34 +14,6 @@ global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
 global.validator = require('validator'); // https://www.npmjs.com/package/validator
 global.S = require('string'); // http://stringjs.com
-
-// Load internal classes into the global namespace. (Is this totally bad form?)
-global.Helpers = require('./helpers');
-global.Job = require('./job');
-
-// Load washer class files in order of filename length, which also matches the inheritance order.
-global.Washer = require('./washer');
-global.allWashers = {};
-fs.readdirSync(path.join(__dirname, 'washers')).sort(function(a, b) {
-    if (a.length === b.length) {
-        return 0;
-    }
-    return a.length < b.length ? -1 : 1;
-}).forEach(function(file) {
-    allWashers[file.replace('.js', '')] = require(path.join(__dirname, 'washers', file));
-});
-
-// Load item class files in order of filename length, which also matches the inheritance order.
-global.Item = require('./item');
-global.allItems = {};
-fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
-    if (a.length === b.length) {
-        return 0;
-    }
-    return a.length < b.length ? -1 : 1;
-}).forEach(function(file) {
-    allItems[file.replace('.js', '')] = require(path.join(__dirname, 'items', file));
-});
 
 // Make config folder
 var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
@@ -64,34 +38,64 @@ log.add(log.transports.DailyRotateFile, {
 });
 log.level = 'debug';
 
-// Load all the jobs all the commands need this anyway.
-Job.getAllJobs(function(jobs) {
-    global.allJobs = jobs;
-    onStart();
+// Load internal classes into the global namespace.
+global.Helpers = require('./helpers');
+global.Job = require('./job');
+
+// Load washer class files in order of filename length, which also matches the inheritance order.
+global.Washer = require('./washer');
+global.allWashers = {};
+fs.readdirSync(path.join(__dirname, 'washers')).sort(function(a, b) {
+    return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
+}).forEach(function(file) {
+    allWashers[file.replace('.js', '')] = require(path.join(__dirname, 'washers', file));
 });
 
-function onStart() {
-    // Parse arguments
-    var args = process.argv.slice(2);
+// Load item class files in order of filename length, which also matches the inheritance order.
+global.Item = require('./item');
+global.allItems = {};
+fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
+    return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
+}).forEach(function(file) {
+    allItems[file.replace('.js', '')] = require(path.join(__dirname, 'items', file));
+});
 
-    var command = '';
-    if (args.length > 0) {
-        command = args.shift().trim().toLowerCase();
+global.allJobs = [];
+
+// Load all the jobs, all the commands need this anyway.
+fs.readdirSync(configFolder).forEach(function(jobFile) {
+    if (path.extname(jobFile) !== '.json') {
+        return;
     }
+    var json = fs.readFileSync(path.join(configFolder, jobFile));
+    try {
+        var config = JSON.parse(json);
+        if (config.name) {
+            allJobs.push(new Job(config));
+        }
+    } catch (e) {}
+});
 
-    var arg = '';
-    if (args.length > 0) {
-        arg = args.shift().trim().toLowerCase();
-    }
+// Parse arguments
+var args = process.argv.slice(2);
 
-    // Do stuff
-    var laundry = require('./laundry');
+var command = '';
+if (args.length > 0) {
+    command = args.shift().trim().toLowerCase();
+}
 
-    if (laundry.isCommand(command)) {
-        laundry.doCommand(command, arg, onComplete);
-    } else {
-        laundry.help(onComplete);
-    }
+var arg = '';
+if (args.length > 0) {
+    arg = args.shift().trim().toLowerCase();
+}
+
+// Do stuff
+var laundry = require('./laundry');
+
+if (laundry.isCommand(command)) {
+    laundry.doCommand(command, arg, onComplete);
+} else {
+    laundry.help(onComplete);
 }
 
 function onComplete() {
