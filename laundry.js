@@ -218,6 +218,10 @@ Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
         }
     }
 
+    validWashers.sort(function(a, b) {
+        return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
+    });
+
     var washersList = '';
     validWashers.forEach(function(washer) {
         washersList += util.format(chalk.bold("%s") + " - %s\n", washer.name, washer[mode].description);
