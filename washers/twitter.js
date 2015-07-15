@@ -78,7 +78,6 @@ Washers.Twitter = function(config) {
             },
             afterEntry: function(rl, job, oldValue, newValue, callback) {
                 if (this.token) {
-                    console.log('got token?');
                     callback(false);
                     return;
                 }
