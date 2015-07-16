@@ -1,8 +1,14 @@
 /*
 
-API wrappers are pretty lame
-
 washers/input/soundcloud
+add mediaFiles to other items?
+
+kill ig wrapper
+kill tumblr wrapper
+kill twitter wrapper
+kill youtube wrapper
+probably kill beforeInput/beforeOutput?
+
 washers/input/google-gmail-search
 washers/input/vimeo - their output is weird
 

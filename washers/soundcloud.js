@@ -92,14 +92,10 @@ Washers.SoundCloud = function(config) {
                         redirect_uri: this._callbackUri,
                         code: newValue
                     }
-                }, function(err, response) {
-                    if (err || !response.access_token) {
-                        callback(err);
-                        return;
-                    }
+                }, function(response) {
                     that.token = response.access_token;
-                    callback(err);
-                });
+                    callback();
+                }, callback);
             }
         }]
     }, this.input);

@@ -88,14 +88,10 @@ Washers.Instagram.prototype.refreshToken = function(code, callback) {
             redirect_uri: this._callbackUri,
             code: code ? code : this.authCode
         }
-    }, function(err, response) {
-        if (err || !response.access_token) {
-            callback(err);
-            return;
-        }
+    }, function(response) {
         that.token = response.access_token;
-        callback(err);
-    });
+        callback();
+    }, callback);
 };
 
 module.exports = Washers.Instagram;

@@ -124,7 +124,10 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
                 url: item.url,
                 date: item.date.toDate(),
                 author: item.author,
-                categories: item.tags
+                categories: _.isArray(item.tags) ? item.tags : [item.tags],
+                enclosure: item.mediaFile ? {
+                    url: item.mediaFile
+                } : null
             });
         });
     }

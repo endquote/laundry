@@ -8,6 +8,7 @@ var Item = function(config) {
     this.date = null;
     this.author = null;
     this.tags = null;
+    this.mediaFile = null;
 
     this.description = '';
 

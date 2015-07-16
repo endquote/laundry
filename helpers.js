@@ -78,19 +78,19 @@ Helpers.classNameFromFile = function(file) {
 };
 
 // Make an HTTP request that expects JSON back, and handle the errors well.
-Helpers.jsonRequest = function(options, callback) {
+Helpers.jsonRequest = function(options, callback, errorCallback) {
+    log.debug(JSON.stringify(options));
     request(options, function(err, response, body) {
         if (!err && response.statusCode === 200) {
             try {
-                body = JSON.parse(body);
-                callback(err, body);
+                callback(JSON.parse(body));
             } catch (e) {
                 log.debug(err ? err : body);
-                callback(err ? err : body);
+                errorCallback(err ? err : body);
             }
         } else {
             log.debug(err ? err : body);
-            callback(err ? err : body);
+            errorCallback(err ? err : body);
         }
     });
 };
