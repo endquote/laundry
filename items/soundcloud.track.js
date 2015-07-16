@@ -31,7 +31,7 @@ Items.SoundCloud.Track.factory = function(track, clientId) {
 
     var item = new Items.SoundCloud.Track({
         title: util.format('%s - %s', track.user.username, track.title),
-        description: track.description,
+        description: util.format('<p>%s</p>', Autolinker.link(track.description)),
         url: track.permalink_url,
         date: moment(new Date(track.created_at)),
         author: track.user.username,
@@ -47,6 +47,10 @@ Items.SoundCloud.Track.factory = function(track, clientId) {
     }
 
     item.mediaFile = item.download ? item.download : item.stream;
+
+    if (item.download || item.stream) {
+        item.description += util.format('<p><audio controls><source src="%s" type="audio/mpeg"/></audio></p>', item.mediaFile);
+    }
 
     return item;
 };
