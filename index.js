@@ -14,6 +14,9 @@ global.moment = require('moment'); // http://momentjs.com/docs/
 global.util = require('util'); // https://nodejs.org/api/util.html
 global.validator = require('validator'); // https://www.npmjs.com/package/validator
 global.S = require('string'); // http://stringjs.com
+global.qs = require('qs'); // https://www.npmjs.com/package/qs
+global.extend = require('deep-extend'); // https://www.npmjs.com/package/deep-extend
+global.request = require('request'); // https://github.com/request/request
 
 // Make config folder
 var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];

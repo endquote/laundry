@@ -7,17 +7,21 @@ output: none
 */
 ns('Washers', global);
 Washers.SoundCloud = function(config) {
-
     this.clientId = null;
     this.clientSecret = null;
     this.token = null;
-    this._client = require('node-soundcloud');
 
     Washer.call(this, config);
 
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/soundcloud.html';
+
+    this._requestOptions = {
+        qs: {
+            oauth_token: this.token
+        }
+    };
 
     this.input = _.merge({
         settings: [{
@@ -53,12 +57,14 @@ Washers.SoundCloud = function(config) {
                     return;
                 }
 
-                this._client.init({
-                    id: this.clientId,
-                    secret: this.clientSecret,
-                    uri: this._callbackUri
+                var url = 'https://soundcloud.com/connect?' + qs.stringify({
+                    client_id: this.clientId,
+                    client_secret: this.clientSecret,
+                    redirect_uri: this._callbackUri,
+                    response_type: 'code',
+                    scope: 'non-expiring'
                 });
-                var url = this._client.getConnectUrl();
+
                 Helpers.shortenUrl(url, function(url) {
                     prompt = util.format(prompt, url);
                     callback(true, prompt);
@@ -76,8 +82,22 @@ Washers.SoundCloud = function(config) {
                 }
 
                 var that = this;
-                this._client.authorize(newValue, function(err, accessToken) {
-                    that.token = accessToken;
+                Helpers.jsonRequest({
+                    uri: 'https://api.soundcloud.com/oauth2/token',
+                    method: 'POST',
+                    qs: {
+                        client_id: this.clientId,
+                        client_secret: this.clientSecret,
+                        grant_type: 'authorization_code',
+                        redirect_uri: this._callbackUri,
+                        code: newValue
+                    }
+                }, function(err, response) {
+                    if (err || !response.access_token) {
+                        callback(err);
+                        return;
+                    }
+                    that.token = response.access_token;
                     callback(err);
                 });
             }
@@ -86,20 +106,5 @@ Washers.SoundCloud = function(config) {
 };
 
 Washers.SoundCloud.prototype = Object.create(Washer.prototype);
-
-Washers.SoundCloud.prototype.beforeInput = function() {
-    console.log({
-        id: this.clientId,
-        secret: this.clientSecret,
-        uri: this._callbackUri,
-        accessToken: this.token
-    });
-    this._client.init({
-        id: this.clientId,
-        secret: this.clientSecret,
-        uri: this._callbackUri,
-        accessToken: this.token
-    });
-};
 
 module.exports = Washers.SoundCloud;

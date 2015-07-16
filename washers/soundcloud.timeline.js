@@ -20,14 +20,17 @@ Washers.SoundCloud.Timeline = function(config) {
 Washers.SoundCloud.Timeline.prototype = Object.create(Washers.SoundCloud.prototype);
 
 Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
-    this.beforeInput();
-    this._client.get('/me', function(err, me) {
-        if (err) {
+    Helpers.jsonRequest(
+        extend(this._requestOptions, {
+            uri: 'https://api.soundcloud.com/me'
+        }), function(err, response) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            console.log(response);
             callback(err);
-            return;
-        }
-        console.log(me);
-    });
+        });
 };
 
 module.exports = Washers.SoundCloud.Timeline;

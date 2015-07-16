@@ -77,6 +77,24 @@ Helpers.classNameFromFile = function(file) {
     return path.basename(file.replace('.js', ''));
 };
 
+// Make an HTTP request that expects JSON back, and handle the errors well.
+Helpers.jsonRequest = function(options, callback) {
+    request(options, function(err, response, body) {
+        if (!err && response.statusCode === 200) {
+            try {
+                body = JSON.parse(body);
+                callback(err, body);
+            } catch (e) {
+                log.debug(err ? err : body);
+                callback(err ? err : body);
+            }
+        } else {
+            log.debug(err ? err : body);
+            callback(err ? err : body);
+        }
+    });
+};
+
 // Test for empty strings.
 validator.extend('isWhitespace', function(str) {
     return /^\s*$/.test(str);

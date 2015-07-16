@@ -1,6 +1,5 @@
 'use strict';
 
-var request = require('request'); // https://www.npmjs.com/package/request
 var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
 
 /*
@@ -79,37 +78,24 @@ Washers.Instagram.prototype = Object.create(Washer.prototype);
 
 Washers.Instagram.prototype.refreshToken = function(code, callback) {
     var that = this;
-    var form = {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        grant_type: 'authorization_code',
-        redirect_uri: this._callbackUri,
-        code: code ? code : this.authCode
-    };
-
-    request.post('https://api.instagram.com/oauth/access_token', {
-            form: form
-        },
-
-        function(err, response, body) {
-            if (!err && response.statusCode === 200) {
-                try {
-                    body = JSON.parse(body);
-                    if (!body.access_token) {
-                        throw body;
-                    }
-
-                    that.token = body.access_token;
-                    callback();
-                } catch (e) {
-                    log.debug(err ? err : body);
-                    callback(err ? err : body);
-                }
-            } else {
-                log.debug(err ? err : body);
-                callback(err ? err : body);
-            }
-        });
+    Helpers.jsonRequest({
+        uri: 'https://api.instagram.com/oauth/access_token',
+        method: 'POST',
+        form: {
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
+            grant_type: 'authorization_code',
+            redirect_uri: this._callbackUri,
+            code: code ? code : this.authCode
+        }
+    }, function(err, response) {
+        if (err || !response.access_token) {
+            callback(err);
+            return;
+        }
+        that.token = response.access_token;
+        callback(err);
+    });
 };
 
 module.exports = Washers.Instagram;

@@ -1,6 +1,5 @@
 'use strict';
 
-var request = require('request'); // https://www.npmjs.com/package/request
 var FeedParser = require('feedparser'); // https://www.npmjs.com/package/feedparser
 var RSSWriter = require('rss'); // https://www.npmjs.com/package/rss
 

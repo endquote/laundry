@@ -20,7 +20,10 @@
         "moment": true,
         "util": true,
         "validator": true,
-        "S": true
+        "S": true,
+        "qs": true,
+        "extend": true,
+        "request": true
     },
     "curly": true,
     "eqeqeq": true,
