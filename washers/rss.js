@@ -126,7 +126,8 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
                 author: item.author,
                 categories: _.isArray(item.tags) ? item.tags : [item.tags],
                 enclosure: item.mediaFile ? {
-                    url: item.mediaFile
+                    url: item.mediaFile,
+                    type: 'audio/mpeg'
                 } : null
             });
         });
