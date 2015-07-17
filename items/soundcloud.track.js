@@ -40,16 +40,24 @@ Items.SoundCloud.Track.factory = function(track, clientId) {
 
     if (track.streamable) {
         item.stream = util.format('%s?client_id=%s', track.stream_url, clientId);
+        item.mediaFile = {
+            url: item.stream,
+            size: track.original_content_size,
+            type: 'audio/mpeg'
+        };
     }
 
     if (track.downloadable) {
         item.download = util.format('%s?client_id=%s', track.download_url, clientId);
+        item.mediaFile = {
+            url: item.download,
+            size: track.original_content_size,
+            type: 'audio/mpeg'
+        };
     }
 
-    item.mediaFile = item.download ? item.download : item.stream;
-
-    if (item.download || item.stream) {
-        item.description += util.format('<p><audio controls><source src="%s" type="audio/mpeg"/></audio></p>', item.mediaFile);
+    if (item.mediaFile) {
+        item.description += util.format('<p><audio controls><source src="%s" type="audio/mpeg" preload="metadata" autoplay="false"/></audio></p>', item.mediaFile.url);
     }
 
     return item;

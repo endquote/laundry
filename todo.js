@@ -1,8 +1,5 @@
 /*
 
-washers/input/soundcloud
-add mediaFiles to other items?
-
 kill ig wrapper
 kill tumblr wrapper
 kill twitter wrapper
@@ -11,6 +8,7 @@ probably kill beforeInput/beforeOutput?
 
 washers/input/google-gmail-search
 washers/input/vimeo - their output is weird
+washers/input/facebook - get actual content of notifications?
 
 washers/input/pinterest-base
 washers/input/pinterest-following
@@ -67,5 +65,12 @@ readme.md
 some kind of website?
 
 washers/input/linkedin?
+
+side process -- use feedbin api to do things with starred items
+- like starred instagrams
+- favorite starred tweets
+- like starred fb notifications
+- add starred enclosures to podcast
+
 
 */
