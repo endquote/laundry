@@ -24,33 +24,28 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     var quantity = 40;
     var posts = [];
     var lastResponse = null;
-    var limit = 100;
+    var limit = 20;
     var that = this;
     async.doWhilst(function(callback) {
-
-        var opts = {
-            limit: Math.min(limit, quantity - posts.length),
-            since_id: posts.length ? posts[posts.length - 1].id : null
-        };
-
-        // This implements a filter even if null.
-        //opts.type = null; // text, quote, link, answer, video, audio, photo, chat
-
         // https://www.tumblr.com/docs/en/api/v2
-        that._client.dashboard(opts, function(err, data) {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            data.posts.forEach(function(post) {
-                posts.push(Items.Tumblr.Post.factory(post));
-            });
-
-            log.debug(util.format('Got %d/%d posts', posts.length, quantity));
-            lastResponse = data;
-            callback();
-        });
+        Helpers.jsonRequest(
+            extend({
+                uri: util.format('http://api.tumblr.com/v2/user/dashboard'),
+                qs: {
+                    limit: Math.min(limit, quantity - posts.length),
+                    since_id: posts.length ? posts[posts.length - 1].id : null
+                }
+            }, that._requestOptions),
+            function(response) {
+                response = response.response;
+                response.posts.forEach(function(post) {
+                    posts.push(Items.Tumblr.Post.factory(post));
+                });
+                log.debug(util.format('Got %d/%d posts', posts.length, quantity));
+                lastResponse = response;
+                callback();
+            },
+            callback);
     }, function() {
         return lastResponse.posts.length === limit && posts.length < quantity;
     }, function(err) {

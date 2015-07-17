@@ -68,10 +68,12 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
                         Helpers.jsonRequest(
                             extend({
                                 uri: util.format('https://api.soundcloud.com/users/%d/tracks', following.id)
-                            }, that._requestOptions), function(response) {
+                            }, that._requestOptions),
+                            function(response) {
                                 tracks = tracks.concat(response);
                                 callback(null, response);
-                            }, callback);
+                            },
+                            callback);
                     },
                     function(err) {
                         callback(err, tracks);

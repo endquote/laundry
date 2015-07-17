@@ -1,7 +1,6 @@
 'use strict';
 
 var OAuth = require('oauth'); // https://www.npmjs.com/package/oauth
-var tumblr = require('tumblr.js'); // https://www.npmjs.com/package/tumblr.js
 
 /*
 Base class for Tumblr washers containing common methods.
@@ -21,6 +20,15 @@ Washers.Tumblr = function(config) {
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/tumblr.html';
+
+    this._requestOptions = {
+        oauth: {
+            consumer_key: this.consumerKey,
+            consumer_secret: this.consumerSecret,
+            token: this.token ? this.token.accessToken : null,
+            token_secret: this.token ? this.token.accessTokenSecret : null
+        }
+    };
 
     // Helpful for auth flow: http://t1mg.com/tumblr-api-oauth-in-node/
     this.input = _.merge({
@@ -106,14 +114,5 @@ Washers.Tumblr = function(config) {
 };
 
 Washers.Tumblr.prototype = Object.create(Washer.prototype);
-
-Washers.Tumblr.prototype.beforeInput = function() {
-    this._client = tumblr.createClient({
-        consumer_key: this.consumerKey,
-        consumer_secret: this.consumerSecret,
-        token: this.token.accessToken,
-        token_secret: this.token.accessTokenSecret
-    });
-};
 
 module.exports = Washers.Tumblr;
