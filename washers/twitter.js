@@ -21,6 +21,15 @@ Washers.Twitter = function(config) {
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);
 
+    this._requestOptions = {
+        oauth: {
+            consumer_key: this.consumerKey,
+            consumer_secret: this.consumerSecret,
+            token: this.token ? this.token.accessToken : '',
+            token_secret: this.token ? this.token.accessTokenSecret : ''
+        }
+    };
+
     this.input = _.merge({
         settings: [{
             name: 'consumerKey',
@@ -105,14 +114,5 @@ Washers.Twitter = function(config) {
 };
 
 Washers.Twitter.prototype = Object.create(Washer.prototype);
-
-Washers.Twitter.prototype.beforeInput = function() {
-    this._client = new Twitter({
-        consumer_key: this.consumerKey,
-        consumer_secret: this.consumerSecret,
-        access_token_key: this.token.accessToken,
-        access_token_secret: this.token.accessTokenSecret
-    });
-};
 
 module.exports = Washers.Twitter;

@@ -88,7 +88,7 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
         if (!err && response.statusCode === 200) {
             callback(body);
         } else {
-            errorCallback(err ? err : body);
+            errorCallback(err || body);
         }
     });
 };

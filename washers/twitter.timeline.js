@@ -39,10 +39,10 @@ Washers.Twitter.Timeline.prototype = Object.create(Washers.Twitter.prototype);
 
 Washers.Twitter.Timeline.prototype.doInput = function(callback) {
     this.beforeInput();
-    this.requestTweets('statuses/home_timeline', {}, callback);
+    this.requestTweets('statuses/home_timeline.json', {}, callback);
 };
 
-Washers.Twitter.Timeline.prototype.requestTweets = function(api, options, callback) {
+Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, callback) {
     var that = this;
     var posts = [];
 
@@ -59,40 +59,46 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(api, options, callba
             options.max_id = maxId;
         }
 
-        that._client.get(api, options, function(err, tweets, response) {
-            if (tweets.statuses) {
-                // search API
-                tweets = tweets.statuses;
-            }
+        Helpers.jsonRequest(
+            extend({
+                uri: 'https://api.twitter.com/1.1/' + method,
+                qs: options
+            }, that._requestOptions),
+            function(response) {
+                var tweets = response;
+                if (tweets.statuses) {
+                    // search API
+                    tweets = tweets.statuses;
+                }
 
-            retrievedLast = 0;
-            if (tweets && tweets.length) {
-                retrievedLast = tweets.length;
-                retrievedTotal += tweets.length;
-                log.debug(util.format('Got %d, total %d/%d', retrievedLast, retrievedTotal, that._quantity));
-                tweets.forEach(function(tweet) {
-                    maxId = tweet.id_str;
-                    var item = Items.Twitter.Tweet.factory(tweet);
-                    var include = true;
-                    if (that.excludeReplies === 'y' && item.isReply) {
-                        include = false;
-                    }
-                    if (that.excludeRetweets === 'y' && (item.isRetweet || item.isQuote)) {
-                        include = false;
-                    }
-                    if (include) {
-                        posts.push(item);
-                    }
-                });
-            }
-            callback(err);
-        });
+                retrievedLast = 0;
+                if (tweets && tweets.length) {
+                    retrievedLast = tweets.length;
+                    retrievedTotal += tweets.length;
+                    log.debug(util.format('Got %d, total %d/%d', retrievedLast, retrievedTotal, that._quantity));
+                    tweets.forEach(function(tweet) {
+                        maxId = tweet.id_str;
+                        var item = Items.Twitter.Tweet.factory(tweet);
+                        var include = true;
+                        if (that.excludeReplies === 'y' && item.isReply) {
+                            include = false;
+                        }
+                        if (that.excludeRetweets === 'y' && (item.isRetweet || item.isQuote)) {
+                            include = false;
+                        }
+                        if (include) {
+                            posts.push(item);
+                        }
+                    });
+                }
+                callback();
+            },
+            callback);
     }, function() {
         return retrievedTotal < that._quantity || retrievedLast === 0;
     }, function(err) {
         callback(err, posts);
     });
-
 };
 
 module.exports = Washers.Twitter.Timeline;

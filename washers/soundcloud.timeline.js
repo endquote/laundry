@@ -51,7 +51,8 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
                                 pageLength = response.length;
                                 following = following.concat(response);
                                 callback();
-                            }, callback);
+                            },
+                            callback);
                     },
                     function() {
                         return pageLength === limit;
