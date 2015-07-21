@@ -1,7 +1,6 @@
 'use strict';
 
 var OAuth = require('oauth'); // https://www.npmjs.com/package/oauth
-var Twitter = require('twitter'); // https://www.npmjs.com/package/twitter
 
 /*
 Base class for Twitter washers containing common methods.
