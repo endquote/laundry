@@ -1,7 +1,5 @@
 'use strict';
 
-var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
-
 /*
 Instagram Likes washer
 input: converts media from the user's Instagram likes into items
@@ -23,7 +21,7 @@ Washers.Instagram.Timeline.Likes.prototype = Object.create(Washers.Instagram.Tim
 
 Washers.Instagram.Timeline.Likes.prototype.doInput = function(callback) {
     this.beforeInput();
-    this.requestMedia('user_self_liked', null, callback);
+    this.requestMedia('/users/self/media/liked', callback);
 };
 
 module.exports = Washers.Instagram.Timeline.Likes;

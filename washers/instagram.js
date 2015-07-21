@@ -1,7 +1,5 @@
 'use strict';
 
-var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
-
 /*
 Base class for Instagram washers containing common methods.
 input: none
@@ -14,6 +12,12 @@ Washers.Instagram = function(config) {
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/instagram.html';
+
+    this._requestOptions = {
+        qs: {
+            access_token: this.token
+        }
+    };
 
     this.input = _.merge({
         settings: [{
@@ -78,20 +82,23 @@ Washers.Instagram.prototype = Object.create(Washer.prototype);
 
 Washers.Instagram.prototype.refreshToken = function(code, callback) {
     var that = this;
-    Helpers.jsonRequest({
-        uri: 'https://api.instagram.com/oauth/access_token',
-        method: 'POST',
-        form: {
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
-            grant_type: 'authorization_code',
-            redirect_uri: this._callbackUri,
-            code: code ? code : this.authCode
-        }
-    }, function(response) {
-        that.token = response.access_token;
-        callback();
-    }, callback);
+    Helpers.jsonRequest(
+        extend({
+            url: 'https://api.instagram.com/oauth/access_token',
+            method: 'POST',
+            form: {
+                client_id: this.clientId,
+                client_secret: this.clientSecret,
+                grant_type: 'authorization_code',
+                redirect_uri: this._callbackUri,
+                code: code ? code : this.authCode
+            }
+        }),
+        function(response) {
+            that.token = response.access_token;
+            callback();
+        },
+        callback);
 };
 
 module.exports = Washers.Instagram;

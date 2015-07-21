@@ -1,7 +1,5 @@
 'use strict';
 
-var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
-
 /*
 Instagram User washer
 input: converts media from a user's Instagram feed into items
@@ -39,30 +37,24 @@ Washers.Instagram.Timeline.User.prototype = Object.create(Washers.Instagram.Time
 
 Washers.Instagram.Timeline.User.prototype.getUserId = function(username, callback) {
     var that = this;
-
-    ig.use({
-        access_token: that.token
-    });
-
-    ig.user_search(username, {
-            sign_request: {
-                client_secret: that.clientSecret,
-            },
-            count: 1
-        },
-        function(err, users, remaining, limit) {
-            if (err || !users.length) {
-                callback(true);
-                return;
+    Helpers.jsonRequest({
+            url: 'https://api.instagram.com/v1/users/search',
+            qs: {
+                count: 1,
+                q: username,
+                access_token: that.token
             }
-            that.userId = users[0].id;
-            callback(err);
-        });
+        },
+        function(response) {
+            that.userId = response.data[0].id;
+            callback();
+        },
+        callback);
 };
 
 Washers.Instagram.Timeline.User.prototype.doInput = function(callback) {
     this.beforeInput();
-    this.requestMedia('user_media_recent', this.userId, callback);
+    this.requestMedia('/users/' + this.userId + '/media/recent', callback);
 };
 
 module.exports = Washers.Instagram.Timeline.User;

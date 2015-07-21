@@ -1,14 +1,11 @@
 /*
 
-kill ig wrapper
-kill tumblr wrapper
 kill twitter wrapper
 kill youtube wrapper
 probably kill beforeInput/beforeOutput?
+figure out podcast issue? look at UHF/Classcadia?
 
 washers/input/google-gmail-search
-washers/input/vimeo - their output is weird
-washers/input/facebook - get actual content of notifications?
 
 washers/input/pinterest-base
 washers/input/pinterest-following
@@ -23,6 +20,8 @@ washers/input/pinterest-notifications
 washers/input/vimeo-notifications
 
 washers/input/merge -- collect N rss feeds and merge them into one, removing duplicates (theverge)
+washers/input/vimeo? - their output is weird
+washers/input/facebook? - get actual content of notifications
 
 better menu for more than a screenful of washers?
 
@@ -66,11 +65,14 @@ some kind of website?
 
 washers/input/linkedin?
 
-side process -- use feedbin api to do things with starred items
+
+feedbin liker, like stuff then unstar it
 - like starred instagrams
 - favorite starred tweets
 - like starred fb notifications
-- add starred enclosures to podcast
+- like starred tumblr posts
+- like starred soundcloud tracks
+- like starred youtube -- but don't unstar it?
 
 
 */

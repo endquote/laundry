@@ -1,7 +1,5 @@
 'use strict';
 
-var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
-
 /*
 Instagram Tag washer
 input: converts media from an Instagram tag into items
@@ -30,7 +28,7 @@ Washers.Instagram.Timeline.Hashtag.prototype = Object.create(Washers.Instagram.T
 
 Washers.Instagram.Timeline.Hashtag.prototype.doInput = function(callback) {
     this.beforeInput();
-    this.requestMedia('tag_media_recent', this.tag, callback);
+    this.requestMedia('/tags/' + encodeURIComponent(this.tag) + '/media/recent', callback);
 };
 
 module.exports = Washers.Instagram.Timeline.Hashtag;

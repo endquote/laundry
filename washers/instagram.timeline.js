@@ -1,7 +1,5 @@
 'use strict';
 
-var ig = require('instagram-node').instagram(); // https://github.com/totemstech/instagram-node
-
 /*
 Instagram Timeline washer
 input: converts media from the user's Instagram timeline into items
@@ -23,15 +21,11 @@ Washers.Instagram.Timeline.prototype = Object.create(Washers.Instagram.prototype
 
 Washers.Instagram.Timeline.prototype.doInput = function(callback) {
     this.beforeInput();
-    this.requestMedia('user_self_feed', null, callback);
+    this.requestMedia('/users/self/feed', callback);
 };
 
-Washers.Instagram.Timeline.prototype.requestMedia = function(method, arg, callback) {
+Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
     var that = this;
-
-    ig.use({
-        access_token: that.token
-    });
 
     var quantity = 150;
     var items = [];
@@ -39,49 +33,27 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, arg, callba
     async.whilst(function() {
             return !items.length || (items.length < quantity && nextMax);
         }, function(callback) {
-
-            var options = {
-                sign_request: {
-                    client_secret: that.clientSecret,
+            Helpers.jsonRequest(
+                extend({
+                    url: 'https://api.instagram.com/v1' + method,
+                    qs: {
+                        count: quantity - items.length,
+                        max_id: nextMax ? nextMax : ''
+                    }
+                }, that._requestOptions),
+                function(response) {
+                    response.data.forEach(function(media) {
+                        items.push(Items.Instagram.Media.factory(media));
+                    });
+                    log.debug(util.format('Got %d/%d items', items.length, quantity));
+                    nextMax = response.pagination.next_max_id;
+                    callback();
                 },
-                count: quantity - items.length,
-                max_id: nextMax ? nextMax : ''
-            };
-
-            var handleResult = function(err, medias, pagination, remaining, limit) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
-                medias.forEach(function(media) {
-                    items.push(Items.Instagram.Media.factory(media));
-                });
-                log.debug(util.format('Got %d/%d items', items.length, quantity));
-                nextMax = pagination.next_max_id;
-                callback(err);
-            };
-
-            if (arg) {
-                ig[method](arg, options, handleResult);
-            } else {
-                ig[method](options, handleResult);
-            }
+                callback);
         },
         function(err) {
             callback(err, items);
         });
 };
-/*
-
-                    ig.user_media_recent(that.userId, {
-                            sign_request: {
-                                client_secret: that.clientSecret,
-                            },
-                            count: quantity - items.length,
-                            max_id: nextMax ? nextMax : ''
-                        },
-
-*/
-
 
 module.exports = Washers.Instagram.Timeline;
