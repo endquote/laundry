@@ -61,7 +61,7 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
 
         Helpers.jsonRequest(
             extend({
-                uri: 'https://api.twitter.com/1.1/' + method,
+                uri: method,
                 qs: options
             }, that._requestOptions),
             function(response) {

@@ -35,7 +35,7 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
         }, function(callback) {
             Helpers.jsonRequest(
                 extend({
-                    url: 'https://api.instagram.com/v1' + method,
+                    url: method,
                     qs: {
                         count: quantity - items.length,
                         max_id: nextMax ? nextMax : ''

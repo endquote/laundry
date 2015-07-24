@@ -14,6 +14,7 @@ Washers.Instagram = function(config) {
     this._callbackUri = 'http://laundry.endquote.com/callbacks/instagram.html';
 
     this._requestOptions = {
+        baseUrl: 'https://api.instagram.com/v1/',
         qs: {
             access_token: this.token
         }

@@ -22,6 +22,7 @@ Washers.Tumblr = function(config) {
     this._callbackUri = 'http://laundry.endquote.com/callbacks/tumblr.html';
 
     this._requestOptions = {
+        baseUrl: 'http://api.tumblr.com/v2/',
         oauth: {
             consumer_key: this.consumerKey,
             consumer_secret: this.consumerSecret,

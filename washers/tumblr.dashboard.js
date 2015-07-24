@@ -30,7 +30,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
         // https://www.tumblr.com/docs/en/api/v2
         Helpers.jsonRequest(
             extend({
-                uri: util.format('http://api.tumblr.com/v2/user/dashboard'),
+                uri: '/user/dashboard',
                 qs: {
                     limit: Math.min(limit, quantity - posts.length),
                     since_id: posts.length ? posts[posts.length - 1].id : null

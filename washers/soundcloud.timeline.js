@@ -27,7 +27,7 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
             function(callback) {
                 Helpers.jsonRequest(
                     extend({
-                        uri: 'https://api.soundcloud.com/me'
+                        uri: '/me'
                     }, that._requestOptions), function(response) {
                         callback(null, response.id);
                     }, callback);
@@ -41,7 +41,7 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
                 async.doWhilst(function(callback) {
                         Helpers.jsonRequest(
                             extend({
-                                uri: util.format('https://api.soundcloud.com/users/%d/followings', userid),
+                                uri: util.format('/users/%d/followings', userid),
                                 qs: {
                                     limit: limit,
                                     offset: following.length
@@ -68,7 +68,7 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
                 async.eachLimit(following, 10, function(following, callback) {
                         Helpers.jsonRequest(
                             extend({
-                                uri: util.format('https://api.soundcloud.com/users/%d/tracks', following.id)
+                                uri: util.format('/users/%d/tracks', following.id)
                             }, that._requestOptions),
                             function(response) {
                                 tracks = tracks.concat(response);

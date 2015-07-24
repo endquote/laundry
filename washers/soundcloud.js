@@ -18,6 +18,7 @@ Washers.SoundCloud = function(config) {
     this._callbackUri = 'http://laundry.endquote.com/callbacks/soundcloud.html';
 
     this._requestOptions = {
+        baseUrl: 'https://api.soundcloud.com',
         qs: {
             oauth_token: this.token
         }

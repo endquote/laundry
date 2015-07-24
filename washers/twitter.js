@@ -21,6 +21,7 @@ Washers.Twitter = function(config) {
     this.className = Helpers.classNameFromFile(__filename);
 
     this._requestOptions = {
+        baseUrl: 'https://api.twitter.com/1.1/',
         oauth: {
             consumer_key: this.consumerKey,
             consumer_secret: this.consumerSecret,
