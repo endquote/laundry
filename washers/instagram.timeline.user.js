@@ -53,7 +53,6 @@ Washers.Instagram.Timeline.User.prototype.getUserId = function(username, callbac
 };
 
 Washers.Instagram.Timeline.User.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestMedia('/users/' + this.userId + '/media/recent', callback);
 };
 

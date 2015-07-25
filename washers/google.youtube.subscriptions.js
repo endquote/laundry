@@ -20,7 +20,6 @@ Washers.Google.YouTube.Subscriptions = function(config) {
 Washers.Google.YouTube.Subscriptions.prototype = Object.create(Washers.Google.YouTube.prototype);
 
 Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
-    this.beforeInput();
     var that = this;
 
     async.waterfall([

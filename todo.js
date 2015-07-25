@@ -2,7 +2,6 @@
 
 kill twitter wrapper
 kill youtube wrapper
-probably kill beforeInput/beforeOutput?
 figure out podcast issue? look at UHF/Classcadia?
 get mp4 from youtube? pocket does it...
 

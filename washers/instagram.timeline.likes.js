@@ -20,7 +20,6 @@ Washers.Instagram.Timeline.Likes = function(config) {
 Washers.Instagram.Timeline.Likes.prototype = Object.create(Washers.Instagram.Timeline.prototype);
 
 Washers.Instagram.Timeline.Likes.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestMedia('/users/self/media/liked', callback);
 };
 

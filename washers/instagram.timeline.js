@@ -20,7 +20,6 @@ Washers.Instagram.Timeline = function(config) {
 Washers.Instagram.Timeline.prototype = Object.create(Washers.Instagram.prototype);
 
 Washers.Instagram.Timeline.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestMedia('/users/self/feed', callback);
 };
 

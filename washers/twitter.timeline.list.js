@@ -34,7 +34,6 @@ Washers.Twitter.Timeline.List = function(config) {
 Washers.Twitter.Timeline.List.prototype = Object.create(Washers.Twitter.Timeline.prototype);
 
 Washers.Twitter.Timeline.List.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestTweets('lists/statuses.json', {
         owner_screen_name: this.listOwner,
         slug: this.listName

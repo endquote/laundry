@@ -27,7 +27,6 @@ Washers.Instagram.Timeline.Hashtag = function(config) {
 Washers.Instagram.Timeline.Hashtag.prototype = Object.create(Washers.Instagram.Timeline.prototype);
 
 Washers.Instagram.Timeline.Hashtag.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestMedia('/tags/' + encodeURIComponent(this.tag) + '/media/recent', callback);
 };
 

@@ -38,7 +38,6 @@ Washers.Twitter.Timeline = function(config) {
 Washers.Twitter.Timeline.prototype = Object.create(Washers.Twitter.prototype);
 
 Washers.Twitter.Timeline.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestTweets('statuses/home_timeline.json', {}, callback);
 };
 

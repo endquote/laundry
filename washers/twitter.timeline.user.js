@@ -27,7 +27,6 @@ Washers.Twitter.Timeline.User = function(config) {
 Washers.Twitter.Timeline.User.prototype = Object.create(Washers.Twitter.Timeline.prototype);
 
 Washers.Twitter.Timeline.User.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestTweets('statuses/user_timeline.json', {
         screen_name: this.username
     }, callback);

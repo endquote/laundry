@@ -20,7 +20,6 @@ Washers.Tumblr.Dashboard = function(config) {
 Washers.Tumblr.Dashboard.prototype = Object.create(Washers.Tumblr.prototype);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
-    this.beforeInput();
     var quantity = 40;
     var posts = [];
     var lastResponse = null;

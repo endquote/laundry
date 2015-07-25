@@ -28,7 +28,6 @@ Washers.Twitter.Timeline.Hashtag = function(config) {
 Washers.Twitter.Timeline.Hashtag.prototype = Object.create(Washers.Twitter.Timeline.prototype);
 
 Washers.Twitter.Timeline.Hashtag.prototype.doInput = function(callback) {
-    this.beforeInput();
     this.requestTweets('search/tweets.json', {
         q: '#' + this.hashtag,
         result_type: 'recent'
