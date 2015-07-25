@@ -1,8 +1,5 @@
 'use strict';
 
-var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
-var youtube = google.youtube('v3'); // https://developers.google.com/youtube/v3/docs/
-
 /*
 Youtube Channel washer
 input: converts videos from a YouTube channel into items
@@ -43,38 +40,38 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
         function(callback) {
             // https://developers.google.com/youtube/v3/docs/channels/list
             log.debug('Getting playlist for channel ' + that.channelName);
-            youtube.channels.list({
-                part: 'contentDetails',
-                auth: that._oauth2Client,
-                forUsername: that.channelName
-            }, function(err, result) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
-
-                var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
-                callback(null, playlistId);
-            });
+            Helpers.jsonRequest(
+                extend({
+                    url: '/channels',
+                    qs: {
+                        part: 'contentDetails',
+                        forUsername: that.channelName
+                    }
+                }, that._requestOptions),
+                function(result) {
+                    var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
+                    callback(null, playlistId);
+                },
+                callback);
         },
 
         // Get the playlist
         function(playlistId, callback) {
             // https://developers.google.com/youtube/v3/docs/playlistItems/list
             log.debug('Getting videos for playlist ' + playlistId);
-            youtube.playlistItems.list({
-                part: 'id,contentDetails,snippet',
-                auth: that._oauth2Client,
-                playlistId: playlistId,
-                maxResults: 50
-            }, function(err, result) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
-
-                callback(null, result.items);
-            });
+            Helpers.jsonRequest(
+                extend({
+                    url: '/playlistItems',
+                    qs: {
+                        part: 'id,contentDetails,snippet',
+                        playlistId: playlistId,
+                        maxResults: 50
+                    }
+                }, that._requestOptions),
+                function(result) {
+                    callback(null, result.items);
+                },
+                callback);
         },
 
         // Parse the video objects into output objects.

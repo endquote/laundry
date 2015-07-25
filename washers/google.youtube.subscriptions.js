@@ -1,8 +1,5 @@
 'use strict';
 
-var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
-var youtube = google.youtube('v3'); // https://developers.google.com/youtube/v3/docs/
-
 /*
 Youtube Subscriptions washer
 input: converts videos from the user's YouTube subscriptions into items
@@ -14,7 +11,6 @@ Washers.Google.YouTube.Subscriptions = function(config) {
 
     this.name = 'YouTube/Subscriptions';
     this.className = Helpers.classNameFromFile(__filename);
-    this._oauth2Client = null;
 
     this.input = _.merge(this.input, {
         description: 'Loads recent videos from your YouTube subscriptions.'
@@ -41,30 +37,30 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
             var nextPageToken = null;
 
             async.doWhilst(function(callback) {
-
                 // https://developers.google.com/youtube/v3/docs/subscriptions/list
-                youtube.subscriptions.list({
-                    part: 'id,snippet',
-                    mine: true,
-                    auth: that._oauth2Client,
-                    maxResults: 50,
-                    pageToken: nextPageToken
-                }, function(err, result) {
-                    if (err) {
-                        callback(err);
-                        return;
-                    }
-
-                    nextPageToken = result.nextPageToken;
-                    result.items.forEach(function(subscription, index, array) {
-                        subscriptions.push({
-                            subscription: subscription
+                Helpers.jsonRequest(
+                    extend({
+                        url: '/subscriptions',
+                        qs: {
+                            part: 'id,snippet',
+                            mine: true,
+                            auth: that._oauth2Client,
+                            maxResults: 50,
+                            pageToken: nextPageToken
+                        }
+                    }, that._requestOptions),
+                    function(result) {
+                        nextPageToken = result.nextPageToken;
+                        result.items.forEach(function(subscription, index, array) {
+                            subscriptions.push({
+                                subscription: subscription
+                            });
                         });
-                    });
 
-                    log.debug('Got ' + subscriptions.length + ' subscriptions');
-                    callback();
-                });
+                        log.debug('Got ' + subscriptions.length + ' subscriptions');
+                        callback();
+                    },
+                    callback);
             }, function() {
                 return nextPageToken;
             }, function(err) {
@@ -81,20 +77,20 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
                 // https://developers.google.com/youtube/v3/docs/channels/list
                 log.debug('Getting playlist for channel ' + channelId);
-                youtube.channels.list({
-                    part: 'contentDetails',
-                    auth: that._oauth2Client,
-                    id: channelId
-                }, function(err, result) {
-                    if (err) {
-                        callback(err);
-                        return;
-                    }
-
-                    var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
-                    subscriptions[index].playlistId = playlistId;
-                    callback();
-                });
+                Helpers.jsonRequest(
+                    extend({
+                        url: '/channels',
+                        qs: {
+                            part: 'contentDetails',
+                            id: channelId
+                        }
+                    }, that._requestOptions),
+                    function(result) {
+                        var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
+                        subscriptions[index].playlistId = playlistId;
+                        callback();
+                    },
+                    callback);
             }, function(err) {
                 callback(err, subscriptions);
             });
@@ -107,20 +103,20 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
                 // https://developers.google.com/youtube/v3/docs/playlistItems/list
                 log.debug('Getting videos for playlist ' + subscription.playlistId);
-                youtube.playlistItems.list({
-                    part: 'id,contentDetails,snippet',
-                    auth: that._oauth2Client,
-                    playlistId: subscription.playlistId,
-                    maxResults: 5
-                }, function(err, result) {
-                    if (err) {
-                        callback(err);
-                        return;
-                    }
-
-                    subscriptions[index].videos = result.items;
-                    callback();
-                });
+                Helpers.jsonRequest(
+                    extend({
+                        url: '/playlistItems',
+                        qs: {
+                            part: 'id,contentDetails,snippet',
+                            playlistId: subscription.playlistId,
+                            maxResults: 5
+                        }
+                    }, that._requestOptions),
+                    function(result) {
+                        subscriptions[index].videos = result.items;
+                        callback();
+                    },
+                    callback);
             }, function(err) {
                 callback(err, subscriptions);
             });

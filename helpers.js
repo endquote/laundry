@@ -1,6 +1,5 @@
 'use strict';
 
-var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
 var touch = require('touch'); // https://github.com/isaacs/node-touch
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 
@@ -39,14 +38,23 @@ Helpers.shortenUrl = function(url, callback) {
         return;
     }
 
-    google.urlshortener('v1').url.insert({
-        key: 'AIzaSyA0K_cjd5UE4j04KK8t_En_x_Y-razJIE8',
-        resource: {
-            longUrl: url
-        }
-    }, function(err, response) {
-        callback(err ? url : response.id);
-    });
+    Helpers.jsonRequest({
+            url: 'https://www.googleapis.com/urlshortener/v1/url',
+            method: 'POST',
+            contentType: 'application/json',
+            body: {
+                longUrl: url
+            },
+            qs: {
+                key: 'AIzaSyA0K_cjd5UE4j04KK8t_En_x_Y-razJIE8',
+            },
+        },
+        function(result) {
+            callback(result.id);
+        },
+        function() {
+            callback(url);
+        });
 };
 
 // Given a file path, try to write to it.
@@ -84,8 +92,10 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
     }
     log.debug(JSON.stringify(options));
     options.json = true;
+    options.proxy = 'http://localhost:8888';
+    options.rejectUnauthorized = false;
     request(options, function(err, response, body) {
-        if (!err && response.statusCode === 200) {
+        if (!err && (response.statusCode === 200 || response.statusCode === undefined)) {
             callback(body);
         } else {
             errorCallback(err || body);

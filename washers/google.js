@@ -1,7 +1,5 @@
 'use strict';
 
-var google = require('googleapis'); // https://github.com/google/google-api-nodejs-client
-
 /*
 Base class for Google washers containing common methods.
 input: none
@@ -13,7 +11,6 @@ Washers.Google = function(config) {
 
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);
-    this._oauth2Client = null;
 
     this.input = _.merge({
         settings: [{
@@ -43,14 +40,16 @@ Washers.Google = function(config) {
         }, {
             name: 'authCode',
             prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, job,prompt, callback) {
+            beforeEntry: function(rl, job, prompt, callback) {
                 if (this.token) {
                     callback(false, prompt);
                     return;
                 }
 
-                this._oauth2Client = new google.auth.OAuth2(this.clientId, this.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
-                var url = this._oauth2Client.generateAuthUrl({
+                var url = 'https://accounts.google.com/o/oauth2/auth?' + qs.stringify({
+                    client_id: this.clientId,
+                    response_type: 'code',
+                    redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
                     access_type: 'offline',
                     scope: 'https://www.googleapis.com/auth/youtube.readonly'
                 });
@@ -71,12 +70,22 @@ Washers.Google = function(config) {
                     return;
                 }
                 var that = this;
-                this._oauth2Client.getToken(newValue, function(err, token) {
-                    if (!err) {
-                        that.token = token;
-                    }
-                    callback(err);
-                });
+                Helpers.jsonRequest({
+                        url: 'https://accounts.google.com/o/oauth2/token',
+                        method: 'POST',
+                        form: {
+                            code: newValue,
+                            client_id: that.clientId,
+                            client_secret: that.clientSecret,
+                            redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
+                            grant_type: 'authorization_code'
+                        }
+                    },
+                    function(response) {
+                        that.token = response;
+                        callback();
+                    },
+                    callback);
             }
         }]
     }, this.input);
@@ -86,15 +95,22 @@ Washers.Google.prototype = Object.create(Washer.prototype);
 
 Washers.Google.prototype.refreshAccessToken = function(callback) {
     var that = this;
-    that._oauth2Client = new google.auth.OAuth2(that.clientId, that.clientSecret, 'urn:ietf:wg:oauth:2.0:oob');
-    that._oauth2Client.setCredentials(that.token);
-    that._oauth2Client.refreshAccessToken(function(err, token) {
-        if (!err) {
+    Helpers.jsonRequest({
+            url: 'https://accounts.google.com/o/oauth2/token',
+            method: 'POST',
+            form: {
+                refresh_token: this.token.refresh_token,
+                client_id: that.clientId,
+                client_secret: that.clientSecret,
+                grant_type: 'refresh_token'
+            }
+        },
+        function(response) {
             log.debug('Refreshed access token');
-            that.token = token;
-        }
-        callback(err);
-    });
+            that.token.access_token = response.access_token;
+            callback();
+        },
+        callback);
 };
 
 module.exports = Washers.Google;

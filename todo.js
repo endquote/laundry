@@ -4,6 +4,7 @@ kill twitter wrapper
 kill youtube wrapper
 probably kill beforeInput/beforeOutput?
 figure out podcast issue? look at UHF/Classcadia?
+get mp4 from youtube? pocket does it...
 
 washers/input/google-gmail-search
 
@@ -22,6 +23,9 @@ washers/input/vimeo-notifications
 washers/input/merge -- collect N rss feeds and merge them into one, removing duplicates (theverge)
 washers/input/vimeo? - their output is weird
 washers/input/facebook? - get actual content of notifications
+
+washers/input/pocket
+washers/output/podcast
 
 better menu for more than a screenful of washers?
 
