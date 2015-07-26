@@ -341,6 +341,9 @@ Laundry.prototype._configureWasher = function(rl, job, mode, callback) {
                             callback();
                             return;
                         }
+                        if (!suggest) {
+                            suggest = '';
+                        }
 
                         // Show the prompt...
                         rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {

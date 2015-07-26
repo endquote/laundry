@@ -2,6 +2,7 @@
 
 var touch = require('touch'); // https://github.com/isaacs/node-touch
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
+var mime = require('mime-types'); // https://www.npmjs.com/package/mime-types
 
 // Misc static helper functions.
 function Helpers() {}
@@ -73,6 +74,15 @@ Helpers.validateFile = function(file, callback) {
     });
 };
 
+// Given a file path, try to create a directory.
+Helpers.validateDirectory = function(dir, callback) {
+    dir = Helpers.cleanString(dir);
+    dir = path.resolve(dir);
+    fs.mkdirp(dir, function(err) {
+        callback(err ? false : true);
+    });
+};
+
 // Remove chalk stuff from a string.
 Helpers.cleanString = function(s) {
     if (!s) {
@@ -92,8 +102,10 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
     }
     log.debug(JSON.stringify(options));
     options.json = true;
-    options.proxy = 'http://localhost:8888';
-    options.rejectUnauthorized = false;
+    if (process.argv.indexOf('proxy') !== -1) {
+        options.proxy = 'http://localhost:8888';
+        options.rejectUnauthorized = false;
+    }
     request(options, function(err, response, body) {
         if (!err && (response.statusCode === 200 || response.statusCode === undefined)) {
             callback(body);
@@ -101,6 +113,29 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
             errorCallback(err || body);
         }
     });
+};
+
+// https://www.apple.com/itunes/podcasts/specs.html
+Helpers._iTunesMimes = {
+    mp3: 'audio/mpeg',
+    m4a: 'audio/x-m4a',
+    mp4: 'video/mp4',
+    m4v: 'video/x-m4v',
+    mov: 'video/quicktime',
+    pdf: 'application/pdf',
+    epub: 'document/x-epub'
+};
+
+// Given a mime type, return a file extension, but iTunes overrides the mime-types db.
+Helpers.mimeTypeToExtension = function(mimeType) {
+    mimeType = mimeType.toLowerCase();
+    for (var i in Helpers._iTunesMimes) {
+        if (Helpers._iTunesMimes[i] === mimeType) {
+            return i;
+        }
+    }
+
+    return mime.extension(mimeType);
 };
 
 // Test for empty strings.
