@@ -12,6 +12,12 @@ Washers.Google = function(config) {
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);
 
+    this._requestOptions = {
+        headers: {
+            Authorization: 'Bearer ' + (this.token ? this.token.access_token : '')
+        }
+    };
+
     this.input = _.merge({
         settings: [{
             name: 'clientId',
@@ -108,6 +114,7 @@ Washers.Google.prototype.refreshAccessToken = function(callback) {
         function(response) {
             log.debug('Refreshed access token');
             that.token.access_token = response.access_token;
+            that._requestOptions.headers.Authorization = 'Bearer ' + response.access_token;
             callback();
         },
         callback);

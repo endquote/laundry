@@ -12,12 +12,9 @@ Washers.Google.YouTube = function(config) {
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);
 
-    this._requestOptions = {
-        baseUrl: 'https://www.googleapis.com/youtube/v3/',
-        headers: {
-            Authorization: 'Bearer ' + (this.token ? this.token.access_token : '')
-        }
-    };
+    this._requestOptions = extend({
+        baseUrl: 'https://www.googleapis.com/youtube/v3/'
+    }, this._requestOptions);
 
     this.input = _.merge({}, this.input);
 };
