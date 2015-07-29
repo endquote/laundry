@@ -48,7 +48,8 @@ Items.Google.YouTube.Video.factory = function(video, callback) {
                 url: url,
                 date: moment(video.snippet.publishedAt),
                 author: video.snippet.channelTitle,
-                thumbnail: thumbnailUrl
+                thumbnail: thumbnailUrl,
+                mediaUrl: videoUrl
             });
 
             callback(item);
