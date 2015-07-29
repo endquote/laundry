@@ -152,6 +152,15 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
             });
         },
 
+        // Clean up any old uploaded media.
+        function(items, callback) {
+            items.sort(function(a, b) {
+                return b.date - a.date;
+            });
+            Items.Google.YouTube.Video.deleteMediaBefore(items[items.length - 1].date, function(err) {
+                callback(err, items);
+            });
+        }
     ], function(err, result) {
         callback(err, result);
     });
