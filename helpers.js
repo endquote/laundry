@@ -4,8 +4,8 @@ var touch = require('touch'); // https://github.com/isaacs/node-touch
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 var mime = require('mime-types'); // https://www.npmjs.com/package/mime-types
 var ytdl = require('youtube-dl'); // https://github.com/fent/node-youtube-dl
-var http = require('http');
-var https = require('https');
+var http = require('follow-redirects').http; // https://www.npmjs.com/package/follow-redirects
+var https = require('follow-redirects').https; // https://www.npmjs.com/package/follow-redirects
 
 // Misc static helper functions.
 function Helpers() {}
@@ -176,7 +176,7 @@ Helpers.uploadUrl = function(url, target, callback) {
         var protocol = require('url').parse(url).protocol;
         var req = protocol === 'http' ? http.request : https.request;
         req(url, function(response) {
-            if (response.statusCode !== 200) {
+            if (response.statusCode !== 200 && response.statusCode !== 302) {
                 callback();
                 return;
             }
