@@ -23,7 +23,8 @@
         "S": true,
         "qs": true,
         "extend": true,
-        "request": true
+        "request": true,
+        "s3": true
     },
     "curly": true,
     "eqeqeq": true,

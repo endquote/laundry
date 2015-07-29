@@ -3,6 +3,9 @@
 var touch = require('touch'); // https://github.com/isaacs/node-touch
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 var mime = require('mime-types'); // https://www.npmjs.com/package/mime-types
+var ytdl = require('youtube-dl'); // https://github.com/fent/node-youtube-dl
+var http = require('http');
+var https = require('https');
 
 // Misc static helper functions.
 function Helpers() {}
@@ -136,6 +139,120 @@ Helpers.mimeTypeToExtension = function(mimeType) {
     }
 
     return mime.extension(mimeType);
+};
+
+// Given a URL to a piece of media that youtube-dl knows about, get the URL to the media file and upload that.
+Helpers.uploadMedia = function(url, target, callback) {
+    log.debug('Getting media URL for ' + url);
+    ytdl.getInfo(url, function(err, info) {
+        if (err) {
+            callback(err);
+        } else {
+            Helpers.uploadUrl(info.url, target, callback);
+        }
+    });
+};
+
+// Given an URL, copy its contents to S3.
+Helpers.uploadUrl = function(url, target, callback) {
+    var mediaUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
+    var params = {
+        Bucket: process.env.LAUNDRY_S3_BUCKET,
+        Key: target
+    };
+
+    // See if the file has previously been uploaded
+    log.debug('Looking for ' + params.Key);
+    s3.headObject(params, function(err, data) {
+        if (data) {
+            // It's already there
+            log.debug('Found ' + params.Key);
+            callback(mediaUrl);
+            return;
+        }
+
+        // Do the upload
+        log.debug('Uploading ' + params.Key);
+        var protocol = require('url').parse(url).protocol;
+        var req = protocol === 'http' ? http.request : https.request;
+        req(url, function(response) {
+            if (response.statusCode !== 200) {
+                callback();
+                return;
+            }
+
+            params.Body = response;
+            params.ContentLength = parseInt(response.headers['content-length']);
+            params.ContentType = response.headers['content-type'];
+            s3.upload(params)
+                .on('httpUploadProgress', function(progress) {
+                    // console.log(progress);
+                }).send(function(err, data) {
+                    log.debug('Done uploading ' + params.Key);
+                    callback(err ? null : mediaUrl);
+                });
+        }).end();
+    });
+};
+
+// Delete S3 objects with a last-modified before a given date.
+Helpers.deleteBefore = function(prefix, date, callback) {
+    log.debug('Cleaning ' + prefix);
+
+    // Get all of the objects with a given prefix.
+    var objects = [];
+    var lastCount = 0;
+    var pageSize = 100;
+    async.doWhilst(
+        function(callback) {
+            s3.listObjects({
+                Bucket: process.env.LAUNDRY_S3_BUCKET,
+                Prefix: prefix,
+                MaxKeys: pageSize,
+                Marker: objects.length ? objects[objects.length - 1].Key : ''
+            }, function(err, data) {
+                if (err) {
+                    callback(err);
+                } else {
+                    objects = objects.concat(data.Contents);
+                    lastCount = data.Contents.length;
+                    callback(err);
+                }
+            });
+        },
+        function() {
+            return lastCount === pageSize;
+        }, function(err) {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            // Get the objects that are older than the requested date and format them as params.
+            objects = objects.filter(function(obj) {
+                return moment(obj.LastModified).isBefore(date);
+            }).map(function(obj) {
+                return {
+                    Key: obj.Key
+                };
+            });
+
+            if (!objects.length) {
+                callback(err);
+                return;
+            }
+
+            log.debug(util.format('Cleaning %d objects from %s', objects.length, prefix));
+            s3.deleteObjects({
+                Bucket: process.env.LAUNDRY_S3_BUCKET,
+                Delete: {
+                    Objects: objects
+                }
+            }, function(err, data) {
+                callback(err);
+            });
+        }
+    );
 };
 
 // Test for empty strings.

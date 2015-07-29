@@ -8,9 +8,7 @@ var Item = function(config) {
     this.date = null;
     this.author = null;
     this.tags = null;
-
-    // used to create RSS enclosures and maybe other things. {url, size, type}
-    this.mediaFile = null;
+    this.mediaUrl = null;
 
     this.description = '';
 

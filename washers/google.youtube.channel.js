@@ -64,7 +64,7 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
                     qs: {
                         part: 'id,contentDetails,snippet',
                         playlistId: playlistId,
-                        maxResults: 50
+                        maxResults: 10
                     }
                 }, that._requestOptions),
                 function(result) {
@@ -75,13 +75,25 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
 
         // Parse the video objects into output objects.
         function(videos, callback) {
-
             var parsed = [];
-            videos.forEach(function(video, index, array) {
-                parsed.push(Items.Google.YouTube.Video.factory(video));
+            async.eachLimit(videos, 10, function(video, callback) {
+                Items.Google.YouTube.Video.factory(video, function(item) {
+                    parsed.push(item);
+                    callback();
+                });
+            }, function(err) {
+                callback(err, parsed);
             });
+        },
 
-            callback(null, parsed);
+        // Clean up any old uploaded media.
+        function(items, callback) {
+            items.sort(function(a, b) {
+                return b.date - a.date;
+            });
+            Items.Google.YouTube.Video.deleteMediaBefore(items[items.length - 1].date, function(err) {
+                callback(err, items);
+            });
         }
     ], function(err, result) {
         callback(err, result);

@@ -141,13 +141,15 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
         // Parse the video objects into output objects.
         function(videos, callback) {
-
             var parsed = [];
-            videos.forEach(function(video, index, array) {
-                parsed.push(Items.Google.YouTube.Video.factory(video));
+            async.eachLimit(videos, 10, function(video, callback) {
+                Items.Google.YouTube.Video.factory(video, function(item) {
+                    parsed.push(item);
+                    callback();
+                });
+            }, function(err) {
+                callback(err, parsed);
             });
-
-            callback(null, parsed);
         },
 
     ], function(err, result) {
