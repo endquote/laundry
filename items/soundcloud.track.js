@@ -57,7 +57,7 @@ Items.SoundCloud.Track.factory = function(track, clientId) {
     }
 
     if (item.mediaFile) {
-        item.description += util.format('<p><audio controls><source src="%s" type="audio/mpeg" preload="metadata" autoplay="false"/></audio></p>', item.mediaFile.url);
+        item.description += util.format('<p><audio controls><source src="%s" type="audio/mpeg" /></audio></p>', item.mediaFile.url);
     }
 
     return item;
