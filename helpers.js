@@ -155,7 +155,7 @@ Helpers.uploadMedia = function(url, target, callback) {
 
 // Given an URL, copy its contents to S3.
 Helpers.uploadUrl = function(url, target, callback) {
-    var mediaUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
+    var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
     var params = {
         Bucket: process.env.LAUNDRY_S3_BUCKET,
         Key: target
@@ -167,7 +167,7 @@ Helpers.uploadUrl = function(url, target, callback) {
         if (data) {
             // It's already there
             log.debug('Found ' + params.Key);
-            callback(mediaUrl);
+            callback(resultUrl);
             return;
         }
 
@@ -189,7 +189,7 @@ Helpers.uploadUrl = function(url, target, callback) {
                     // console.log(progress);
                 }).send(function(err, data) {
                     log.debug('Done uploading ' + params.Key);
-                    callback(err ? null : mediaUrl);
+                    callback(err ? null : resultUrl);
                 });
         }).end();
     });

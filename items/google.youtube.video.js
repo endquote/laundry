@@ -35,7 +35,7 @@ Items.Google.YouTube.Video.factory = function(video, callback) {
         var mediaTarget = 'Items/Google/YouTube/Video/' + video.contentDetails.videoId + '.mp4';
         Helpers.uploadMedia(url, mediaTarget, function(videoUrl) {
 
-            var player = util.format('<p><video controls poster="%s" src="%s" autoplay="false" autobuffer="false" preload="none"></video></p>', thumbnailUrl, videoUrl);
+            var player = util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbnailUrl, videoUrl);
             var description = video.snippet.description;
             description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
             description = description.replace(/[\n\r]/gim, '<br/>');
