@@ -118,66 +118,22 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
     });
 };
 
-// https://www.apple.com/itunes/podcasts/specs.html
-Helpers._iTunesMimes = {
-    mp3: 'audio/mpeg',
-    m4a: 'audio/x-m4a',
-    mp4: 'video/mp4',
-    m4v: 'video/x-m4v',
-    mov: 'video/quicktime',
-    pdf: 'application/pdf',
-    epub: 'document/x-epub'
-};
-
-// Given a mime type, return a file extension, but iTunes overrides the mime-types db.
-Helpers.mimeTypeToExtension = function(mimeType) {
-    mimeType = mimeType.toLowerCase();
-    for (var i in Helpers._iTunesMimes) {
-        if (Helpers._iTunesMimes[i] === mimeType) {
-            return i;
-        }
-    }
-
-    return mime.extension(mimeType);
-};
-
-// Given a URL to a piece of media that youtube-dl knows about, get the URL to the media file and upload that.
-Helpers.uploadMedia = function(url, target, callback) {
-    log.debug('Getting media URL for ' + url);
-    ytdl.getInfo(url, function(err, info) {
-        if (err) {
-            callback(err);
-        } else {
-            Helpers.uploadUrl(info.url, target, callback);
-        }
-    });
-};
-
 // Given an URL, copy its contents to S3.
-Helpers.uploadUrl = function(url, target, callback) {
+Helpers.uploadUrl = function(url, useYTDL, target, callback) {
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
     var params = {
         Bucket: process.env.LAUNDRY_S3_BUCKET,
         Key: target
     };
 
-    // See if the file has previously been uploaded
-    log.debug('Looking for ' + params.Key);
-    s3.headObject(params, function(err, data) {
-        if (data) {
-            // It's already there
-            log.debug('Found ' + params.Key);
-            callback(resultUrl);
-            return;
-        }
-
+    function doUpload() {
         // Do the upload
         log.debug('Uploading ' + params.Key);
         var protocol = require('url').parse(url).protocol;
         var req = protocol === 'http' ? http.request : https.request;
         req(url, function(response) {
             if (response.statusCode !== 200 && response.statusCode !== 302) {
-                callback();
+                callback(url);
                 return;
             }
 
@@ -189,9 +145,35 @@ Helpers.uploadUrl = function(url, target, callback) {
                     // console.log(progress);
                 }).send(function(err, data) {
                     log.debug('Done uploading ' + params.Key);
-                    callback(err ? null : resultUrl);
+                    callback(err ? url : resultUrl);
                 });
         }).end();
+    }
+
+    // See if the file has previously been uploaded
+    log.debug('Looking for ' + params.Key);
+    s3.headObject(params, function(err, data) {
+        if (data) {
+            // It's already there
+            log.debug('Found ' + params.Key);
+            callback(resultUrl);
+            return;
+        }
+
+        if (useYTDL) {
+            // Use the youtube-dl to change the url into a media url
+            log.debug('Getting media URL for ' + url);
+            ytdl.getInfo(url, function(err, info) {
+                if (err) {
+                    callback(err);
+                } else {
+                    url = info.url;
+                    doUpload();
+                }
+            });
+        } else {
+            doUpload();
+        }
     });
 };
 

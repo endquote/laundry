@@ -29,11 +29,11 @@ Items.Google.YouTube.Video.factory = function(video, callback) {
 
     // Upload the thumbnail
     var thumbTarget = 'Items/Google/YouTube/Video/Thumbnail/' + video.contentDetails.videoId + '.jpg';
-    Helpers.uploadUrl(thumbnail.url, thumbTarget, function(thumbnailUrl) {
+    Helpers.uploadUrl(thumbnail.url, false, thumbTarget, function(thumbnailUrl) {
 
         // Upload the video
         var mediaTarget = 'Items/Google/YouTube/Video/' + video.contentDetails.videoId + '.mp4';
-        Helpers.uploadMedia(url, mediaTarget, function(videoUrl) {
+        Helpers.uploadUrl(url, true, mediaTarget, function(videoUrl) {
 
             var player = util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbnailUrl, videoUrl);
             var description = video.snippet.description;
