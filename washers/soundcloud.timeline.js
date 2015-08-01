@@ -86,20 +86,22 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
                 tracks.sort(function(a, b) {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 });
-                tracks = tracks.slice(0, 50);
+                tracks = tracks.slice(0, 20);
                 callback(null, tracks);
             },
 
             // Parse the tracks into Item objects.
             function(tracks, callback) {
                 var parsed = [];
-                tracks.forEach(function(track, index, array) {
-                    parsed.push(Items.SoundCloud.Track.factory(track, that.clientId));
+                async.eachLimit(tracks, 10, function(track, callback) {
+                    Items.SoundCloud.Track.factory(track, that.clientId, function(item) {
+                        parsed.push(item);
+                        callback();
+                    });
+                }, function(err) {
+                    callback(err, parsed);
                 });
-
-                callback(null, parsed);
             }
-
         ],
         function(err, result) {
             callback(err, result);

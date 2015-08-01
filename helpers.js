@@ -120,35 +120,16 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
 
 // Given an URL, copy its contents to S3.
 Helpers.uploadUrl = function(url, useYTDL, target, callback) {
+    if (!url) {
+        callback(url);
+        return;
+    }
+
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
     var params = {
         Bucket: process.env.LAUNDRY_S3_BUCKET,
         Key: target
     };
-
-    function doUpload() {
-        // Do the upload
-        log.debug('Uploading ' + params.Key);
-        var protocol = require('url').parse(url).protocol;
-        var req = protocol === 'http' ? http.request : https.request;
-        req(url, function(response) {
-            if (response.statusCode !== 200 && response.statusCode !== 302) {
-                callback(url);
-                return;
-            }
-
-            params.Body = response;
-            params.ContentLength = parseInt(response.headers['content-length']);
-            params.ContentType = response.headers['content-type'];
-            s3.upload(params)
-                .on('httpUploadProgress', function(progress) {
-                    // console.log(progress);
-                }).send(function(err, data) {
-                    log.debug('Done uploading ' + params.Key);
-                    callback(err ? url : resultUrl);
-                });
-        }).end();
-    }
 
     // See if the file has previously been uploaded
     log.debug('Looking for ' + params.Key);
@@ -175,6 +156,30 @@ Helpers.uploadUrl = function(url, useYTDL, target, callback) {
             doUpload();
         }
     });
+
+    function doUpload() {
+        // Do the upload
+        log.debug('Uploading ' + params.Key);
+        var protocol = require('url').parse(url).protocol;
+        var req = protocol === 'http' ? http.request : https.request;
+        req(url, function(response) {
+            if (response.statusCode !== 200 && response.statusCode !== 302) {
+                callback(url);
+                return;
+            }
+
+            params.Body = response;
+            params.ContentLength = parseInt(response.headers['content-length']);
+            params.ContentType = response.headers['content-type'];
+            s3.upload(params)
+                .on('httpUploadProgress', function(progress) {
+                    // console.log(progress);
+                }).send(function(err, data) {
+                    log.debug('Done uploading ' + params.Key);
+                    callback(err ? url : resultUrl);
+                });
+        }).end();
+    }
 };
 
 // Delete S3 objects with a last-modified before a given date.
@@ -224,6 +229,7 @@ Helpers.deleteBefore = function(prefix, date, callback) {
                 return;
             }
 
+            // Delete the old objects.
             log.debug(util.format('Cleaning %d objects from %s', objects.length, prefix));
             s3.deleteObjects({
                 Bucket: process.env.LAUNDRY_S3_BUCKET,
