@@ -19,8 +19,9 @@ Items.SoundCloud.Track.factory = function(track, clientId, callback) {
     Helpers.uploadUrl(track.artwork_url, false, artworkTarget, function(artworkUrl) {
 
         // Upload the video
-        var mediaTarget = 'Items/SoundCloud/Track/' + track.id + '.' + (track.downloadable ? track.original_format : 'mp3');
-        Helpers.uploadUrl(track.permalink_url, true, mediaTarget, function(audioUrl) {
+        var mediaTarget = 'Items/SoundCloud/Track/' + track.id + '.mp3';
+        var mediaSource = util.format('%s?client_id=%s', track.stream_url, clientId);
+        Helpers.uploadUrl(mediaSource, false, mediaTarget, function(audioUrl) {
 
             // tag_list is all like: yous truly r "ritual union" little dragon man live sweden gothenburg
             var tags = [];
