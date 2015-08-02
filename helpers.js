@@ -119,7 +119,7 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
 };
 
 // Given an URL, copy its contents to S3.
-Helpers.uploadUrl = function(url, useYTDL, target, callback) {
+Helpers.uploadUrl = function(url, prefix, target, useYTDL, callback) {
     if (!url) {
         callback(url);
         return;
@@ -128,7 +128,7 @@ Helpers.uploadUrl = function(url, useYTDL, target, callback) {
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
     var params = {
         Bucket: process.env.LAUNDRY_S3_BUCKET,
-        Key: target
+        Key: prefix + target
     };
 
     // See if the file has previously been uploaded

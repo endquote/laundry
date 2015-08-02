@@ -14,7 +14,8 @@ Items.Google.YouTube.Video = function(config) {
 Items.Google.YouTube.Video.prototype = Object.create(Item.prototype);
 
 // Convert a video from the api response into a laundry item.
-Items.Google.YouTube.Video.factory = function(video, callback) {
+Items.Google.YouTube.Video.factory = function(jobName, video, callback) {
+    var prefix = jobName + '/items/google/youtube/video/';
 
     var url = 'https://youtube.com/watch?v=' + video.contentDetails.videoId;
 
@@ -28,12 +29,12 @@ Items.Google.YouTube.Video.factory = function(video, callback) {
     }).pop();
 
     // Upload the thumbnail
-    var thumbTarget = 'Items/Google/YouTube/Video/Thumbnail/' + video.contentDetails.videoId + '.jpg';
-    Helpers.uploadUrl(thumbnail.url, false, thumbTarget, function(thumbnailUrl) {
+    var thumbTarget = video.contentDetails.videoId + '.jpg';
+    Helpers.uploadUrl(thumbnail.url, prefix, thumbTarget, false, function(thumbnailUrl) {
 
         // Upload the video
-        var mediaTarget = 'Items/Google/YouTube/Video/' + video.contentDetails.videoId + '.mp4';
-        Helpers.uploadUrl(url, true, mediaTarget, function(videoUrl) {
+        var mediaTarget = video.contentDetails.videoId + '.mp4';
+        Helpers.uploadUrl(url, prefix, mediaTarget, true, function(videoUrl) {
 
             var player = util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbnailUrl, videoUrl);
             var description = video.snippet.description;
@@ -53,14 +54,6 @@ Items.Google.YouTube.Video.factory = function(video, callback) {
             });
 
             callback(item);
-        });
-    });
-};
-
-Items.Google.YouTube.Video.deleteMediaBefore = function(date, callback) {
-    Helpers.deleteBefore('Items/Google/YouTube/Video/Thumbnail/', date, function(err) {
-        Helpers.deleteBefore('Items/Google/YouTube/Video/', date, function(err) {
-            callback(err);
         });
     });
 };

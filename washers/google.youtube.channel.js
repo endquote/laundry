@@ -77,7 +77,7 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
         function(videos, callback) {
             var parsed = [];
             async.eachLimit(videos, 10, function(video, callback) {
-                Items.Google.YouTube.Video.factory(video, function(item) {
+                Items.Google.YouTube.Video.factory(that._job.name, video, function(item) {
                     parsed.push(item);
                     callback();
                 });
@@ -91,9 +91,7 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
             items.sort(function(a, b) {
                 return b.date - a.date;
             });
-            Items.Google.YouTube.Video.deleteMediaBefore(items[items.length - 1].date, function(err) {
-                callback(err, items);
-            });
+            callback(items);
         }
     ], function(err, result) {
         callback(err, result);
