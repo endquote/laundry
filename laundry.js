@@ -78,7 +78,13 @@ Laundry.prototype.help = function(callback) {
 
 // Create a new job.
 Laundry.prototype.create = function(jobName, callback) {
-    if (!jobName || jobName.toLowerCase() === 'all') {
+    // Convert name to confirm to S3 bucket naming best practices
+    jobName = jobName.toLowerCase(); // No capital letters (A-Z)
+    jobName = jobName.replace('.', '-'); // No periods (.)
+    jobName = jobName.replace('_', '-'); // No underscores (_)
+    jobName = jobName.replace(/(^-|-$)/g, ''); // - cannot appear at the beginning nor end of the bucket name
+    jobName = jobName.substr(0, 32); // The bucket name must be less than or equal to 32 characters long
+    if (!jobName || jobName === 'all') {
         console.log("Specify a name for the job with " + chalk.bold("laundry create [job]") + ".\n");
         this.list(callback);
         return;
