@@ -15,6 +15,7 @@ Items.Google.YouTube.Video.prototype = Object.create(Item.prototype);
 
 // Convert a video from the api response into a laundry item.
 Items.Google.YouTube.Video.factory = function(video, callback) {
+
     var url = 'https://youtube.com/watch?v=' + video.contentDetails.videoId;
 
     // Figure out the biggest thumbnail available.

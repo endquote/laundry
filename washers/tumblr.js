@@ -18,6 +18,7 @@ Washers.Tumblr = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
+    this.className = Helpers.classNameFromFile(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/tumblr.html';
 
     this._requestOptions = {

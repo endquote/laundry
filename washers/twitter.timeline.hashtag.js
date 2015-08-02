@@ -10,6 +10,7 @@ Washers.Twitter.Timeline.Hashtag = function(config, job) {
     Washers.Twitter.Timeline.call(this, config, job);
 
     this.name = 'Twitter/Hashtag';
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Load recent tweets with a given hashtag.',

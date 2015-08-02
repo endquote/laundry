@@ -10,6 +10,7 @@ Washers.SoundCloud.Timeline = function(config, job) {
     Washers.SoundCloud.call(this, config, job);
 
     this.name = 'SoundCloud/Timeline';
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent sounds from your SoundCloud timeline.'

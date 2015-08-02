@@ -10,6 +10,7 @@ Washers.Google = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
+    this.className = Helpers.classNameFromFile(__filename);
 
     this._requestOptions = {
         headers: {

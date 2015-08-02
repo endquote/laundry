@@ -10,6 +10,7 @@ Washers.Twitter.Timeline.List = function(config, job) {
     Washers.Twitter.Timeline.call(this, config, job);
 
     this.name = 'Twitter/List';
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent tweets Twitter list.',

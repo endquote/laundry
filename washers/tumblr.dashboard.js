@@ -10,6 +10,7 @@ Washers.Tumblr.Dashboard = function(config, job) {
     Washers.Tumblr.call(this, config, job);
 
     this.name = 'Tumblr/Dashboard';
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from your Tumblr Dashboard.'

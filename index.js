@@ -60,9 +60,7 @@ global.allWashers = {};
 fs.readdirSync(path.join(__dirname, 'washers')).sort(function(a, b) {
     return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
 }).forEach(function(file) {
-    var className = file.replace('.js', '');
-    var c = allWashers[className] = require(path.join(__dirname, 'washers', file));
-    c.className = className;
+    allWashers[file.replace('.js', '')] = require(path.join(__dirname, 'washers', file));
 });
 
 // Load item class files in order of filename length, which also matches the inheritance order.
@@ -71,9 +69,7 @@ global.allItems = {};
 fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
     return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
 }).forEach(function(file) {
-    var className = file.replace('.js', '');
-    var c = allItems[className] = require(path.join(__dirname, 'items', file));
-    c.className = className;
+    allItems[file.replace('.js', '')] = require(path.join(__dirname, 'items', file));
 });
 
 // Load all the jobs, all the commands need this anyway.

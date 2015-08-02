@@ -14,6 +14,7 @@ Washers.RSS = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = 'RSS';
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge({
         description: 'Loads data from an RSS feed.',

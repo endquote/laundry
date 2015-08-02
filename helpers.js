@@ -94,6 +94,10 @@ Helpers.cleanString = function(s) {
     return chalk.stripColor(s).trim();
 };
 
+Helpers.classNameFromFile = function(file) {
+    return path.basename(file.replace('.js', ''));
+};
+
 // Make an HTTP request that expects JSON back, and handle the errors well.
 Helpers.jsonRequest = function(options, callback, errorCallback) {
     if (!options) {

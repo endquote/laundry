@@ -10,6 +10,7 @@ Washers.Twitter.Timeline.User = function(config, job) {
     Washers.Twitter.Timeline.call(this, config, job);
 
     this.name = 'Twitter/User';
+    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from a Twitter user.',
