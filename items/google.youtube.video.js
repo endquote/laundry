@@ -44,6 +44,7 @@ Items.Google.YouTube.Video.factory = function(jobName, video, callback) {
             description = player + '<p>' + description + '</p>';
 
             var item = new Items.Google.YouTube.Video({
+                id: video.contentDetails.videoId,
                 title: video.snippet.channelTitle + ': ' + video.snippet.title,
                 description: description,
                 url: url,

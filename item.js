@@ -2,6 +2,7 @@
 
 // Basic class representing an item from anywhere.
 var Item = function(config) {
+    this.id = null;
     this.title = null;
     this.description = null;
     this.url = null;
@@ -9,7 +10,6 @@ var Item = function(config) {
     this.author = null;
     this.tags = null;
     this.mediaUrl = null;
-
     this.description = '';
 
     if (config) {
