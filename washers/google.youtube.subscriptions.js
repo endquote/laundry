@@ -10,7 +10,6 @@ Washers.Google.YouTube.Subscriptions = function(config, job) {
     Washers.Google.YouTube.call(this, config, job);
 
     this.name = 'YouTube/Subscriptions';
-    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent videos from your YouTube subscriptions.'

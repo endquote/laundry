@@ -218,7 +218,7 @@ Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
 
     var validWashers = [];
     for (var i in allWashers) {
-        var w = new allWashers[i]();
+        var w = new allWashers[i](null, job);
         if (w[mode] && w.name) {
             validWashers.push(w);
         }

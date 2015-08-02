@@ -8,9 +8,6 @@ var Washer = function(config, job) {
     // The user-facing name of the washer. Leave empty to not show it as an option.
     this.name = null;
 
-    // The internal name.
-    this.className = Helpers.classNameFromFile(__filename);
-
     // An object describing the input function of this washer, if any. It contains a user-facing
     // description of the functionality, and an array of settings required to configure it.
     /*

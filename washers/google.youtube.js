@@ -10,7 +10,6 @@ Washers.Google.YouTube = function(config, job) {
     Washers.Google.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
 
     this._requestOptions = extend({
         baseUrl: 'https://www.googleapis.com/youtube/v3/'

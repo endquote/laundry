@@ -10,7 +10,6 @@ Washers.Instagram.Timeline = function(config, job) {
     Washers.Instagram.call(this, config, job);
 
     this.name = 'Instagram/Timeline';
-    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent images from your Instagram timeline.'

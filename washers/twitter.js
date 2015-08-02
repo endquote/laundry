@@ -18,7 +18,6 @@ Washers.Twitter = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
 
     this._requestOptions = {
         baseUrl: 'https://api.twitter.com/1.1/',

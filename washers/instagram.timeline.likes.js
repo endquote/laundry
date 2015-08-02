@@ -10,7 +10,6 @@ Washers.Instagram.Timeline.Likes = function(config, job) {
     Washers.Instagram.Timeline.call(this, config, job);
 
     this.name = 'Instagram/Likes';
-    this.className = Helpers.classNameFromFile(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads media you\'ve liked on Instagram.'

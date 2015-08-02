@@ -10,7 +10,6 @@ Washers.Instagram.Timeline.Hashtag = function(config, job) {
     Washers.Instagram.Timeline.call(this, config, job);
 
     this.name = 'Instagram/Hashtag';
-    this.className = Helpers.classNameFromFile(__filename);
     this.input = _.merge(this.input, {
         description: 'Loads recent images from Instagram with a given hashtag.',
         settings: [{

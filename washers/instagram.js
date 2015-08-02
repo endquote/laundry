@@ -10,7 +10,6 @@ Washers.Instagram = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/instagram.html';
 
     this._requestOptions = {
