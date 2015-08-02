@@ -6,8 +6,8 @@ input: converts videos from the user's YouTube subscriptions into items
 output: none
 */
 ns('Washers.Google.YouTube', global);
-Washers.Google.YouTube.Subscriptions = function(config) {
-    Washers.Google.YouTube.call(this, config);
+Washers.Google.YouTube.Subscriptions = function(config, job) {
+    Washers.Google.YouTube.call(this, config, job);
 
     this.name = 'YouTube/Subscriptions';
     this.className = Helpers.classNameFromFile(__filename);

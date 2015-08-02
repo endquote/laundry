@@ -6,8 +6,8 @@ input: converts media from the user's Tumblr Dashboard into items
 output: none
 */
 ns('Washers.Tumblr', global);
-Washers.Tumblr.Dashboard = function(config) {
-    Washers.Tumblr.call(this, config);
+Washers.Tumblr.Dashboard = function(config, job) {
+    Washers.Tumblr.call(this, config, job);
 
     this.name = 'Tumblr/Dashboard';
     this.className = Helpers.classNameFromFile(__filename);

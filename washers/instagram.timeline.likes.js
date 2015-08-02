@@ -6,8 +6,8 @@ input: converts media from the user's Instagram likes into items
 output: none
 */
 ns('Washers.Instagram.Timeline', global);
-Washers.Instagram.Timeline.Likes = function(config) {
-    Washers.Instagram.Timeline.call(this, config);
+Washers.Instagram.Timeline.Likes = function(config, job) {
+    Washers.Instagram.Timeline.call(this, config, job);
 
     this.name = 'Instagram/Likes';
     this.className = Helpers.classNameFromFile(__filename);

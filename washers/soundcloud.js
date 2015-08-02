@@ -6,12 +6,12 @@ input: none
 output: none
 */
 ns('Washers', global);
-Washers.SoundCloud = function(config) {
+Washers.SoundCloud = function(config, job) {
     this.clientId = null;
     this.clientSecret = null;
     this.token = null;
 
-    Washer.call(this, config);
+    Washer.call(this, config, job);
 
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);

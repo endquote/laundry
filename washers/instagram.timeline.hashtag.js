@@ -6,8 +6,8 @@ input: converts media from an Instagram tag into items
 output: none
 */
 ns('Washers.Instagram.Timeline', global);
-Washers.Instagram.Timeline.Hashtag = function(config) {
-    Washers.Instagram.Timeline.call(this, config);
+Washers.Instagram.Timeline.Hashtag = function(config, job) {
+    Washers.Instagram.Timeline.call(this, config, job);
 
     this.name = 'Instagram/Hashtag';
     this.className = Helpers.classNameFromFile(__filename);

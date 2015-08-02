@@ -6,8 +6,8 @@ input: converts videos from a YouTube channel into items
 output: null
 */
 ns('Washers.Google.YouTube', global);
-Washers.Google.YouTube.Channel = function(config) {
-    Washers.Google.YouTube.call(this, config);
+Washers.Google.YouTube.Channel = function(config, job) {
+    Washers.Google.YouTube.call(this, config, job);
 
     this.name = 'YouTube/Channel';
     this.className = Helpers.classNameFromFile(__filename);

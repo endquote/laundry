@@ -6,8 +6,8 @@ input: searches for tweets with a hashtag and converts them into items
 output: none
 */
 ns('Washers.Twitter.Timeline', global);
-Washers.Twitter.Timeline.Hashtag = function(config) {
-    Washers.Twitter.Timeline.call(this, config);
+Washers.Twitter.Timeline.Hashtag = function(config, job) {
+    Washers.Twitter.Timeline.call(this, config, job);
 
     this.name = 'Twitter/Hashtag';
     this.className = Helpers.classNameFromFile(__filename);

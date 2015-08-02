@@ -6,8 +6,8 @@ input: none
 output: none
 */
 ns('Washers', global);
-Washers.Instagram = function(config) {
-    Washer.call(this, config);
+Washers.Instagram = function(config, job) {
+    Washer.call(this, config, job);
 
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);

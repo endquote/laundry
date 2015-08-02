@@ -10,8 +10,8 @@ output: writes an array of Items to an RSS feed on disk
 */
 
 ns('Washers', global);
-Washers.RSS = function(config) {
-    Washer.call(this, config);
+Washers.RSS = function(config, job) {
+    Washer.call(this, config, job);
 
     this.name = 'RSS';
     this.className = Helpers.classNameFromFile(__filename);

@@ -6,8 +6,8 @@ input: converts media from a user's Twitter timeline into items
 output: none
 */
 ns('Washers.Twitter.Timeline', global);
-Washers.Twitter.Timeline.User = function(config) {
-    Washers.Twitter.Timeline.call(this, config);
+Washers.Twitter.Timeline.User = function(config, job) {
+    Washers.Twitter.Timeline.call(this, config, job);
 
     this.name = 'Twitter/User';
     this.className = Helpers.classNameFromFile(__filename);

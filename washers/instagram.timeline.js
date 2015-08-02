@@ -6,8 +6,8 @@ input: converts media from the user's Instagram timeline into items
 output: none
 */
 ns('Washers.Instagram', global);
-Washers.Instagram.Timeline = function(config) {
-    Washers.Instagram.call(this, config);
+Washers.Instagram.Timeline = function(config, job) {
+    Washers.Instagram.call(this, config, job);
 
     this.name = 'Instagram/Timeline';
     this.className = Helpers.classNameFromFile(__filename);

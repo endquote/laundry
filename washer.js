@@ -2,7 +2,8 @@
 
 // Base class for washers. Washers can accept input from the web, parse it into general-purpose objects,
 // and return it to other washers which output those objects to other formats.
-var Washer = function(config) {
+var Washer = function(config, job) {
+    this._job = job;
 
     // The user-facing name of the washer. Leave empty to not show it as an option.
     this.name = null;

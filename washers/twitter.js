@@ -8,14 +8,14 @@ input: none
 output: none
 */
 ns('Washers', global);
-Washers.Twitter = function(config) {
+Washers.Twitter = function(config, job) {
 
     this.consumerKey = null;
     this.consumerSecret = null;
     this.authVerifier = null;
     this.token = null;
 
-    Washer.call(this, config);
+    Washer.call(this, config, job);
 
     this.name = '';
     this.className = Helpers.classNameFromFile(__filename);

@@ -6,8 +6,8 @@ input: none
 output: none
 */
 ns('Washers.SoundCloud', global);
-Washers.SoundCloud.Timeline = function(config) {
-    Washers.SoundCloud.call(this, config);
+Washers.SoundCloud.Timeline = function(config, job) {
+    Washers.SoundCloud.call(this, config, job);
 
     this.name = 'SoundCloud/Timeline';
     this.className = Helpers.classNameFromFile(__filename);
