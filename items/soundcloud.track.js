@@ -16,7 +16,7 @@ Items.SoundCloud.Track.className = Helpers.buildClassName(__filename);
 
 // Convert a media object from the API into a media item.
 Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
-    var prefix = (jobName + '.' + Items.SoundCloud.Track.className).toLowerCase().split('.').join('/');
+    var prefix = Item.buildPrefix(jobName, Items.SoundCloud.Track.className);
     var items = [];
     var newKeys = [];
     var oldKeys = [];
