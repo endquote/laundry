@@ -81,7 +81,7 @@ Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
                     }
 
                     if (uploads.audioUrl) {
-                        description += util.format('<p>(<a href="%s">download</a>)</p>', uploads.audioUrl);
+                        description += util.format('<p>(<a href="%s">download</a>)</p>', track.download_url ? track.download_url : uploads.audioUrl);
                     }
 
                     var item = new Items.SoundCloud.Track({
