@@ -1,0 +1,90 @@
+'use strict';
+
+/*
+Converts media from the user's SoundCloud timeline into items.
+input: none
+output: none
+*/
+ns('Washers.SoundCloud', global);
+Washers.SoundCloud.Artist = function(config, job) {
+    Washers.SoundCloud.call(this, config, job);
+
+    this.name = 'SoundCloud/Artist';
+    this.className = Helpers.buildClassName(__filename);
+
+    this.input = _.merge(this.input, {
+        description: 'Loads recent sounds from a SoundCloud artist.',
+        settings: [{
+            name: 'artistName',
+            prompt: 'What is the name of the artist to follow?',
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
+                callback(validator.isWhitespace(newValue));
+            }
+        }]
+    });
+};
+
+Washers.SoundCloud.Artist.prototype = Object.create(Washers.SoundCloud.prototype);
+Washers.SoundCloud.Artist.className = Helpers.buildClassName(__filename);
+
+Washers.SoundCloud.Artist.prototype.doInput = function(callback) {
+    var that = this;
+    async.waterfall([
+
+            // Get the userid
+            function(callback) {
+                Helpers.jsonRequest(
+                    extend({
+                        uri: '/users',
+                        qs: {
+                            q: that.artistName
+                        }
+                    }, that._requestOptions), function(response) {
+                        var user = response.filter(function(u) {
+                            return u.permalink.toLowerCase() === that.artistName.toLowerCase();
+                        })[0];
+                        if (!user) {
+                            callback(util.format('User %s not found', that.artistName));
+                        } else {
+                            callback(null, user.id);
+                        }
+                    }, callback);
+            },
+
+            // Get the tracks.
+            function(userId, callback) {
+                var tracks = [];
+                Helpers.jsonRequest(
+                    extend({
+                        uri: util.format('/users/%d/tracks', userId),
+                        qs: {
+                            client_id: that.clientId
+                        }
+                    }, that._requestOptions),
+                    function(response) {
+                        tracks = tracks.concat(response);
+                        callback(null, response);
+                    },
+                    callback);
+            },
+
+            // Sort the tracks together and return the most recent.
+            function(tracks, callback) {
+                tracks.sort(function(a, b) {
+                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                });
+                tracks = tracks.slice(0, 20);
+                callback(null, tracks);
+            },
+
+            // Parse the tracks into Item objects.
+            function(tracks, callback) {
+                Items.SoundCloud.Track.factory(that._job.name, tracks, that.clientId, callback);
+            }
+        ],
+        function(err, result) {
+            callback(err, result);
+        });
+};
+
+module.exports = Washers.SoundCloud.Artist;
