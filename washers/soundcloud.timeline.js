@@ -10,7 +10,7 @@ Washers.SoundCloud.Timeline = function(config, job) {
     Washers.SoundCloud.call(this, config, job);
 
     this.name = 'SoundCloud/Timeline';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent sounds from your SoundCloud timeline.'
@@ -18,6 +18,7 @@ Washers.SoundCloud.Timeline = function(config, job) {
 };
 
 Washers.SoundCloud.Timeline.prototype = Object.create(Washers.SoundCloud.prototype);
+Washers.SoundCloud.Timeline.className = Helpers.buildClassName(__filename);
 
 Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
     var that = this;
@@ -92,15 +93,7 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
 
             // Parse the tracks into Item objects.
             function(tracks, callback) {
-                var parsed = [];
-                async.eachLimit(tracks, 10, function(track, callback) {
-                    Items.SoundCloud.Track.factory(track, that.clientId, function(item) {
-                        parsed.push(item);
-                        callback();
-                    });
-                }, function(err) {
-                    callback(err, parsed);
-                });
+                Items.SoundCloud.Track.factory(that._job.name, tracks, that.clientId, callback);
             }
         ],
         function(err, result) {

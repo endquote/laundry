@@ -18,7 +18,7 @@ Washers.Twitter = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this._requestOptions = {
         baseUrl: 'https://api.twitter.com/1.1/',
@@ -114,5 +114,6 @@ Washers.Twitter = function(config, job) {
 };
 
 Washers.Twitter.prototype = Object.create(Washer.prototype);
+Washers.Twitter.className = Helpers.buildClassName(__filename);
 
 module.exports = Washers.Twitter;

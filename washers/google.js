@@ -10,7 +10,7 @@ Washers.Google = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this._requestOptions = {
         headers: {
@@ -98,7 +98,7 @@ Washers.Google = function(config, job) {
 };
 
 Washers.Google.prototype = Object.create(Washer.prototype);
-
+Washers.Google.className = Helpers.buildClassName(__filename);
 Washers.Google.prototype.refreshAccessToken = function(callback) {
     var that = this;
     Helpers.jsonRequest({

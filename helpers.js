@@ -94,8 +94,15 @@ Helpers.cleanString = function(s) {
     return chalk.stripColor(s).trim();
 };
 
-Helpers.classNameFromFile = function(file) {
-    return path.basename(file.replace('.js', ''));
+Helpers.buildClassName = function(file) {
+    file = path.parse(file.toLowerCase());
+    var parts = file.dir.split('/');
+    parts = parts.slice(parts.indexOf('laundry') + 1);
+    parts = parts.concat(file.name.split('.'));
+    parts.forEach(function(p, i) {
+        parts[i] = p[0].toUpperCase() + p.substr(1);
+    });
+    return parts.join('.');
 };
 
 // Make an HTTP request that expects JSON back, and handle the errors well.
@@ -118,44 +125,48 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
     });
 };
 
-// Given an URL, copy its contents to S3.
-Helpers.uploadUrl = function(url, prefix, target, useYTDL, callback) {
+// Given a URL and an S3 target, copy the URL to S3.
+// Cache is an array of keys to not upload, since it's there already.
+// Optionally use youtube-dl to transform the url to a media url.
+Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
     if (!url) {
-        callback(url);
+        callback(null, url);
         return;
     }
 
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
-    var params = {
-        Bucket: process.env.LAUNDRY_S3_BUCKET,
-        Key: prefix + target
-    };
 
     // See if the file has previously been uploaded
-    log.debug('Looking for ' + params.Key);
-    s3.headObject(params, function(err, data) {
-        if (data) {
-            // It's already there
-            log.debug('Found ' + params.Key);
-            callback(resultUrl);
+    if (cache && cache.length) {
+        var cached = cache.filter(function(key) {
+            return key === target;
+        })[0];
+        if (cached) {
+            log.debug('Found ' + target);
+            callback(null, resultUrl);
             return;
         }
+    }
 
-        if (useYTDL) {
-            // Use the youtube-dl to change the url into a media url
-            log.debug('Getting media URL for ' + url);
-            ytdl.getInfo(url, function(err, info) {
-                if (err) {
-                    callback(err);
-                } else {
-                    url = info.url;
-                    doUpload();
-                }
-            });
-        } else {
-            doUpload();
-        }
-    });
+    var params = {
+        Bucket: process.env.LAUNDRY_S3_BUCKET,
+        Key: target
+    };
+
+    if (useYTDL) {
+        // Use the youtube-dl to change the url into a media url
+        log.debug('Getting media URL for ' + url);
+        ytdl.getInfo(url, function(err, info) {
+            if (err) {
+                callback(err);
+            } else {
+                url = info.url;
+                doUpload();
+            }
+        });
+    } else {
+        doUpload();
+    }
 
     function doUpload() {
         // Do the upload
@@ -164,29 +175,26 @@ Helpers.uploadUrl = function(url, prefix, target, useYTDL, callback) {
         var req = protocol === 'http' ? http.request : https.request;
         req(url, function(response) {
             if (response.statusCode !== 200 && response.statusCode !== 302) {
-                callback(url);
+                callback(response.error, url);
                 return;
             }
 
             params.Body = response;
-            params.ContentLength = parseInt(response.headers['content-length']);
+            params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
             params.ContentType = response.headers['content-type'];
             s3.upload(params)
                 .on('httpUploadProgress', function(progress) {
                     // console.log(progress);
                 }).send(function(err, data) {
-                    log.debug('Done uploading ' + params.Key);
-                    callback(err ? url : resultUrl);
+                    callback(err, err ? url : resultUrl);
                 });
         }).end();
     }
 };
 
-// Delete S3 objects with a last-modified before a given date.
-Helpers.deleteBefore = function(prefix, date, callback) {
-    log.debug('Cleaning ' + prefix);
-
-    // Get all of the objects with a given prefix.
+// Given a prefix, return all the matching keys.
+Helpers.cacheObjects = function(prefix, callback) {
+    log.debug('Caching ' + prefix);
     var objects = [];
     var lastCount = 0;
     var pageSize = 100;
@@ -210,37 +218,44 @@ Helpers.deleteBefore = function(prefix, date, callback) {
         function() {
             return lastCount === pageSize;
         }, function(err) {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            // Get the objects that are older than the requested date and format them as params.
-            objects = objects.filter(function(obj) {
-                return moment(obj.LastModified).isBefore(date);
-            }).map(function(obj) {
-                return {
-                    Key: obj.Key
-                };
+            objects = objects.map(function(obj) {
+                return obj.Key;
             });
-
-            if (!objects.length) {
-                callback(err);
-                return;
-            }
-
-            // Delete the old objects.
-            log.debug(util.format('Cleaning %d objects from %s', objects.length, prefix));
-            s3.deleteObjects({
-                Bucket: process.env.LAUNDRY_S3_BUCKET,
-                Delete: {
-                    Objects: objects
-                }
-            }, function(err, data) {
-                callback(err);
-            });
+            callback(err, objects);
         }
     );
+};
+
+// Given an array of the current keys and an array of the cached keys, delete
+// any keys which are in the cache but not in the current list.
+Helpers.deleteExpired = function(keys, cache, callback) {
+    var objects = cache
+        .concat([])
+        .filter(function(key) {
+            return keys.indexOf(key) === -1;
+        })
+        .map(function(key) {
+            return {
+                Key: key
+            };
+        });
+
+    if (!objects.length) {
+        log.debug('No items to clean.');
+        callback();
+        return;
+    }
+
+    // Delete the old objects.
+    log.debug(util.format('Cleaning %d objects.', objects.length));
+    s3.deleteObjects({
+        Bucket: process.env.LAUNDRY_S3_BUCKET,
+        Delete: {
+            Objects: objects
+        }
+    }, function(err, data) {
+        callback(err);
+    });
 };
 
 // Test for empty strings.

@@ -14,9 +14,11 @@ Items.Twitter.Tweet = function(config) {
     this.isRetweeted = false;
 
     Item.call(this, config);
+    this.className = Helpers.buildClassName(__filename);
 };
 
 Items.Twitter.Tweet.prototype = Object.create(Item.prototype);
+Items.Twitter.Tweet.className = Helpers.buildClassName(__filename);
 
 Items.Twitter.Tweet.factory = function(tweet) {
     var item = new Items.Twitter.Tweet({

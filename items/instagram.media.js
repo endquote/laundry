@@ -13,9 +13,11 @@ Items.Instagram.Media = function(config) {
     this.authorpic = null;
 
     Item.call(this, config);
+    this.className = Helpers.buildClassName(__filename);
 };
 
 Items.Instagram.Media.prototype = Object.create(Item.prototype);
+Items.Instagram.Media.className = Helpers.buildClassName(__filename);
 
 // Convert a media object from the API into a media item.
 Items.Instagram.Media.factory = function(media) {

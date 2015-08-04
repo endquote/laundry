@@ -10,7 +10,7 @@ Washers.Twitter.Timeline.Hashtag = function(config, job) {
     Washers.Twitter.Timeline.call(this, config, job);
 
     this.name = 'Twitter/Hashtag';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Load recent tweets with a given hashtag.',
@@ -26,6 +26,7 @@ Washers.Twitter.Timeline.Hashtag = function(config, job) {
 };
 
 Washers.Twitter.Timeline.Hashtag.prototype = Object.create(Washers.Twitter.Timeline.prototype);
+Washers.Twitter.Timeline.Hashtag.className = Helpers.buildClassName(__filename);
 
 Washers.Twitter.Timeline.Hashtag.prototype.doInput = function(callback) {
     this.requestTweets('search/tweets.json', {

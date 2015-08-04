@@ -12,7 +12,7 @@ Washers.Instagram.Timeline.User = function(config, job) {
     Washers.Instagram.Timeline.call(this, config, job);
 
     this.name = 'Instagram/User';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent images from an Instagram account.',
@@ -34,6 +34,7 @@ Washers.Instagram.Timeline.User = function(config, job) {
 };
 
 Washers.Instagram.Timeline.User.prototype = Object.create(Washers.Instagram.Timeline.prototype);
+Washers.Instagram.Timeline.User.className = Helpers.buildClassName(__filename);
 
 Washers.Instagram.Timeline.User.prototype.getUserId = function(username, callback) {
     var that = this;

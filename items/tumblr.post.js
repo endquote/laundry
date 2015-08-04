@@ -9,9 +9,11 @@ Items.Tumblr.Post = function(config) {
     this.liked = false;
 
     Item.call(this, config);
+    this.className = Helpers.buildClassName(__filename);
 };
 
 Items.Tumblr.Post.prototype = Object.create(Item.prototype);
+Items.Tumblr.Post.className = Helpers.buildClassName(__filename);
 
 // Convert a post from the API into a media item.
 Items.Tumblr.Post.factory = function(post) {

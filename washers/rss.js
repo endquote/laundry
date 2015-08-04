@@ -14,7 +14,7 @@ Washers.RSS = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = 'RSS';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge({
         description: 'Loads data from an RSS feed.',
@@ -55,6 +55,7 @@ Washers.RSS = function(config, job) {
 };
 
 Washers.RSS.prototype = Object.create(Washer.prototype);
+Washers.RSS.className = Helpers.buildClassName(__filename);
 
 // Request the feed, parse it into items, and pass it to the output washer.
 Washers.RSS.prototype.doInput = function(callback) {

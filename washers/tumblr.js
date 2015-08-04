@@ -18,7 +18,7 @@ Washers.Tumblr = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/tumblr.html';
 
     this._requestOptions = {
@@ -115,5 +115,6 @@ Washers.Tumblr = function(config, job) {
 };
 
 Washers.Tumblr.prototype = Object.create(Washer.prototype);
+Washers.Tumblr.className = Helpers.buildClassName(__filename);
 
 module.exports = Washers.Tumblr;

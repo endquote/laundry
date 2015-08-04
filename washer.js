@@ -9,7 +9,7 @@ var Washer = function(config, job) {
     this.name = null;
 
     // The internal name.
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     // An object describing the input function of this washer, if any. It contains a user-facing
     // description of the functionality, and an array of settings required to configure it.
@@ -35,6 +35,8 @@ var Washer = function(config, job) {
         }
     }
 };
+
+Washer.className = Helpers.buildClassName(__filename);
 
 // Remove stuff from the washer that's saved to disk.
 Washer.prototype.stringify = function() {

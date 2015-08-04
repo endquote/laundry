@@ -10,7 +10,7 @@ Washers.Instagram = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/instagram.html';
 
     this._requestOptions = {
@@ -80,6 +80,7 @@ Washers.Instagram = function(config, job) {
 };
 
 Washers.Instagram.prototype = Object.create(Washer.prototype);
+Washers.Instagram.className = Helpers.buildClassName(__filename);
 
 Washers.Instagram.prototype.refreshToken = function(code, callback) {
     var that = this;

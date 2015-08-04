@@ -10,7 +10,7 @@ Washers.Google.YouTube.Subscriptions = function(config, job) {
     Washers.Google.YouTube.call(this, config, job);
 
     this.name = 'YouTube/Subscriptions';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent videos from your YouTube subscriptions.'
@@ -18,6 +18,7 @@ Washers.Google.YouTube.Subscriptions = function(config, job) {
 };
 
 Washers.Google.YouTube.Subscriptions.prototype = Object.create(Washers.Google.YouTube.prototype);
+Washers.Google.YouTube.Subscriptions.className = Helpers.buildClassName(__filename);
 
 Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
     var that = this;
@@ -141,23 +142,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
         // Parse the video objects into output objects.
         function(videos, callback) {
-            var parsed = [];
-            async.eachLimit(videos, 10, function(video, callback) {
-                Items.Google.YouTube.Video.factory(that._job.name, video, function(item) {
-                    parsed.push(item);
-                    callback();
-                });
-            }, function(err) {
-                callback(err, parsed);
-            });
-        },
-
-        // Clean up any old uploaded media.
-        function(items, callback) {
-            items.sort(function(a, b) {
-                return b.date - a.date;
-            });
-            callback(items);
+            Items.Google.YouTube.Video.factory(that._job.name, videos, callback);
         }
     ], function(err, result) {
         callback(err, result);

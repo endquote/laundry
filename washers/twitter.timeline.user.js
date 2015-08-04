@@ -10,7 +10,7 @@ Washers.Twitter.Timeline.User = function(config, job) {
     Washers.Twitter.Timeline.call(this, config, job);
 
     this.name = 'Twitter/User';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from a Twitter user.',
@@ -25,6 +25,7 @@ Washers.Twitter.Timeline.User = function(config, job) {
 };
 
 Washers.Twitter.Timeline.User.prototype = Object.create(Washers.Twitter.Timeline.prototype);
+Washers.Twitter.Timeline.User.className = Helpers.buildClassName(__filename);
 
 Washers.Twitter.Timeline.User.prototype.doInput = function(callback) {
     this.requestTweets('statuses/user_timeline.json', {

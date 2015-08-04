@@ -10,7 +10,7 @@ Washers.Tumblr.Dashboard = function(config, job) {
     Washers.Tumblr.call(this, config, job);
 
     this.name = 'Tumblr/Dashboard';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from your Tumblr Dashboard.'
@@ -18,6 +18,7 @@ Washers.Tumblr.Dashboard = function(config, job) {
 };
 
 Washers.Tumblr.Dashboard.prototype = Object.create(Washers.Tumblr.prototype);
+Washers.Tumblr.Dashboard.className = Helpers.buildClassName(__filename);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     var quantity = 40;

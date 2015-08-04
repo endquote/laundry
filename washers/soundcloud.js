@@ -14,7 +14,7 @@ Washers.SoundCloud = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
-    this.className = Helpers.classNameFromFile(__filename);
+    this.className = Helpers.buildClassName(__filename);
     this._callbackUri = 'http://laundry.endquote.com/callbacks/soundcloud.html';
 
     this._requestOptions = {
@@ -103,5 +103,6 @@ Washers.SoundCloud = function(config, job) {
 };
 
 Washers.SoundCloud.prototype = Object.create(Washer.prototype);
+Washers.SoundCloud.className = Helpers.buildClassName(__filename);
 
 module.exports = Washers.SoundCloud;
