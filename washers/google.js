@@ -99,6 +99,7 @@ Washers.Google = function(config, job) {
 
 Washers.Google.prototype = Object.create(Washer.prototype);
 Washers.Google.className = Helpers.buildClassName(__filename);
+
 Washers.Google.prototype.refreshAccessToken = function(callback) {
     var that = this;
     Helpers.jsonRequest({

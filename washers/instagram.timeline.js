@@ -28,31 +28,36 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
     var that = this;
 
     var quantity = 150;
-    var items = [];
+    var posts = [];
     var nextMax = null;
     async.whilst(function() {
-            return !items.length || (items.length < quantity && nextMax);
+            return !posts.length || (posts.length < quantity && nextMax);
         }, function(callback) {
             Helpers.jsonRequest(
                 extend({
                     url: method,
                     qs: {
-                        count: quantity - items.length,
+                        count: quantity - posts.length,
                         max_id: nextMax ? nextMax : ''
                     }
                 }, that._requestOptions),
                 function(response) {
                     response.data.forEach(function(media) {
-                        items.push(Items.Instagram.Media.factory(media));
+                        posts.push(media);
                     });
-                    log.debug(util.format('Got %d/%d items', items.length, quantity));
+                    log.debug(util.format('Got %d/%d posts', posts.length, quantity));
                     nextMax = response.pagination.next_max_id;
                     callback();
                 },
                 callback);
         },
         function(err) {
-            callback(err, items);
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            Items.Instagram.Media.factory(that._job.name, posts, callback);
         });
 };
 

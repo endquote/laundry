@@ -52,15 +52,15 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
 
                     thumbnailUrl: function(callback) {
                         // Upload the thumbnail
-                        var thumbTarget = prefix + '/' + video.contentDetails.videoId + '.jpg';
-                        newKeys.push(thumbTarget);
-                        Helpers.uploadUrl(thumbnail.url, thumbTarget, oldKeys, false, callback);
+                        var target = prefix + '/' + video.contentDetails.videoId + '.jpg';
+                        newKeys.push(target);
+                        Helpers.uploadUrl(thumbnail.url, target, oldKeys, false, callback);
                     },
                     videoUrl: function(callback) {
                         // Upload the video
-                        var mediaTarget = prefix + '/' + video.contentDetails.videoId + '.mp4';
-                        newKeys.push(mediaTarget);
-                        Helpers.uploadUrl(url, mediaTarget, oldKeys, true, callback);
+                        var target = prefix + '/' + video.contentDetails.videoId + '.mp4';
+                        newKeys.push(target);
+                        Helpers.uploadUrl(url, target, oldKeys, true, callback);
                     }
                 }, function(err, uploads) {
                     if (err) {
