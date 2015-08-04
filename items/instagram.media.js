@@ -71,6 +71,7 @@ Items.Instagram.Media.factory = function(jobName, posts, callback) {
                         caption: post.caption ? post.caption.text : null,
                         author: post.user.username,
                         authorpic: post.user.profile_picture,
+                        mediaUrl: uploads.videoUrl
                     });
 
                     item.title = item.author;
