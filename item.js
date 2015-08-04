@@ -19,15 +19,13 @@ var Item = function(config) {
     }
 };
 
-Item.factory = function(item) {
-    return new Item({
-        title: item.title,
-        description: item.description,
-        url: item.link,
-        date: moment(item.date),
-        author: item.author,
-        tags: item.categories
-    });
+Item.factory = function(jobName, objects, callback) {
+    callback([]);
+};
+
+// Build the S3 object prefix for a media type.
+Item.buildPrefix = function(jobName, className) {
+    return ('jobs.' + jobName + '.' + className).toLowerCase().split('.').join('/');
 };
 
 module.exports = Item;

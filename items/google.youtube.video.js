@@ -18,7 +18,7 @@ Items.Google.YouTube.Video.className = Helpers.buildClassName(__filename);
 
 // Convert an array of videos from the API response into Laundry Items, including handling uploads.
 Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
-    var prefix = (jobName + '.' + Items.Google.YouTube.Video.className).toLowerCase().split('.').join('/');
+    var prefix = Item.buildPrefix(jobName, Items.Google.YouTube.Video.className);
     var items = [];
     var newKeys = [];
     var oldKeys = [];

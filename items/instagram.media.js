@@ -21,7 +21,7 @@ Items.Instagram.Media.className = Helpers.buildClassName(__filename);
 
 // Convert a media object from the API into a media item.
 Items.Instagram.Media.factory = function(jobName, posts, callback) {
-    var prefix = (jobName + '.' + Items.Instagram.Media.className).toLowerCase().split('.').join('/');
+    var prefix = Item.buildPrefix(jobName, Items.Instagram.Media.className);
     var items = [];
     var newKeys = [];
     var oldKeys = [];
