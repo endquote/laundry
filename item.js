@@ -19,8 +19,60 @@ var Item = function(config) {
     }
 };
 
-Item.factory = function(jobName, objects, callback) {
-    callback([]);
+// An object passed to async.parallel() which handles downloading of files.
+Item.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+    return {};
+};
+
+// Given a collection of API responses, perform downloads and construct Item objects.
+Item.download = function(jobName, itemClass, objects, params, callback) {
+    var prefix = Item.buildPrefix(jobName, itemClass.className);
+    var items = [];
+    var newKeys = [];
+    var oldKeys = [];
+    async.waterfall([
+
+        // Cache existing newKeys so they're not uploaded again.
+        function(callback) {
+            Helpers.cacheObjects(prefix, function(err, c) {
+                oldKeys = c;
+                callback(err);
+            });
+        },
+        function(callback) {
+
+        // Process each object.
+        async.eachLimit(objects, 5, function(object, callback) {
+                // Upload files.
+                async.parallel(
+                    itemClass.downloadLogic(prefix, object, oldKeys, newKeys, params),
+                    function(err, uploads) {
+                        if (err) {
+                            // Carry on when an upload fails.
+                            log.warn(err);
+                            callback();
+                            return;
+                        }
+
+                        items.push(itemClass.factory(object, uploads));
+                        callback();
+                    });
+            }, callback);
+        },
+
+        // Delete any old stuff in the cache.
+        function(callback) {
+            Helpers.deleteExpired(newKeys, oldKeys, callback);
+        }
+    ], function(err) {
+        // Return all the constructed items.
+        callback(err, items);
+    });
+};
+
+// Construct an Item given an API response and any upload info.
+Item.factory = function(obj, uploads) {
+    return new Item(obj);
 };
 
 // Build the S3 object prefix for a media type.

@@ -147,10 +147,7 @@ Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
 
     // See if the file has previously been uploaded
     if (cache && cache.length) {
-        var cached = cache.filter(function(key) {
-            return key === target;
-        })[0];
-        if (cached) {
+        if (cache.indexOf(target) !== -1) {
             log.debug('Found ' + target);
             result.newUrl = resultUrl;
             callback(null, result);

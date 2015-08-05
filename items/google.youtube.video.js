@@ -17,71 +17,35 @@ Items.Google.YouTube.Video.prototype = Object.create(Item.prototype);
 Items.Google.YouTube.Video.className = Helpers.buildClassName(__filename);
 
 // Given a collection of API responses, perform downloads and construct Item objects.
-Items.Google.YouTube.Video.download = function(jobName, videos, callback) {
-    var prefix = Item.buildPrefix(jobName, Items.Google.YouTube.Video.className);
-    var items = [];
-    var newKeys = [];
-    var oldKeys = [];
+Items.Google.YouTube.Video.download = function(jobName, objects, params, callback) {
+    Item.download(jobName, Items.Google.YouTube.Video, objects, params, callback);
+};
 
-    async.waterfall([
+// An object passed to async.parallel() which handles downloading of files.
+Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+    return {
+        thumbnail: function(callback) {
+            // Figure out the biggest thumbnail available.
+            var thumbnails = [];
+            for (var i in obj.snippet.thumbnails) {
+                thumbnails.push(obj.snippet.thumbnails[i]);
+            }
+            var thumbnail = thumbnails.sort(function(a, b) {
+                return a.width - b.width;
+            }).pop();
 
-        // Cache existing newKeys so they're not uploaded again.
-        function(callback) {
-            Helpers.cacheObjects(prefix, function(err, c) {
-                oldKeys = c;
-                callback(err);
-            });
+            // Upload the thumbnail
+            var target = prefix + '/' + obj.contentDetails.videoId + '.jpg';
+            newKeys.push(target);
+            Helpers.uploadUrl(thumbnail.url, target, oldKeys, false, callback);
         },
-        function(callback) {
-
-            // Process each video object.
-            async.eachLimit(videos, 5, function(video, callback) {
-                // Upload files.
-                async.parallel({
-
-                    thumbnail: function(callback) {
-                        // Figure out the biggest thumbnail available.
-                        var thumbnails = [];
-                        for (var i in video.snippet.thumbnails) {
-                            thumbnails.push(video.snippet.thumbnails[i]);
-                        }
-                        var thumbnail = thumbnails.sort(function(a, b) {
-                            return a.width - b.width;
-                        }).pop();
-
-                        // Upload the thumbnail
-                        var target = prefix + '/' + video.contentDetails.videoId + '.jpg';
-                        newKeys.push(target);
-                        Helpers.uploadUrl(thumbnail.url, target, oldKeys, false, callback);
-                    },
-                    video: function(callback) {
-                        // Upload the video
-                        var target = prefix + '/' + video.contentDetails.videoId + '.mp4';
-                        newKeys.push(target);
-                        Helpers.uploadUrl('https://youtube.com/watch?v=' + video.contentDetails.videoId, target, oldKeys, true, callback);
-                    }
-                }, function(err, uploads) {
-                    if (err) {
-                        // Carry on when an upload fails.
-                        log.warn(err);
-                        callback();
-                        return;
-                    }
-
-                    items.push(Items.Google.YouTube.Video.factory(video, uploads));
-                    callback();
-                });
-            }, callback);
-        },
-
-        // Delete any old stuff in the cache.
-        function(callback) {
-            Helpers.deleteExpired(newKeys, oldKeys, callback);
+        video: function(callback) {
+            // Upload the video
+            var target = prefix + '/' + obj.contentDetails.videoId + '.mp4';
+            newKeys.push(target);
+            Helpers.uploadUrl('https://youtube.com/watch?v=' + obj.contentDetails.videoId, target, oldKeys, true, callback);
         }
-    ], function(err) {
-        // Return all the constructed items.
-        callback(err, items);
-    });
+    };
 };
 
 // Construct an Item given an API response and any upload info.

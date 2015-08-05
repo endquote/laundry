@@ -20,59 +20,24 @@ Items.Instagram.Media.prototype = Object.create(Item.prototype);
 Items.Instagram.Media.className = Helpers.buildClassName(__filename);
 
 // Given a collection of API responses, perform downloads and construct Item objects.
-Items.Instagram.Media.download = function(jobName, posts, callback) {
-    var prefix = Item.buildPrefix(jobName, Items.Instagram.Media.className);
-    var items = [];
-    var newKeys = [];
-    var oldKeys = [];
-    async.waterfall([
+Items.Instagram.Media.download = function(jobName, objects, params, callback) {
+    Item.download(jobName, Items.Instagram.Media, objects, params, callback);
+};
 
-        // Cache existing newKeys so they're not uploaded again.
-        function(callback) {
-            Helpers.cacheObjects(prefix, function(err, c) {
-                oldKeys = c;
-                callback(err);
-            });
+// An object passed to async.parallel() which handles downloading of files.
+Items.Instagram.Media.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+    return {
+        image: function(callback) {
+            var target = prefix + '/' + obj.id + '.jpg';
+            newKeys.push(target);
+            Helpers.uploadUrl(obj.images.standard_resolution.url, target, oldKeys, false, callback);
         },
-        function(callback) {
-
-            // Process each post object.
-            async.eachLimit(posts, 5, function(post, callback) {
-
-                // Upload files.
-                async.parallel({
-                    image: function(callback) {
-                        var target = prefix + '/' + post.id + '.jpg';
-                        newKeys.push(target);
-                        Helpers.uploadUrl(post.images.standard_resolution.url, target, oldKeys, false, callback);
-                    },
-                    video: function(callback) {
-                        var target = prefix + '/' + post.id + '.mp4';
-                        newKeys.push(target);
-                        Helpers.uploadUrl(post.videos ? post.videos.standard_resolution.url : null, target, oldKeys, false, callback);
-                    }
-                }, function(err, uploads) {
-                    if (err) {
-                        // Carry on when an upload fails.
-                        log.warn(err);
-                        callback();
-                        return;
-                    }
-
-                    items.push(Items.Instagram.Media.factory(post, uploads));
-                    callback();
-                });
-            }, callback);
-        },
-
-        // Delete any old stuff in the cache.
-        function(callback) {
-            Helpers.deleteExpired(newKeys, oldKeys, callback);
+        video: function(callback) {
+            var target = prefix + '/' + obj.id + '.mp4';
+            newKeys.push(target);
+            Helpers.uploadUrl(obj.videos ? obj.videos.standard_resolution.url : null, target, oldKeys, false, callback);
         }
-    ], function(err) {
-        // Return all the constructed items.
-        callback(err, items);
-    });
+    };
 };
 
 // Construct an Item given an API response and any upload info.

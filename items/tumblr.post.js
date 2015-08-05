@@ -16,93 +16,57 @@ Items.Tumblr.Post.prototype = Object.create(Item.prototype);
 Items.Tumblr.Post.className = Helpers.buildClassName(__filename);
 
 // Given a collection of API responses, perform downloads and construct Item objects.
-Items.Tumblr.Post.download = function(jobName, posts, callback) {
-    var prefix = Item.buildPrefix(jobName, Items.Tumblr.Post.className);
-    var items = [];
-    var newKeys = [];
-    var oldKeys = [];
+Items.Tumblr.Post.download = function(jobName, objects, params, callback) {
+    Item.download(jobName, Items.Tumblr.Post, objects, params, callback);
+};
 
-    async.waterfall([
+// An object passed to async.parallel() which handles downloading of files.
+Items.Tumblr.Post.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+    return {
+        // Try to extract a video -- this often fails on Tumblr.
+        video: function(callback) {
+            var target = prefix + '/' + obj.id + '.mp4';
+            newKeys.push(target);
+            Helpers.uploadUrl(obj.type === 'video' ? obj.post_url : null, target, oldKeys, true, function(err, res) {
 
-        // Cache existing keys so they're not uploaded again.
-        function(callback) {
-            Helpers.cacheObjects(prefix, function(err, c) {
-                oldKeys = c;
-                callback(err);
+                // If we did get a video, get the thumbnail too.
+                if (res && res.ytdl && res.ytdl.thumbnails && res.ytdl.thumbnails.length) {
+                    var target = prefix + '/' + obj.id + '-thumb.jpg';
+                    newKeys.push(target);
+                    Helpers.uploadUrl(res.ytdl.thumbnails[0].url, target, oldKeys, false, function() {
+                        callback(err, res);
+                    });
+                } else {
+                    callback(err, res);
+                }
             });
         },
-        function(callback) {
 
-            // Process each post object.
-            async.eachLimit(posts, 5, function(post, callback) {
-                // Upload files.
-                async.parallel({
-
-                    // Try to extract a video -- this often fails on Tumblr.
-                    video: function(callback) {
-                        var target = prefix + '/' + post.id + '.mp4';
-                        newKeys.push(target);
-                        Helpers.uploadUrl(post.type === 'video' ? post.post_url : null, target, oldKeys, true, function(err, res) {
-
-                            // If we did get a video, get the thumbnail too.
-                            if (res && res.ytdl && res.ytdl.thumbnails && res.ytdl.thumbnails.length) {
-                                var target = prefix + '/' + post.id + '-thumb.jpg';
-                                newKeys.push(target);
-                                Helpers.uploadUrl(res.ytdl.thumbnails[0].url, target, oldKeys, false, function() {
-                                    callback(err, res);
-                                });
-                            } else {
-                                callback(err, res);
-                            }
-                        });
-                    },
-
-                    audio: function(callback) {
-                        var target = prefix + '/' + post.id + '.mp3';
-                        newKeys.push(target);
-                        Helpers.uploadUrl(post.type === 'audio' ? post.post_url : null, target, oldKeys, true, callback);
-                    },
-
-                    photos: function(callback) {
-                        var results = [];
-                        async.each(post.photos, function(photo, callback) {
-                            var target = prefix + '/' + post.id;
-                            if (post.photos.length > 1) {
-                                target += '-' + (post.photos.indexOf(photo) + 1);
-                            }
-                            target += '.jpg';
-                            newKeys.push(target);
-                            // "protocol mismatch" error in follow-redirects if it's http
-                            Helpers.uploadUrl(photo.original_size.url.replace('http:', 'https:'), target, oldKeys, false, function(err, res) {
-                                results.push(res);
-                                callback();
-                            });
-                        }, function(err) {
-                            callback(err, results);
-                        });
-                    }
-                }, function(err, uploads) {
-                    if (err) {
-                        // Carry on when an upload fails.
-                        log.warn(err);
-                        callback();
-                        return;
-                    }
-
-                    items.push(Items.Tumblr.Post.factory(post, uploads));
-                    callback();
-                });
-            }, callback);
+        audio: function(callback) {
+            var target = prefix + '/' + obj.id + '.mp3';
+            newKeys.push(target);
+            Helpers.uploadUrl(obj.type === 'audio' ? obj.post_url : null, target, oldKeys, true, callback);
         },
 
-        // Delete any old stuff in the cache.
-        function(callback) {
-            Helpers.deleteExpired(newKeys, oldKeys, callback);
+        photos: function(callback) {
+            var results = [];
+            async.each(obj.photos, function(photo, callback) {
+                var target = prefix + '/' + obj.id;
+                if (obj.photos.length > 1) {
+                    target += '-' + (obj.photos.indexOf(photo) + 1);
+                }
+                target += '.jpg';
+                newKeys.push(target);
+                // "protocol mismatch" error in follow-redirects if it's http
+                Helpers.uploadUrl(photo.original_size.url.replace('http:', 'https:'), target, oldKeys, false, function(err, res) {
+                    results.push(res);
+                    callback();
+                });
+            }, function(err) {
+                callback(err, results);
+            });
         }
-    ], function(err) {
-        // Return all the constructed items.
-        callback(err, items);
-    });
+    };
 };
 
 // Construct an Item given an API response and any upload info.

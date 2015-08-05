@@ -15,75 +15,41 @@ Items.SoundCloud.Track.prototype = Object.create(Item.prototype);
 Items.SoundCloud.Track.className = Helpers.buildClassName(__filename);
 
 // Given a collection of API responses, perform downloads and construct Item objects.
-Items.SoundCloud.Track.download = function(jobName, tracks, clientId, callback) {
-    var prefix = Item.buildPrefix(jobName, Items.SoundCloud.Track.className);
-    var items = [];
-    var newKeys = [];
-    var oldKeys = [];
-    async.waterfall([
+Items.SoundCloud.Track.download = function(jobName, objects, params, callback) {
+    Item.download(jobName, Items.SoundCloud.Track, objects, params, callback);
+};
 
-        // Cache existing newKeys so they're not uploaded again.
-        function(callback) {
-            Helpers.cacheObjects(prefix, function(err, c) {
-                oldKeys = c;
-                callback(err);
-            });
+// An object passed to async.parallel() which handles downloading of files.
+Items.SoundCloud.Track.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+    return {
+        artwork: function(callback) {
+            var target = prefix + '/' + obj.id + '.jpg';
+            newKeys.push(target);
+            Helpers.uploadUrl(obj.artwork_url, target, oldKeys, false, callback);
         },
-        function(callback) {
-
-            // Process each track object.
-            async.eachLimit(tracks, 5, function(track, callback) {
-                // Upload files.
-                async.parallel({
-                    artwork: function(callback) {
-                        var artworkTarget = prefix + '/' + track.id + '.jpg';
-                        newKeys.push(artworkTarget);
-                        Helpers.uploadUrl(track.artwork_url, artworkTarget, oldKeys, false, callback);
-                    },
-                    audio: function(callback) {
-                        var audioTarget = prefix + '/' + track.id + '.mp3';
-                        newKeys.push(audioTarget);
-                        var audioSource = util.format('%s?client_id=%s', track.stream_url, clientId);
-                        Helpers.uploadUrl(audioSource, audioTarget, oldKeys, false, callback);
-                    }
-                }, function(err, uploads) {
-                    if (err) {
-                        // Carry on when an upload fails.
-                        log.warn(err);
-                        callback();
-                        return;
-                    }
-
-                    items.push(Items.SoundCloud.Track.factory(track, uploads));
-                    callback();
-                });
-            }, callback);
-        },
-
-        // Delete any old stuff in the cache.
-        function(callback) {
-            Helpers.deleteExpired(newKeys, oldKeys, callback);
+        audio: function(callback) {
+            var target = prefix + '/' + obj.id + '.mp3';
+            newKeys.push(target);
+            var audioSource = util.format('%s?client_id=%s', obj.stream_url, params.clientId);
+            Helpers.uploadUrl(audioSource, target, oldKeys, false, callback);
         }
-    ], function(err) {
-        // Return all the constructed items.
-        callback(err, items);
-    });
+    };
 };
 
 // Construct an Item given an API response and any upload info.
-Items.SoundCloud.Track.factory = function(track, uploads) {
+Items.SoundCloud.Track.factory = function(obj, uploads) {
     // Tag list: yous truly r "ritual union" little dragon man live sweden gothenburg
     var tags = [];
-    var quoted = track.tag_list.match(/"[^"]+"/g);
+    var quoted = obj.tag_list.match(/"[^"]+"/g);
     if (quoted) {
         quoted.forEach(function(tag) {
-            track.tag_list = track.tag_list.replace(tag, '');
+            obj.tag_list = obj.tag_list.replace(tag, '');
             tags.push(tag.replace(/"/g, ''));
         });
-        track.tag_list = track.tag_list.replace('  ', ' ');
+        obj.tag_list = obj.tag_list.replace('  ', ' ');
     }
 
-    tags = tags.concat(track.tag_list.split(' '));
+    tags = tags.concat(obj.tag_list.split(' '));
 
     var description = '';
     if (uploads.artwork.newUrl) {
@@ -94,20 +60,20 @@ Items.SoundCloud.Track.factory = function(track, uploads) {
         description += Item.buildAudio(uploads.audio.newUrl);
     }
 
-    if (track.description) {
-        description += util.format('<p>%s</p>', Autolinker.link(track.description));
+    if (obj.description) {
+        description += util.format('<p>%s</p>', Autolinker.link(obj.description));
     }
 
     if (uploads.audio.newUrl) {
-        description += util.format('<p>(<a href="%s">download</a>)</p>', track.download_url ? track.download_url : uploads.audio.newUrl);
+        description += util.format('<p>(<a href="%s">download</a>)</p>', obj.download_url ? obj.download_url : uploads.audio.newUrl);
     }
 
     var item = new Items.SoundCloud.Track({
-        title: util.format('%s - %s', track.user.username, track.title),
+        title: util.format('%s - %s', obj.user.username, obj.title),
         description: description,
-        url: track.permalink_url,
-        date: moment(new Date(track.created_at)),
-        author: track.user.username,
+        url: obj.permalink_url,
+        date: moment(new Date(obj.created_at)),
+        author: obj.user.username,
         tags: tags,
         mediaUrl: uploads.audio.newUrl,
         artwork: uploads.artwork.newUrl

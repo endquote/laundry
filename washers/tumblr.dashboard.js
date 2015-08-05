@@ -52,7 +52,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
             return;
         }
 
-        Items.Tumblr.Post.download(that._job.name, posts, callback);
+        Items.Tumblr.Post.download(that._job.name, posts, null, callback);
     });
 };
 

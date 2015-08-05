@@ -76,7 +76,7 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
 
         // Parse the video objects into output objects.
         function(videos, callback) {
-            Items.Google.YouTube.Video.factory(that._job.name, videos, callback);
+            Items.Google.YouTube.Video.download(that._job.name, videos, null, callback);
         }
     ], function(err, result) {
         callback(err, result);
