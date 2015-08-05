@@ -19,8 +19,8 @@ Items.Instagram.Media = function(config) {
 Items.Instagram.Media.prototype = Object.create(Item.prototype);
 Items.Instagram.Media.className = Helpers.buildClassName(__filename);
 
-// Convert a media object from the API into a media item.
-Items.Instagram.Media.factory = function(jobName, posts, callback) {
+// Given a collection of API responses, perform downloads and construct Item objects.
+Items.Instagram.Media.download = function(jobName, posts, callback) {
     var prefix = Item.buildPrefix(jobName, Items.Instagram.Media.className);
     var items = [];
     var newKeys = [];
@@ -59,55 +59,7 @@ Items.Instagram.Media.factory = function(jobName, posts, callback) {
                         return;
                     }
 
-                    var item = new Items.Instagram.Media({
-                        tags: post.tags,
-                        type: post.type,
-                        comments: post.comments,
-                        date: moment.unix(post.created_time),
-                        url: post.link,
-                        likes: post.likes,
-                        image: uploads.image.newUrl,
-                        video: uploads.video.newUrl,
-                        caption: post.caption ? post.caption.text : null,
-                        author: post.user.username,
-                        authorpic: post.user.profile_picture,
-                        mediaUrl: uploads.video.newUrl
-                    });
-
-                    item.title = item.author;
-                    if (item.caption) {
-                        item.title += ': ' + Helpers.shortenString(item.caption, 30);
-                    }
-
-                    if (!item.video) {
-                        item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
-                    } else {
-                        item.description = Item.buildVideo(item.video, item.image);
-                    }
-
-                    if (item.caption) {
-                        item.description += util.format('<p>%s</p>', Items.Instagram.Media.linkify(item.caption));
-                    }
-
-                    if (item.likes.data.length) {
-                        item.description += util.format('<p>%d likes: ', item.likes.count);
-                        item.likes.data.forEach(function(like, index, list) {
-                            item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username, like.username);
-                            if (index < list.length - 1) {
-                                item.description += ', ';
-                            }
-                        });
-                        item.description += '</p>';
-                    }
-
-                    if (item.comments.data.length) {
-                        item.description += util.format('<p>%d comments:</p>', item.comments.count);
-                        item.comments.data.forEach(function(comment) {
-                            item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>', comment.from.username, comment.from.username, Items.Instagram.Media.linkify(comment.text));
-                        });
-                    }
-
-                    items.push(item);
+                    items.push(Items.Instagram.Media.factory(post, uploads));
                     callback();
                 });
             }, callback);
@@ -121,6 +73,59 @@ Items.Instagram.Media.factory = function(jobName, posts, callback) {
         // Return all the constructed items.
         callback(err, items);
     });
+};
+
+// Construct an Item given an API response and any upload info.
+Items.Instagram.Media.factory = function(post, uploads) {
+    var item = new Items.Instagram.Media({
+        tags: post.tags,
+        type: post.type,
+        comments: post.comments,
+        date: moment.unix(post.created_time),
+        url: post.link,
+        likes: post.likes,
+        image: uploads.image.newUrl,
+        video: uploads.video.newUrl,
+        caption: post.caption ? post.caption.text : null,
+        author: post.user.username,
+        authorpic: post.user.profile_picture,
+        mediaUrl: uploads.video.newUrl
+    });
+
+    item.title = item.author;
+    if (item.caption) {
+        item.title += ': ' + Helpers.shortenString(item.caption, 30);
+    }
+
+    if (!item.video) {
+        item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
+    } else {
+        item.description = Item.buildVideo(item.video, item.image);
+    }
+
+    if (item.caption) {
+        item.description += util.format('<p>%s</p>', Items.Instagram.Media.linkify(item.caption));
+    }
+
+    if (item.likes.data.length) {
+        item.description += util.format('<p>%d likes: ', item.likes.count);
+        item.likes.data.forEach(function(like, index, list) {
+            item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username, like.username);
+            if (index < list.length - 1) {
+                item.description += ', ';
+            }
+        });
+        item.description += '</p>';
+    }
+
+    if (item.comments.data.length) {
+        item.description += util.format('<p>%d comments:</p>', item.comments.count);
+        item.comments.data.forEach(function(comment) {
+            item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>', comment.from.username, comment.from.username, Items.Instagram.Media.linkify(comment.text));
+        });
+    }
+
+    return item;
 };
 
 // Link usernames, tags, and urls.

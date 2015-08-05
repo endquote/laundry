@@ -24,76 +24,72 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
     var that = this;
     async.waterfall([
 
-            // Get my userid
-            function(callback) {
+        // Get my userid
+        function(callback) {
+            Helpers.jsonRequest(
+                extend({
+                    uri: '/me'
+                }, that._requestOptions), function(response) {
+                    callback(null, response.id);
+                }, callback);
+        },
+
+        // Paged request to get all the people I'm following
+        function(userid, callback) {
+            var limit = 200;
+            var following = [];
+            var pageLength = 0;
+            async.doWhilst(function(callback) {
                 Helpers.jsonRequest(
                     extend({
-                        uri: '/me'
-                    }, that._requestOptions), function(response) {
-                        callback(null, response.id);
-                    }, callback);
-            },
-
-            // Paged request to get all the people I'm following
-            function(userid, callback) {
-                var limit = 200;
-                var following = [];
-                var pageLength = 0;
-                async.doWhilst(function(callback) {
-                        Helpers.jsonRequest(
-                            extend({
-                                uri: util.format('/users/%d/followings', userid),
-                                qs: {
-                                    limit: limit,
-                                    offset: following.length
-                                }
-                            }, that._requestOptions),
-                            function(response) {
-                                pageLength = response.length;
-                                following = following.concat(response);
-                                callback();
-                            },
-                            callback);
+                        uri: util.format('/users/%d/followings', userid),
+                        qs: {
+                            limit: limit,
+                            offset: following.length
+                        }
+                    }, that._requestOptions),
+                    function(response) {
+                        pageLength = response.length;
+                        following = following.concat(response);
+                        callback();
                     },
-                    function() {
-                        return pageLength === limit;
-                    },
-                    function(err) {
-                        callback(err, following);
-                    });
-            },
+                    callback);
+            }, function() {
+                return pageLength === limit;
+            }, function(err) {
+                callback(err, following);
+            });
+        },
 
-            // For each person I'm following, get their recent tracks.
-            function(following, callback) {
-                var tracks = [];
-                async.eachLimit(following, 10, function(following, callback) {
-                        Helpers.jsonRequest(
-                            extend({
-                                uri: util.format('/users/%d/tracks', following.id)
-                            }, that._requestOptions),
-                            function(response) {
-                                tracks = tracks.concat(response);
-                                callback(null, response);
-                            },
-                            callback);
+        // For each person I'm following, get their recent tracks.
+        function(following, callback) {
+            var tracks = [];
+            async.eachLimit(following, 10, function(following, callback) {
+                Helpers.jsonRequest(
+                    extend({
+                        uri: util.format('/users/%d/tracks', following.id)
+                    }, that._requestOptions),
+                    function(response) {
+                        tracks = tracks.concat(response);
+                        callback(null, response);
                     },
-                    function(err) {
-                        callback(err, tracks);
-                    });
-            },
+                    callback);
+            }, function(err) {
+                callback(err, tracks);
+            });
+        },
 
-            // Sort the tracks together and return the most recent.
-            function(tracks, callback) {
-                tracks.sort(function(a, b) {
-                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-                });
-                tracks = tracks.slice(0, 20);
-                Items.SoundCloud.Track.factory(that._job.name, tracks, that.clientId, callback);
-            }
-        ],
-        function(err, result) {
-            callback(err, result);
-        });
+        // Sort the tracks together and return the most recent.
+        function(tracks, callback) {
+            tracks.sort(function(a, b) {
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            });
+            tracks = tracks.slice(0, 20);
+            Items.SoundCloud.Track.download(that._job.name, tracks, that.clientId, callback);
+        }
+    ], function(err, result) {
+        callback(err, result);
+    });
 };
 
 module.exports = Washers.SoundCloud.Timeline;

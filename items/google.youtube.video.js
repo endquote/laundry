@@ -16,8 +16,8 @@ Items.Google.YouTube.Video = function(config) {
 Items.Google.YouTube.Video.prototype = Object.create(Item.prototype);
 Items.Google.YouTube.Video.className = Helpers.buildClassName(__filename);
 
-// Convert an array of videos from the API response into Laundry Items, including handling uploads.
-Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
+// Given a collection of API responses, perform downloads and construct Item objects.
+Items.Google.YouTube.Video.download = function(jobName, videos, callback) {
     var prefix = Item.buildPrefix(jobName, Items.Google.YouTube.Video.className);
     var items = [];
     var newKeys = [];
@@ -36,21 +36,19 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
 
             // Process each video object.
             async.eachLimit(videos, 5, function(video, callback) {
-                var url = 'https://youtube.com/watch?v=' + video.contentDetails.videoId;
-
-                // Figure out the biggest thumbnail available.
-                var thumbnails = [];
-                for (var i in video.snippet.thumbnails) {
-                    thumbnails.push(video.snippet.thumbnails[i]);
-                }
-                var thumbnail = thumbnails.sort(function(a, b) {
-                    return a.width - b.width;
-                }).pop();
-
                 // Upload files.
                 async.parallel({
 
                     thumbnail: function(callback) {
+                        // Figure out the biggest thumbnail available.
+                        var thumbnails = [];
+                        for (var i in video.snippet.thumbnails) {
+                            thumbnails.push(video.snippet.thumbnails[i]);
+                        }
+                        var thumbnail = thumbnails.sort(function(a, b) {
+                            return a.width - b.width;
+                        }).pop();
+
                         // Upload the thumbnail
                         var target = prefix + '/' + video.contentDetails.videoId + '.jpg';
                         newKeys.push(target);
@@ -60,7 +58,7 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
                         // Upload the video
                         var target = prefix + '/' + video.contentDetails.videoId + '.mp4';
                         newKeys.push(target);
-                        Helpers.uploadUrl(url, target, oldKeys, true, callback);
+                        Helpers.uploadUrl('https://youtube.com/watch?v=' + video.contentDetails.videoId, target, oldKeys, true, callback);
                     }
                 }, function(err, uploads) {
                     if (err) {
@@ -70,26 +68,7 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
                         return;
                     }
 
-                    // Build the actual item object.
-                    var player = Item.buildVideo(uploads.video.newUrl, uploads.thumbnail.newUrl);
-                    var description = video.snippet.description;
-                    description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
-                    description = description.replace(/[\n\r]/gim, '<br/>');
-                    description = Autolinker.link(description);
-                    description = player + '<p>' + description + '</p>';
-
-                    var item = new Items.Google.YouTube.Video({
-                        id: video.contentDetails.videoId,
-                        title: video.snippet.channelTitle + ': ' + video.snippet.title,
-                        description: description,
-                        url: url,
-                        date: moment(video.snippet.publishedAt),
-                        author: video.snippet.channelTitle,
-                        thumbnail: uploads.thumbnail.newUrl,
-                        mediaUrl: uploads.video.newUrl
-                    });
-
-                    items.push(item);
+                    items.push(Items.Google.YouTube.Video.factory(video, uploads));
                     callback();
                 });
             }, callback);
@@ -103,6 +82,29 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
         // Return all the constructed items.
         callback(err, items);
     });
+};
+
+// Construct an Item given an API response and any upload info.
+Items.Google.YouTube.Video.factory = function(video, uploads) {
+    var player = Item.buildVideo(uploads.video.newUrl, uploads.thumbnail.newUrl);
+    var description = video.snippet.description;
+    description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
+    description = description.replace(/[\n\r]/gim, '<br/>');
+    description = Autolinker.link(description);
+    description = player + '<p>' + description + '</p>';
+
+    var item = new Items.Google.YouTube.Video({
+        id: video.contentDetails.videoId,
+        title: video.snippet.channelTitle + ': ' + video.snippet.title,
+        description: description,
+        url: 'https://youtube.com/watch?v=' + video.contentDetails.videoId,
+        date: moment(video.snippet.publishedAt),
+        author: video.snippet.channelTitle,
+        thumbnail: uploads.thumbnail.newUrl,
+        mediaUrl: uploads.video.newUrl
+    });
+
+    return item;
 };
 
 module.exports = Items.Google.YouTube.Video;

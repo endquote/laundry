@@ -15,7 +15,7 @@ Items.Tumblr.Post = function(config) {
 Items.Tumblr.Post.prototype = Object.create(Item.prototype);
 Items.Tumblr.Post.className = Helpers.buildClassName(__filename);
 
-// Given a collection of API responses, perform downloads and construct a item objects.
+// Given a collection of API responses, perform downloads and construct Item objects.
 Items.Tumblr.Post.download = function(jobName, posts, callback) {
     var prefix = Item.buildPrefix(jobName, Items.Tumblr.Post.className);
     var items = [];

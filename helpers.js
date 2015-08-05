@@ -171,7 +171,7 @@ Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
             if (!err && info.url) {
                 url = result.oldUrl = info.url;
                 result.ytdl = info;
-                doUpload(info);
+                doUpload();
             } else {
                 callback(err, result);
             }
@@ -180,7 +180,7 @@ Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
         doUpload();
     }
 
-    function doUpload(ytdlInfo) {
+    function doUpload() {
         // Do the upload
         log.debug('Uploading ' + params.Key);
         var protocol = require('url').parse(url).protocol;

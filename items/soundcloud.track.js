@@ -14,8 +14,8 @@ Items.SoundCloud.Track = function(config) {
 Items.SoundCloud.Track.prototype = Object.create(Item.prototype);
 Items.SoundCloud.Track.className = Helpers.buildClassName(__filename);
 
-// Convert a media object from the API into a media item.
-Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
+// Given a collection of API responses, perform downloads and construct Item objects.
+Items.SoundCloud.Track.download = function(jobName, tracks, clientId, callback) {
     var prefix = Item.buildPrefix(jobName, Items.SoundCloud.Track.className);
     var items = [];
     var newKeys = [];
@@ -54,48 +54,7 @@ Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
                         return;
                     }
 
-                    // Tag list: yous truly r "ritual union" little dragon man live sweden gothenburg
-                    var tags = [];
-                    var quoted = track.tag_list.match(/"[^"]+"/g);
-                    if (quoted) {
-                        quoted.forEach(function(tag) {
-                            track.tag_list = track.tag_list.replace(tag, '');
-                            tags.push(tag.replace(/"/g, ''));
-                        });
-                        track.tag_list = track.tag_list.replace('  ', ' ');
-                    }
-
-                    tags = tags.concat(track.tag_list.split(' '));
-
-                    var description = '';
-                    if (uploads.artwork.newUrl) {
-                        description += util.format('<p><img src="%s" /></p>', uploads.artwork.newUrl);
-                    }
-
-                    if (uploads.audio.newUrl) {
-                        description += Item.buildAudio(uploads.audio.newUrl);
-                    }
-
-                    if (track.description) {
-                        description += util.format('<p>%s</p>', Autolinker.link(track.description));
-                    }
-
-                    if (uploads.audio.newUrl) {
-                        description += util.format('<p>(<a href="%s">download</a>)</p>', track.download_url ? track.download_url : uploads.audio.newUrl);
-                    }
-
-                    var item = new Items.SoundCloud.Track({
-                        title: util.format('%s - %s', track.user.username, track.title),
-                        description: description,
-                        url: track.permalink_url,
-                        date: moment(new Date(track.created_at)),
-                        author: track.user.username,
-                        tags: tags,
-                        mediaUrl: uploads.audio.newUrl,
-                        artwork: uploads.artwork.newUrl
-                    });
-
-                    items.push(item);
+                    items.push(Items.SoundCloud.Track.factory(track, uploads));
                     callback();
                 });
             }, callback);
@@ -109,6 +68,52 @@ Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
         // Return all the constructed items.
         callback(err, items);
     });
+};
+
+// Construct an Item given an API response and any upload info.
+Items.SoundCloud.Track.factory = function(track, uploads) {
+    // Tag list: yous truly r "ritual union" little dragon man live sweden gothenburg
+    var tags = [];
+    var quoted = track.tag_list.match(/"[^"]+"/g);
+    if (quoted) {
+        quoted.forEach(function(tag) {
+            track.tag_list = track.tag_list.replace(tag, '');
+            tags.push(tag.replace(/"/g, ''));
+        });
+        track.tag_list = track.tag_list.replace('  ', ' ');
+    }
+
+    tags = tags.concat(track.tag_list.split(' '));
+
+    var description = '';
+    if (uploads.artwork.newUrl) {
+        description += util.format('<p><img src="%s" /></p>', uploads.artwork.newUrl);
+    }
+
+    if (uploads.audio.newUrl) {
+        description += Item.buildAudio(uploads.audio.newUrl);
+    }
+
+    if (track.description) {
+        description += util.format('<p>%s</p>', Autolinker.link(track.description));
+    }
+
+    if (uploads.audio.newUrl) {
+        description += util.format('<p>(<a href="%s">download</a>)</p>', track.download_url ? track.download_url : uploads.audio.newUrl);
+    }
+
+    var item = new Items.SoundCloud.Track({
+        title: util.format('%s - %s', track.user.username, track.title),
+        description: description,
+        url: track.permalink_url,
+        date: moment(new Date(track.created_at)),
+        author: track.user.username,
+        tags: tags,
+        mediaUrl: uploads.audio.newUrl,
+        artwork: uploads.artwork.newUrl
+    });
+
+    return item;
 };
 
 module.exports = Items.SoundCloud.Track;
