@@ -2,7 +2,6 @@
 
 // Basic class representing an item from anywhere.
 var Item = function(config) {
-    this.id = null;
     this.title = null;
     this.description = null;
     this.url = null;
@@ -40,7 +39,6 @@ Item.download = function(itemClass, washer, objects, callback) {
             });
         },
         function(callback) {
-
             // Process each object.
             async.eachLimit(objects, 5, function(object, callback) {
                 // Upload files.
@@ -53,7 +51,6 @@ Item.download = function(itemClass, washer, objects, callback) {
                             callback();
                             return;
                         }
-
                         items.push(itemClass.factory(object, uploads));
                         callback();
                     });

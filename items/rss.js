@@ -11,8 +11,19 @@ Items.RSS = function(config) {
 Items.RSS.prototype = Object.create(Item.prototype);
 Items.RSS.className = Helpers.buildClassName(__filename);
 
-Items.RSS.factory = function(item) {
-    return new Items.RSS(Item.factory(item));
+// An object passed to async.parallel() which handles downloading of files.
+Items.RSS.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+    return {};
+};
+
+Items.RSS.factory = function(item, uploads) {
+    return new Items.RSS({
+        title: item.title,
+        description: item.description,
+        url: item.link,
+        date: moment(item.date),
+        author: item.author
+    });
 };
 
 module.exports = Items.RSS;

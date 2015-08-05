@@ -63,6 +63,7 @@ Washers.RSS.prototype.doInput = function(callback) {
     var feedparser = new FeedParser();
     var items = [];
     var called = false;
+    var that = this;
 
     req.on('error', function(err) {
         if (!called) {
@@ -93,15 +94,14 @@ Washers.RSS.prototype.doInput = function(callback) {
         var item;
 
         while (item = stream.read()) { // jshint ignore:line
-            item.date = moment(item.date);
-            items.push(Items.RSS.factory(item));
+            items.push(item);
         }
     });
 
     feedparser.on('end', function(err) {
         if (!called) {
             called = true;
-            callback(err, items);
+            Item.download(Items.RSS, that, items, callback);
         }
     });
 };
