@@ -34,7 +34,7 @@ Items.Tumblr.Post.download = function(jobName, posts, callback) {
         function(callback) {
 
             // Process each post object.
-            async.eachLimit(posts, 10, function(post, callback) {
+            async.eachLimit(posts, 5, function(post, callback) {
                 // Upload files.
                 async.parallel({
 

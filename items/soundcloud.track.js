@@ -32,15 +32,15 @@ Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
         function(callback) {
 
             // Process each track object.
-            async.eachLimit(tracks, 10, function(track, callback) {
+            async.eachLimit(tracks, 5, function(track, callback) {
                 // Upload files.
                 async.parallel({
-                    artworkUrl: function(callback) {
+                    artwork: function(callback) {
                         var artworkTarget = prefix + '/' + track.id + '.jpg';
                         newKeys.push(artworkTarget);
                         Helpers.uploadUrl(track.artwork_url, artworkTarget, oldKeys, false, callback);
                     },
-                    audioUrl: function(callback) {
+                    audio: function(callback) {
                         var audioTarget = prefix + '/' + track.id + '.mp3';
                         newKeys.push(audioTarget);
                         var audioSource = util.format('%s?client_id=%s', track.stream_url, clientId);
@@ -68,20 +68,20 @@ Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
                     tags = tags.concat(track.tag_list.split(' '));
 
                     var description = '';
-                    if (uploads.artworkUrl) {
-                        description += util.format('<p><img src="%s" /></p>', uploads.artworkUrl);
+                    if (uploads.artwork.newUrl) {
+                        description += util.format('<p><img src="%s" /></p>', uploads.artwork.newUrl);
                     }
 
-                    if (uploads.audioUrl) {
-                        description += util.format('<p><audio controls preload="none" src="%s" /></p>', uploads.audioUrl);
+                    if (uploads.audio.newUrl) {
+                        description += Item.buildAudio(uploads.audio.newUrl);
                     }
 
                     if (track.description) {
                         description += util.format('<p>%s</p>', Autolinker.link(track.description));
                     }
 
-                    if (uploads.audioUrl) {
-                        description += util.format('<p>(<a href="%s">download</a>)</p>', track.download_url ? track.download_url : uploads.audioUrl);
+                    if (uploads.audio.newUrl) {
+                        description += util.format('<p>(<a href="%s">download</a>)</p>', track.download_url ? track.download_url : uploads.audio.newUrl);
                     }
 
                     var item = new Items.SoundCloud.Track({
@@ -91,8 +91,8 @@ Items.SoundCloud.Track.factory = function(jobName, tracks, clientId, callback) {
                         date: moment(new Date(track.created_at)),
                         author: track.user.username,
                         tags: tags,
-                        mediaUrl: uploads.audioUrl,
-                        artwork: uploads.artworkUrl
+                        mediaUrl: uploads.audio.newUrl,
+                        artwork: uploads.artwork.newUrl
                     });
 
                     items.push(item);

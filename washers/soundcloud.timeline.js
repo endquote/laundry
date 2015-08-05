@@ -88,11 +88,6 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 });
                 tracks = tracks.slice(0, 20);
-                callback(null, tracks);
-            },
-
-            // Parse the tracks into Item objects.
-            function(tracks, callback) {
                 Items.SoundCloud.Track.factory(that._job.name, tracks, that.clientId, callback);
             }
         ],

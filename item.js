@@ -30,7 +30,11 @@ Item.buildPrefix = function(jobName, className) {
 
 // Build an HTML video player.
 Item.buildVideo = function(videoUrl, thumbUrl) {
-    return util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbUrl, videoUrl);
+    if (thumbUrl) {
+        return util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbUrl, videoUrl);
+    } else {
+        return util.format('<p><video controls src="%s" autobuffer="false" preload="none"></video></p>', videoUrl);
+    }
 };
 
 // Build an HTML audio player.

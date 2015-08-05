@@ -37,16 +37,16 @@ Items.Instagram.Media.factory = function(jobName, posts, callback) {
         function(callback) {
 
             // Process each post object.
-            async.eachLimit(posts, 10, function(post, callback) {
+            async.eachLimit(posts, 5, function(post, callback) {
 
                 // Upload files.
                 async.parallel({
-                    imageUrl: function(callback) {
+                    image: function(callback) {
                         var target = prefix + '/' + post.id + '.jpg';
                         newKeys.push(target);
                         Helpers.uploadUrl(post.images.standard_resolution.url, target, oldKeys, false, callback);
                     },
-                    videoUrl: function(callback) {
+                    video: function(callback) {
                         var target = prefix + '/' + post.id + '.mp4';
                         newKeys.push(target);
                         Helpers.uploadUrl(post.videos ? post.videos.standard_resolution.url : null, target, oldKeys, false, callback);
@@ -66,12 +66,12 @@ Items.Instagram.Media.factory = function(jobName, posts, callback) {
                         date: moment.unix(post.created_time),
                         url: post.link,
                         likes: post.likes,
-                        image: uploads.imageUrl,
-                        video: uploads.videoUrl,
+                        image: uploads.image.newUrl,
+                        video: uploads.video.newUrl,
                         caption: post.caption ? post.caption.text : null,
                         author: post.user.username,
                         authorpic: post.user.profile_picture,
-                        mediaUrl: uploads.videoUrl
+                        mediaUrl: uploads.video.newUrl
                     });
 
                     item.title = item.author;
@@ -82,7 +82,7 @@ Items.Instagram.Media.factory = function(jobName, posts, callback) {
                     if (!item.video) {
                         item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
                     } else {
-                        item.description = util.format('<p><video poster="%s" width="640" height="640" controls><source src="%s" type="video/mp4"></video></p>', item.image, item.video);
+                        item.description = Item.buildVideo(item.video, item.image);
                     }
 
                     if (item.caption) {

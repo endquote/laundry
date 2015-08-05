@@ -137,11 +137,6 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
             });
 
             videos = videos.slice(0, 50);
-            callback(null, videos);
-        },
-
-        // Parse the video objects into output objects.
-        function(videos, callback) {
             Items.Google.YouTube.Video.factory(that._job.name, videos, callback);
         }
     ], function(err, result) {

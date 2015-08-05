@@ -35,7 +35,7 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
         function(callback) {
 
             // Process each video object.
-            async.eachLimit(videos, 10, function(video, callback) {
+            async.eachLimit(videos, 5, function(video, callback) {
                 var url = 'https://youtube.com/watch?v=' + video.contentDetails.videoId;
 
                 // Figure out the biggest thumbnail available.
@@ -50,13 +50,13 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
                 // Upload files.
                 async.parallel({
 
-                    thumbnailUrl: function(callback) {
+                    thumbnail: function(callback) {
                         // Upload the thumbnail
                         var target = prefix + '/' + video.contentDetails.videoId + '.jpg';
                         newKeys.push(target);
                         Helpers.uploadUrl(thumbnail.url, target, oldKeys, false, callback);
                     },
-                    videoUrl: function(callback) {
+                    video: function(callback) {
                         // Upload the video
                         var target = prefix + '/' + video.contentDetails.videoId + '.mp4';
                         newKeys.push(target);
@@ -71,7 +71,7 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
                     }
 
                     // Build the actual item object.
-                    var player = util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', uploads.thumbnailUrl, uploads.videoUrl);
+                    var player = Item.buildVideo(uploads.video.newUrl, uploads.thumbnail.newUrl);
                     var description = video.snippet.description;
                     description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
                     description = description.replace(/[\n\r]/gim, '<br/>');
@@ -85,8 +85,8 @@ Items.Google.YouTube.Video.factory = function(jobName, videos, callback) {
                         url: url,
                         date: moment(video.snippet.publishedAt),
                         author: video.snippet.channelTitle,
-                        thumbnail: uploads.thumbnailUrl,
-                        mediaUrl: uploads.videoUrl
+                        thumbnail: uploads.thumbnail.newUrl,
+                        mediaUrl: uploads.video.newUrl
                     });
 
                     items.push(item);
