@@ -126,11 +126,20 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
 };
 
 // Given a URL and an S3 target, copy the URL to S3.
-// Cache is an array of keys to not upload, since it's there already.
+// Cache is an array of keys to not upload, since they are there already.
 // Optionally use youtube-dl to transform the url to a media url.
+// The callback is (err, {oldUrl, newUrl, error, ytdl})
+// The ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
 Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
+    var result = {
+        oldUrl: url,
+        newUrl: url,
+        error: null,
+        ytdl: null
+    };
+
     if (!url) {
-        callback(null, url);
+        callback(null, result);
         return;
     }
 
@@ -143,7 +152,8 @@ Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
         })[0];
         if (cached) {
             log.debug('Found ' + target);
-            callback(null, resultUrl);
+            result.newUrl = resultUrl;
+            callback(null, result);
             return;
         }
     }
@@ -157,25 +167,27 @@ Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
         // Use the youtube-dl to change the url into a media url
         log.debug('Getting media URL for ' + url);
         ytdl.getInfo(url, function(err, info) {
-            if (err) {
-                callback(err);
+            result.error = err;
+            if (!err && info.url) {
+                url = result.oldUrl = info.url;
+                result.ytdl = info;
+                doUpload(info);
             } else {
-                url = info.url;
-                doUpload();
+                callback(err, result);
             }
         });
     } else {
         doUpload();
     }
 
-    function doUpload() {
+    function doUpload(ytdlInfo) {
         // Do the upload
         log.debug('Uploading ' + params.Key);
         var protocol = require('url').parse(url).protocol;
         var req = protocol === 'http' ? http.request : https.request;
         req(url, function(response) {
             if (response.statusCode !== 200 && response.statusCode !== 302) {
-                callback(response.error, url);
+                callback(response.error, result);
                 return;
             }
 
@@ -186,7 +198,11 @@ Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
                 .on('httpUploadProgress', function(progress) {
                     // console.log(progress);
                 }).send(function(err, data) {
-                    callback(err, err ? url : resultUrl);
+                    result.error = err;
+                    if (!err) {
+                        result.newUrl = resultUrl;
+                    }
+                    callback(err, result);
                 });
         }).end();
     }

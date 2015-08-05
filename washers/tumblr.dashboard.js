@@ -21,7 +21,7 @@ Washers.Tumblr.Dashboard.prototype = Object.create(Washers.Tumblr.prototype);
 Washers.Tumblr.Dashboard.className = Helpers.buildClassName(__filename);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
-    var quantity = 40;
+    var quantity = 100;
     var posts = [];
     var lastResponse = null;
     var limit = 20;
@@ -38,9 +38,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
             }, that._requestOptions),
             function(response) {
                 response = response.response;
-                response.posts.forEach(function(post) {
-                    posts.push(Items.Tumblr.Post.factory(post));
-                });
+                posts = posts.concat(response.posts);
                 log.debug(util.format('Got %d/%d posts', posts.length, quantity));
                 lastResponse = response;
                 callback();
@@ -49,7 +47,12 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     }, function() {
         return lastResponse.posts.length === limit && posts.length < quantity;
     }, function(err) {
-        callback(err, posts);
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        Items.Tumblr.Post.download(that._job.name, posts, callback);
     });
 };
 

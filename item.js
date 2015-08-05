@@ -28,4 +28,14 @@ Item.buildPrefix = function(jobName, className) {
     return ('jobs.' + jobName + '.' + className).toLowerCase().split('.').join('/');
 };
 
+// Build an HTML video player.
+Item.buildVideo = function(videoUrl, thumbUrl) {
+    return util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbUrl, videoUrl);
+};
+
+// Build an HTML audio player.
+Item.buildAudio = function(audioUrl) {
+    return util.format('<p><audio controls preload="none" src="%s" /></p>', audioUrl);
+};
+
 module.exports = Item;
