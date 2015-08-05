@@ -137,7 +137,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
             });
 
             videos = videos.slice(0, 50);
-            Items.Google.YouTube.Video.download(that._job.name, videos, null, callback);
+            Item.download(Items.Google.YouTube.Video, that, videos, callback);
         }
     ], function(err, result) {
         callback(err, result);

@@ -19,11 +19,6 @@ Items.Instagram.Media = function(config) {
 Items.Instagram.Media.prototype = Object.create(Item.prototype);
 Items.Instagram.Media.className = Helpers.buildClassName(__filename);
 
-// Given a collection of API responses, perform downloads and construct Item objects.
-Items.Instagram.Media.download = function(jobName, objects, params, callback) {
-    Item.download(jobName, Items.Instagram.Media, objects, params, callback);
-};
-
 // An object passed to async.parallel() which handles downloading of files.
 Items.Instagram.Media.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
     return {

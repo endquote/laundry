@@ -85,9 +85,7 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
                 return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
             });
             tracks = tracks.slice(0, 20);
-            Items.SoundCloud.Track.download(that._job.name, tracks, {
-                clientId: that.clientId
-            }, callback);
+            Item.download(Items.SoundCloud.Track, that, tracks, callback);
         }
     ], function(err, result) {
         callback(err, result);

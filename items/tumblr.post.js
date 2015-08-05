@@ -15,11 +15,6 @@ Items.Tumblr.Post = function(config) {
 Items.Tumblr.Post.prototype = Object.create(Item.prototype);
 Items.Tumblr.Post.className = Helpers.buildClassName(__filename);
 
-// Given a collection of API responses, perform downloads and construct Item objects.
-Items.Tumblr.Post.download = function(jobName, objects, params, callback) {
-    Item.download(jobName, Items.Tumblr.Post, objects, params, callback);
-};
-
 // An object passed to async.parallel() which handles downloading of files.
 Items.Tumblr.Post.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
     return {

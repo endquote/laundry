@@ -25,8 +25,8 @@ Item.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
 };
 
 // Given a collection of API responses, perform downloads and construct Item objects.
-Item.download = function(jobName, itemClass, objects, params, callback) {
-    var prefix = Item.buildPrefix(jobName, itemClass.className);
+Item.download = function(itemClass, washer, objects, callback) {
+    var prefix = Item.buildPrefix(washer._job.name, itemClass.className);
     var items = [];
     var newKeys = [];
     var oldKeys = [];
@@ -41,11 +41,11 @@ Item.download = function(jobName, itemClass, objects, params, callback) {
         },
         function(callback) {
 
-        // Process each object.
-        async.eachLimit(objects, 5, function(object, callback) {
+            // Process each object.
+            async.eachLimit(objects, 5, function(object, callback) {
                 // Upload files.
                 async.parallel(
-                    itemClass.downloadLogic(prefix, object, oldKeys, newKeys, params),
+                    itemClass.downloadLogic(prefix, object, oldKeys, newKeys, washer),
                     function(err, uploads) {
                         if (err) {
                             // Carry on when an upload fails.

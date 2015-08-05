@@ -57,7 +57,7 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
                 return;
             }
 
-            Items.Instagram.Media.download(that._job.name, posts, null, callback);
+            Item.download(Items.Instagram.Media, that, posts, callback);
         });
 };
 

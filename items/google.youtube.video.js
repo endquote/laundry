@@ -16,11 +16,6 @@ Items.Google.YouTube.Video = function(config) {
 Items.Google.YouTube.Video.prototype = Object.create(Item.prototype);
 Items.Google.YouTube.Video.className = Helpers.buildClassName(__filename);
 
-// Given a collection of API responses, perform downloads and construct Item objects.
-Items.Google.YouTube.Video.download = function(jobName, objects, params, callback) {
-    Item.download(jobName, Items.Google.YouTube.Video, objects, params, callback);
-};
-
 // An object passed to async.parallel() which handles downloading of files.
 Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
     return {

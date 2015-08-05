@@ -14,11 +14,6 @@ Items.SoundCloud.Track = function(config) {
 Items.SoundCloud.Track.prototype = Object.create(Item.prototype);
 Items.SoundCloud.Track.className = Helpers.buildClassName(__filename);
 
-// Given a collection of API responses, perform downloads and construct Item objects.
-Items.SoundCloud.Track.download = function(jobName, objects, params, callback) {
-    Item.download(jobName, Items.SoundCloud.Track, objects, params, callback);
-};
-
 // An object passed to async.parallel() which handles downloading of files.
 Items.SoundCloud.Track.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
     return {
