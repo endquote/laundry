@@ -28,7 +28,8 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, oldKeys, newKeys, params
                 if (res && res.ytdl && res.ytdl.thumbnails && res.ytdl.thumbnails.length) {
                     var target = prefix + '/' + obj.id + '-thumb.jpg';
                     newKeys.push(target);
-                    Helpers.uploadUrl(res.ytdl.thumbnails[0].url, target, oldKeys, false, function() {
+                    Helpers.uploadUrl(res.ytdl.thumbnails[0].url, target, oldKeys, false, function(thumbErr, thumbRes) {
+                        res.thumbnail = thumbRes;
                         callback(err, res);
                     });
                 } else {
@@ -165,7 +166,7 @@ Items.Tumblr.Post.factory = function(post, uploads) {
         item.description = post.caption;
 
         if (uploads.video) {
-            item.description += Item.buildVideo(uploads.video.newUrl, uploads.video.newUrl.replace('.mp4', '-thumb.jpg'));
+            item.description += Item.buildVideo(uploads.video.newUrl, uploads.video.thumbnail ? uploads.video.thumbnail.newUrl : null);
             item.mediaUrl = uploads.video.newUrl;
         } else {
             var biggest = post.player.sort(function(a, b) {

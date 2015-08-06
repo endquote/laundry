@@ -28,7 +28,7 @@ Washers.Tumblr.Blog.prototype = Object.create(Washers.Tumblr.prototype);
 Washers.Tumblr.Blog.className = Helpers.buildClassName(__filename);
 
 Washers.Tumblr.Blog.prototype.doInput = function(callback) {
-    var quantity = 500;
+    var quantity = 50;
     var posts = [];
     var lastResponse = null;
     var limit = 20;
