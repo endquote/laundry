@@ -6,6 +6,7 @@ var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolin
 ns('Items.SoundCloud', global);
 Items.SoundCloud.Track = function(config) {
     this.artwork = null;
+    this.duration = 0;
 
     Item.call(this, config);
     this.className = Helpers.buildClassName(__filename);
@@ -71,7 +72,8 @@ Items.SoundCloud.Track.factory = function(obj, downloads) {
         author: obj.user.username,
         tags: tags,
         mediaUrl: downloads.audio.newUrl,
-        artwork: downloads.artwork.newUrl
+        artwork: downloads.artwork.newUrl,
+        duration: obj.duration
     });
 
     return item;

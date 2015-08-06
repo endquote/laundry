@@ -8,6 +8,7 @@ var AWS = require('aws-sdk');
 ns('Items.Google.YouTube', global);
 Items.Google.YouTube.Video = function(config) {
     this.thumbnail = null;
+    this.duration = 0;
 
     Item.call(this, config);
     this.className = Helpers.buildClassName(__filename);
@@ -60,7 +61,8 @@ Items.Google.YouTube.Video.factory = function(video, downloads) {
         date: moment(video.snippet.publishedAt),
         author: video.snippet.channelTitle,
         thumbnail: downloads.thumbnail.newUrl,
-        mediaUrl: downloads.video.newUrl
+        mediaUrl: downloads.video.newUrl,
+        duration: video.duration
     });
 
     return item;

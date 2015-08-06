@@ -108,27 +108,63 @@ Washers.RSS.prototype.doInput = function(callback) {
 
 // Format items as an RSS feed and write them to disk.
 Washers.RSS.prototype.doOutput = function(items, callback) {
-    var feed = new RSSWriter({
+    var feedSettings = {
         title: this.feedname,
         description: this.feedname,
         feed_url: 'http://laundry.endquote.com',
         site_url: 'http://laundry.endquote.com',
         generator: 'Laundry'
-    });
+    };
+
+    // If there are any enclosures, add some custom iTunes podcast stuff.
+    if (items.filter(function(item) {
+        return item.mediaUrl;
+    }).length) {
+        feedSettings.custom_namespaces = {
+            'itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd'
+        };
+        feedSettings.custom_elements = [{
+            'itunes:image': {
+                _attr: {
+                    href: 'http://laundry.endquote.com/favicons/apple-touch-icon.png'
+                }
+            }
+        }];
+    }
+
+    var feed = new RSSWriter(feedSettings);
 
     if (items) {
         items.forEach(function(item) {
-            feed.item({
+            var entry = {
                 title: item.title,
                 description: item.description,
                 url: item.url,
                 date: item.date.toDate(),
                 author: item.author,
-                categories: _.isArray(item.tags) ? item.tags : [item.tags],
-                enclosure: item.mediaUrl ? {
+                categories: _.isArray(item.tags) ? item.tags : [item.tags]
+            };
+
+            // Set up enclosures.
+            if (item.mediaUrl) {
+                entry.enclosure = {
                     url: item.mediaUrl
-                } : null
-            });
+                };
+
+                entry.custom_elements = [{
+                    'itunes:author': item.author,
+                }, {
+                    'itunes:duration': item.duration
+                }, {
+                    'itunes:image': {
+                        _attr: {
+                            href: item.artwork || item.thumbnail
+                        }
+                    }
+                }];
+            }
+
+            feed.item(entry);
         });
     }
 
