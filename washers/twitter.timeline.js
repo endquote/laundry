@@ -78,16 +78,15 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
                     log.debug(util.format('Got %d, total %d/%d', retrievedLast, retrievedTotal, that._quantity));
                     tweets.forEach(function(tweet) {
                         maxId = tweet.id_str;
-                        var item = Items.Twitter.Tweet.factory(tweet);
                         var include = true;
-                        if (that.excludeReplies === 'y' && item.isReply) {
+                        if (that.excludeReplies === 'y' && tweet.in_reply_to_screen_name) {
                             include = false;
                         }
-                        if (that.excludeRetweets === 'y' && (item.isRetweet || item.isQuote)) {
+                        if (that.excludeRetweets === 'y' && (tweet.retweeted_status || tweet.quoted_status_id)) {
                             include = false;
                         }
                         if (include) {
-                            posts.push(item);
+                            posts.push(tweet);
                         }
                     });
                 }
@@ -97,7 +96,12 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
     }, function() {
         return retrievedTotal < that._quantity || retrievedLast === 0;
     }, function(err) {
-        callback(err, posts);
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        Item.download(Items.Twitter.Tweet, that, posts, callback);
     });
 };
 

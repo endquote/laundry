@@ -20,7 +20,39 @@ Items.Twitter.Tweet = function(config) {
 Items.Twitter.Tweet.prototype = Object.create(Item.prototype);
 Items.Twitter.Tweet.className = Helpers.buildClassName(__filename);
 
-Items.Twitter.Tweet.factory = function(tweet) {
+// An object passed to async.parallel() which handles downloading of files.
+Items.Twitter.Tweet.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+    return {
+        media: function(callback) {
+            var results = [];
+            async.each(obj.entities.media, function(entity, callback) {
+                // Figure out the biggest size (probably always 'large')
+                var width = 0;
+                var size = 'thumb';
+                for (var i in entity.sizes) {
+                    if (entity.sizes[i].w > width) {
+                        width = entity.sizes[i].w;
+                        size = i;
+                    }
+                }
+
+                var source = entity.media_url_https + ':' + size;
+                var target = prefix + '/' + obj.id + '.' + entity.media_url_https.split('.').pop();
+                newKeys.push(target);
+
+                Helpers.uploadUrl(source, target, oldKeys, false, function(err, res) {
+                    results.push(res);
+                    callback();
+                });
+            }, function(err) {
+                callback(err, results);
+            });
+        }
+    };
+};
+
+// Construct an Item given an API response and any upload info.
+Items.Twitter.Tweet.factory = function(tweet, downloads) {
     var item = new Items.Twitter.Tweet({
         date: moment(new Date(tweet.created_at)),
         author: tweet.user.screen_name,
@@ -55,9 +87,9 @@ Items.Twitter.Tweet.factory = function(tweet) {
     item.description = item.description.replace(/@([\w]+)/g, '<a href="https://twitter.com/$1">@$1</a>');
     item.description = item.description.replace(/#([\w]+)/g, '<a href="https://twitter.com/hashtag/$1">#$1</a>');
 
-    if (tweet.entities.media) {
-        tweet.entities.media.forEach(function(media) {
-            item.description += util.format('<p><img src="%s:large"/></p>', media.media_url);
+    if (downloads.media) {
+        downloads.media.forEach(function(download) {
+            item.description += util.format('<p><img src="%s"/></p>', download.newUrl);
         });
     }
 
