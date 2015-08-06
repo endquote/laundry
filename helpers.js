@@ -117,7 +117,7 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
         options.rejectUnauthorized = false;
     }
     request(options, function(err, response, body) {
-        if (!err && (response.statusCode === 200 || response.statusCode === undefined)) {
+        if (!err && (body && !body.errors) && (response.statusCode === 200 || response.statusCode === undefined)) {
             callback(body);
         } else {
             errorCallback(err || body);
