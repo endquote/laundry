@@ -150,7 +150,11 @@ Helpers.uploadUrl = function(url, target, cache, useYTDL, callback) {
         if (cache.indexOf(target) !== -1) {
             log.debug('Found ' + target);
             result.newUrl = resultUrl;
-            callback(null, result);
+
+            // Don't call the callback syncronously, interesting: https://github.com/caolan/async/issues/75
+            process.nextTick(function() {
+                callback(null, result);
+            });
             return;
         }
     }
