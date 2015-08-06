@@ -13,7 +13,20 @@ Washers.SoundCloud.Timeline = function(config, job) {
     this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
-        description: 'Loads recent sounds from your SoundCloud timeline.'
+        description: 'Loads recent sounds from your SoundCloud timeline.',
+        settings: [{
+            name: 'minDuration',
+            prompt: 'Only get tracks longer than this many minutes (leave blank to include short tracks).',
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
+                callback(newValue && !validator.isDecimal(newValue));
+            }
+        }, {
+            name: 'maxDuration',
+            prompt: 'Only get tracks shorter than this many minutes (leave blank to include long tracks).',
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
+                callback(newValue && !validator.isDecimal(newValue));
+            }
+        }]
     });
 };
 
@@ -84,6 +97,16 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
             tracks.sort(function(a, b) {
                 return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
             });
+            if (that.minDuration) {
+                tracks = tracks.filter(function(track) {
+                    return track.duration >= that.minDuration * 60 * 1000;
+                });
+            }
+            if (that.maxDuration) {
+                tracks = tracks.filter(function(track) {
+                    return track.duration <= that.maxDuration * 60 * 1000;
+                });
+            }
             tracks = tracks.slice(0, 20);
             Item.download(Items.SoundCloud.Track, that, tracks, callback);
         }
