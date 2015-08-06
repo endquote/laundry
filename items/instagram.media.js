@@ -36,7 +36,7 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, oldKeys, newKeys, pa
 };
 
 // Construct an Item given an API response and any upload info.
-Items.Instagram.Media.factory = function(post, uploads) {
+Items.Instagram.Media.factory = function(post, downloads) {
     var item = new Items.Instagram.Media({
         tags: post.tags,
         type: post.type,
@@ -44,12 +44,12 @@ Items.Instagram.Media.factory = function(post, uploads) {
         date: moment.unix(post.created_time),
         url: post.link,
         likes: post.likes,
-        image: uploads.image.newUrl,
-        video: uploads.video.newUrl,
+        image: downloads.image.newUrl,
+        video: downloads.video.newUrl,
         caption: post.caption ? post.caption.text : null,
         author: post.user.username,
         authorpic: post.user.profile_picture,
-        mediaUrl: uploads.video.newUrl
+        mediaUrl: downloads.video.newUrl
     });
 
     item.title = item.author;

@@ -66,7 +66,7 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, oldKeys, newKeys, params
 };
 
 // Construct an Item given an API response and any upload info.
-Items.Tumblr.Post.factory = function(post, uploads) {
+Items.Tumblr.Post.factory = function(post, downloads) {
     var titleLength = 30;
 
     var item = new Items.Tumblr.Post({
@@ -86,7 +86,7 @@ Items.Tumblr.Post.factory = function(post, uploads) {
     // Use uploaded photos if any
     if (post.photos) {
         post.photos.forEach(function(photo, index) {
-            photo.url = uploads && uploads.photos ? uploads.photos[index].newUrl : photo.original_size.url;
+            photo.url = downloads && downloads.photos ? downloads.photos[index].newUrl : photo.original_size.url;
         });
     }
 
@@ -165,9 +165,9 @@ Items.Tumblr.Post.factory = function(post, uploads) {
 
         item.description = post.caption;
 
-        if (uploads.video) {
-            item.description += Item.buildVideo(uploads.video.newUrl, uploads.video.thumbnail ? uploads.video.thumbnail.newUrl : null);
-            item.mediaUrl = uploads.video.newUrl;
+        if (downloads.video) {
+            item.description += Item.buildVideo(downloads.video.newUrl, downloads.video.thumbnail ? downloads.video.thumbnail.newUrl : null);
+            item.mediaUrl = downloads.video.newUrl;
         } else {
             var biggest = post.player.sort(function(a, b) {
                 return a.width - b.width;
@@ -183,9 +183,9 @@ Items.Tumblr.Post.factory = function(post, uploads) {
 
         item.description = post.caption;
 
-        if (uploads.audio) {
-            item.description += Item.buildAudio(uploads.audio.newUrl);
-            item.mediaUrl = uploads.audio.newUrl;
+        if (downloads.audio) {
+            item.description += Item.buildAudio(downloads.audio.newUrl);
+            item.mediaUrl = downloads.audio.newUrl;
         } else {
             item.description += post.player;
         }

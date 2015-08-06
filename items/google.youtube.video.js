@@ -44,8 +44,8 @@ Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, oldKeys, newKey
 };
 
 // Construct an Item given an API response and any upload info.
-Items.Google.YouTube.Video.factory = function(video, uploads) {
-    var player = Item.buildVideo(uploads.video.newUrl, uploads.thumbnail.newUrl);
+Items.Google.YouTube.Video.factory = function(video, downloads) {
+    var player = Item.buildVideo(downloads.video.newUrl, downloads.thumbnail.newUrl);
     var description = video.snippet.description;
     description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
     description = description.replace(/[\n\r]/gim, '<br/>');
@@ -59,8 +59,8 @@ Items.Google.YouTube.Video.factory = function(video, uploads) {
         url: 'https://youtube.com/watch?v=' + video.contentDetails.videoId,
         date: moment(video.snippet.publishedAt),
         author: video.snippet.channelTitle,
-        thumbnail: uploads.thumbnail.newUrl,
-        mediaUrl: uploads.video.newUrl
+        thumbnail: downloads.thumbnail.newUrl,
+        mediaUrl: downloads.video.newUrl
     });
 
     return item;

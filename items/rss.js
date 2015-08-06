@@ -16,7 +16,7 @@ Items.RSS.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
     return {};
 };
 
-Items.RSS.factory = function(item, uploads) {
+Items.RSS.factory = function(item, downloads) {
     return new Items.RSS({
         title: item.title,
         description: item.description,

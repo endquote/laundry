@@ -32,7 +32,7 @@ Items.SoundCloud.Track.downloadLogic = function(prefix, obj, oldKeys, newKeys, p
 };
 
 // Construct an Item given an API response and any upload info.
-Items.SoundCloud.Track.factory = function(obj, uploads) {
+Items.SoundCloud.Track.factory = function(obj, downloads) {
     // Tag list: yous truly r "ritual union" little dragon man live sweden gothenburg
     var tags = [];
     var quoted = obj.tag_list.match(/"[^"]+"/g);
@@ -47,20 +47,20 @@ Items.SoundCloud.Track.factory = function(obj, uploads) {
     tags = tags.concat(obj.tag_list.split(' '));
 
     var description = '';
-    if (uploads.artwork.newUrl) {
-        description += util.format('<p><img src="%s" /></p>', uploads.artwork.newUrl);
+    if (downloads.artwork.newUrl) {
+        description += util.format('<p><img src="%s" /></p>', downloads.artwork.newUrl);
     }
 
-    if (uploads.audio.newUrl) {
-        description += Item.buildAudio(uploads.audio.newUrl);
+    if (downloads.audio.newUrl) {
+        description += Item.buildAudio(downloads.audio.newUrl);
     }
 
     if (obj.description) {
         description += util.format('<p>%s</p>', Autolinker.link(obj.description));
     }
 
-    if (uploads.audio.newUrl) {
-        description += util.format('<p>(<a href="%s">download</a>)</p>', obj.download_url ? obj.download_url : uploads.audio.newUrl);
+    if (downloads.audio.newUrl) {
+        description += util.format('<p>(<a href="%s">download</a>)</p>', obj.download_url ? obj.download_url : downloads.audio.newUrl);
     }
 
     var item = new Items.SoundCloud.Track({
@@ -70,8 +70,8 @@ Items.SoundCloud.Track.factory = function(obj, uploads) {
         date: moment(new Date(obj.created_at)),
         author: obj.user.username,
         tags: tags,
-        mediaUrl: uploads.audio.newUrl,
-        artwork: uploads.artwork.newUrl
+        mediaUrl: downloads.audio.newUrl,
+        artwork: downloads.artwork.newUrl
     });
 
     return item;
