@@ -555,7 +555,7 @@ Laundry.prototype.run = function(jobName, callback) {
                             }));
                         }
 
-                        callback(err, job);
+                        callback(null, job);
                     });
                 }, function(err) {
                     callback(err);
