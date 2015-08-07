@@ -30,18 +30,6 @@ Washers.RSS = function(config, job) {
     this.output = _.merge({
         description: 'Writes data to an RSS feed on disk.',
         settings: [{
-            name: 'file',
-            prompt: 'Where do you want to save the output?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-                callback(true, prompt, path.join(home, job.name + '.xml'));
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                Helpers.validateFile(newValue, function(isValid) {
-                    callback(!isValid);
-                });
-            }
-        }, {
             name: 'feedname',
             prompt: 'What do you want the title of the output feed to be?',
             beforeEntry: function(rl, job, prompt, callback) {
@@ -172,7 +160,12 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
         indent: true
     });
 
-    fs.writeFile(this.file, xml, function(err) {
+    var target = Item.buildPrefix(this._job.name, this.className) + '/feed.xml';
+
+    Storage.writeFile(target, xml, function(err, url) {
+        if (url) {
+            log.info('The feed is available at ' + url);
+        }
         callback(err);
     });
 };

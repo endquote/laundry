@@ -3,6 +3,7 @@
 var ytdl = require('youtube-dl'); // https://github.com/fent/node-youtube-dl
 var http = require('follow-redirects').http; // https://www.npmjs.com/package/follow-redirects
 var https = require('follow-redirects').https; // https://www.npmjs.com/package/follow-redirects
+var mime = require('mime-types'); // https://www.npmjs.com/package/mime-types
 var AWS = require('aws-sdk');
 var s3 = new AWS.S3();
 
@@ -218,6 +219,20 @@ Storage.deleteBefore = function(prefix, date, callback) {
             });
         }
     );
+};
+
+// Write some data to a file.
+Storage.writeFile = function(target, contents, callback) {
+    target = target.replace(/^\//, ''); // remove leading slash for S3
+    var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', process.env.LAUNDRY_S3_BUCKET, target);
+    s3.upload({
+        Bucket: process.env.LAUNDRY_S3_BUCKET,
+        Key: target,
+        Body: contents,
+        ContentType: mime.lookup(target.split('.').pop())
+    }, function(err) {
+        callback(err, err || resultUrl);
+    });
 };
 
 module.exports = Storage;
