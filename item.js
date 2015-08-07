@@ -19,7 +19,7 @@ var Item = function(config) {
 };
 
 // An object passed to async.parallel() which handles downloading of files.
-Item.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+Item.downloadLogic = function(prefix, obj, params) {
     return {};
 };
 
@@ -27,23 +27,23 @@ Item.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
 Item.download = function(itemClass, washer, objects, callback) {
     var prefix = Item.buildPrefix(washer._job.name, itemClass.className);
     var items = [];
-    var newKeys = [];
-    var oldKeys = [];
-    async.waterfall([
+    var cache = [];
 
+    async.waterfall([
         // Cache existing newKeys so they're not uploaded again.
         function(callback) {
-            Helpers.cacheObjects(prefix, function(err, c) {
-                oldKeys = c;
+            Storage.cacheObjects(prefix, function(err, c) {
+                cache = c;
                 callback(err);
             });
         },
+
         function(callback) {
             // Process each object.
             async.eachLimit(objects, 5, function(object, callback) {
                 // Upload files.
                 async.parallel(
-                    itemClass.downloadLogic(prefix, object, oldKeys, newKeys, washer),
+                    itemClass.downloadLogic(prefix, object, washer, cache),
                     function(err, uploads) {
                         if (err) {
                             // Carry on when an upload fails.
@@ -59,7 +59,7 @@ Item.download = function(itemClass, washer, objects, callback) {
 
         // Delete any old stuff in the cache.
         function(callback) {
-            Helpers.deleteExpired(newKeys, oldKeys, callback);
+            Storage.deleteBefore(prefix, moment().subtract(30, 'days').toDate(), callback);
         }
     ], function(err) {
         // Return all the constructed items.

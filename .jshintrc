@@ -7,6 +7,7 @@
         "Item": true,
         "Job": true,
         "Helpers": true,
+        "Storage": true,
         "allWashers": true,
         "allItems": true,
         "allJobs": true,
@@ -23,8 +24,7 @@
         "S": true,
         "qs": true,
         "extend": true,
-        "request": true,
-        "s3": true
+        "request": true
     },
     "curly": true,
     "eqeqeq": true,

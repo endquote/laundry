@@ -18,7 +18,7 @@ Items.Google.YouTube.Video.prototype = Object.create(Item.prototype);
 Items.Google.YouTube.Video.className = Helpers.buildClassName(__filename);
 
 // An object passed to async.parallel() which handles downloading of files.
-Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, params, cache) {
     return {
         thumbnail: function(callback) {
             // Figure out the biggest thumbnail available.
@@ -32,14 +32,12 @@ Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, oldKeys, newKey
 
             // Upload the thumbnail
             var target = prefix + '/' + obj.contentDetails.videoId + '.jpg';
-            newKeys.push(target);
-            Helpers.uploadUrl(thumbnail.url, target, oldKeys, false, callback);
+            Storage.downloadUrl(thumbnail.url, target, cache, false, callback);
         },
         video: function(callback) {
             // Upload the video
             var target = prefix + '/' + obj.contentDetails.videoId + '.mp4';
-            newKeys.push(target);
-            Helpers.uploadUrl('https://youtube.com/watch?v=' + obj.contentDetails.videoId, target, oldKeys, true, callback);
+            Storage.downloadUrl('https://youtube.com/watch?v=' + obj.contentDetails.videoId, target, cache, true, callback);
         }
     };
 };

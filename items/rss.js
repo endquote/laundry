@@ -12,7 +12,7 @@ Items.RSS.prototype = Object.create(Item.prototype);
 Items.RSS.className = Helpers.buildClassName(__filename);
 
 // An object passed to async.parallel() which handles downloading of files.
-Items.RSS.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+Items.RSS.downloadLogic = function(prefix, obj, params, cache) {
     return {};
 };
 

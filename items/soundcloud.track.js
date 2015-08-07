@@ -16,18 +16,16 @@ Items.SoundCloud.Track.prototype = Object.create(Item.prototype);
 Items.SoundCloud.Track.className = Helpers.buildClassName(__filename);
 
 // An object passed to async.parallel() which handles downloading of files.
-Items.SoundCloud.Track.downloadLogic = function(prefix, obj, oldKeys, newKeys, params) {
+Items.SoundCloud.Track.downloadLogic = function(prefix, obj, params, cache) {
     return {
         artwork: function(callback) {
             var target = prefix + '/' + obj.id + '.jpg';
-            newKeys.push(target);
-            Helpers.uploadUrl(obj.artwork_url, target, oldKeys, false, callback);
+            Storage.downloadUrl(obj.artwork_url, target, cache, false, callback);
         },
         audio: function(callback) {
             var target = prefix + '/' + obj.id + '.mp3';
-            newKeys.push(target);
             var audioSource = util.format('%s?client_id=%s', obj.stream_url, params.clientId);
-            Helpers.uploadUrl(audioSource, target, oldKeys, false, callback);
+            Storage.downloadUrl(audioSource, target, cache, false, callback);
         }
     };
 };

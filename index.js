@@ -18,15 +18,6 @@ global.qs = require('qs'); // https://www.npmjs.com/package/qs
 global.extend = require('deep-extend'); // https://www.npmjs.com/package/deep-extend
 global.request = require('request'); // https://github.com/request/request
 
-var AWS = require('aws-sdk');
-global.s3 = new AWS.S3();
-
-// Check for S3 config
-if (!s3.config.credentials || !process.env.LAUNDRY_S3_BUCKET) {
-    console.log('S3 configuration not found. Set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,\nand LAUNDRY_S3_BUCKET environment variables.');
-    return;
-}
-
 // Make config folder
 var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 var configFolder = path.join(home, '.laundry');
@@ -52,6 +43,7 @@ log.level = 'debug';
 
 // Load internal classes into the global namespace.
 global.Helpers = require('./helpers');
+global.Storage = require('./storage');
 global.Job = require('./job');
 
 // Load washer class files in order of filename length, which also matches the inheritance order.
