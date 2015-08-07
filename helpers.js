@@ -50,6 +50,7 @@ Helpers.shortenUrl = function(url, callback) {
                 longUrl: url
             },
             qs: {
+                // Please don't abuse my precious goo.gl API key
                 key: 'AIzaSyA0K_cjd5UE4j04KK8t_En_x_Y-razJIE8',
             },
         },
