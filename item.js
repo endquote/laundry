@@ -80,15 +80,15 @@ Item.buildPrefix = function(jobName, className) {
 // Build an HTML video player.
 Item.buildVideo = function(videoUrl, thumbUrl) {
     if (thumbUrl) {
-        return util.format('<p><video controls poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbUrl, videoUrl);
+        return util.format('<p><video controls width="100%" poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbUrl, videoUrl);
     } else {
-        return util.format('<p><video controls src="%s" autobuffer="false" preload="none"></video></p>', videoUrl);
+        return util.format('<p><video controls width="100%" src="%s" autobuffer="false" preload="none"></video></p>', videoUrl);
     }
 };
 
 // Build an HTML audio player.
 Item.buildAudio = function(audioUrl) {
-    return util.format('<p><audio controls preload="none" src="%s" /></p>', audioUrl);
+    return util.format('<p><audio controls width="100%" preload="none" src="%s" /></p>', audioUrl);
 };
 
 module.exports = Item;
