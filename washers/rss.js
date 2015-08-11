@@ -30,6 +30,21 @@ Washers.RSS = function(config, job) {
     this.output = _.merge({
         description: 'Writes data to an RSS feed on disk.',
         settings: [{
+            name: 'file',
+            prompt: 'Where do you want to save the output?',
+            beforeEntry: function(rl, job, prompt, callback) {
+                if (laundryConfig.settings.storageMode === 'none' || laundryConfig.settings.storageMode === 'local') {
+                    callback(true, prompt, path.join(path.parse(commander.config).dir, job.name + '.xml'));
+                } else {
+                    callback(false);
+                }
+            },
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
+                Helpers.validateFile(newValue, function(isValid) {
+                    callback(!isValid);
+                });
+            }
+        }, {
             name: 'feedname',
             prompt: 'What do you want the title of the output feed to be?',
             beforeEntry: function(rl, job, prompt, callback) {

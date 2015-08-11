@@ -11,22 +11,8 @@ function Job(config) {
     this.output = config && config.output ? new allWashers[config.output.className](config.output, this) : null;
 }
 
-// Save the job file to disk.
-Job.prototype.save = function(callback) {
-    fs.writeFile(Job.getPath(this.name), JSON.stringify(this, function(key, value) {
-        return value && value.stringify && value.stringify instanceof Function ? value.stringify() : value;
-    }, 4), callback);
-};
-
 Job.prototype.del = function(callback) {
     fs.unlink(Job.getPath(this.name), callback);
-};
-
-// Return the file path for the job file.
-Job.getPath = function(jobName) {
-    var configFile = sanitize(jobName) + '.json';
-    var filePath = path.join(global.configFolder, configFile);
-    return filePath;
 };
 
 module.exports = Job;

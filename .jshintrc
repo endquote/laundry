@@ -1,6 +1,7 @@
 {
     "globals":
     {
+        "Laundry": true,
         "Washers": true, 
         "Items": true,
         "Washer": true,
@@ -11,6 +12,8 @@
         "allWashers": true,
         "allItems": true,
         "allJobs": true,
+        "laundryConfig": true,
+        "commander": true,
         
         "_": true,
         "ns": true,

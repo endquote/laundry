@@ -8,76 +8,15 @@ var Washer = require('./washer');
 var Job = require('./job');
 
 // Singleton Laundry class, generally the entry point to the whole thing.
-function Laundry() {
+function Laundry() {}
 
-    // Valid commands and their descriptions.
-    this._commands = {
-        'create': 'create [job] -- configure a new job',
-        'edit': 'edit [job] -- edit the configuration of an existing job',
-        'run': 'run [job] -- run an existing job (or "run all" to do that)',
-        'destroy': 'destroy [job] -- destroy an existing job',
-        'list': 'list -- list configured jobs',
-        'tick': 'tick -- run on an interval to run scheduled jobs',
-        'server': 'server [port] -- run continuously and serve up generated static content',
-        'version': 'version -- output version info',
-        'help': 'help -- this help text'
-    };
-
-    // Options to pass to the word wrap method.
-    this._wrapOpts = {
-        width: 70
-    };
-}
-
-// Is the command you're trying to run a real command?
-Laundry.prototype.isCommand = function(command) {
-    return command && this._commands[command.trim().toLowerCase()] !== undefined;
-};
-
-// Run a command.
-Laundry.prototype.doCommand = function(command, job, callback) {
-    if (!this.isCommand(command)) {
-        return false;
-    }
-
-    command = command.trim().toLowerCase();
-    if (['create', 'edit', 'run', 'destroy', 'server'].indexOf(command) !== -1) {
-        this[command](job, callback);
-    } else {
-        this[command](callback);
-    }
-};
-
-// Output version info.
-Laundry.prototype.version = function(callback) {
-    var p = require('./package.json');
-    var docs = '';
-    docs += '\nLaundry version ' + p.version + '\n';
-    console.log(docs);
-    if (callback) {
-        callback();
-    }
-};
-
-// Output help text.
-Laundry.prototype.help = function(callback) {
-    this.version();
-    var p = require('./package.json');
-    var docs = '';
-    docs += 'The available commands for laundry are as follows: \n\n';
-    for (var i in this._commands) {
-        docs += 'laundry ' + this._commands[i] + '\n';
-    }
-
-    docs += '\nFor more info see ' + p.homepage + '\n';
-    console.log(docs);
-    if (callback) {
-        callback();
-    }
+// Options to pass to the word wrap method.
+Laundry._wrapOpts = {
+    width: 70
 };
 
 // Create a new job.
-Laundry.prototype.create = function(jobName, callback) {
+Laundry.create = function(jobName, callback) {
     // Convert name to confirm to S3 bucket naming best practices
     jobName = jobName.toLowerCase(); // No capital letters (A-Z)
     jobName = jobName.replace('.', '-'); // No periods (.)
@@ -86,7 +25,7 @@ Laundry.prototype.create = function(jobName, callback) {
     jobName = jobName.substr(0, 32); // The bucket name must be less than or equal to 32 characters long
     if (!jobName || jobName === 'all') {
         console.log("Specify a name for the job with " + chalk.bold("laundry create [job]") + ".\n");
-        this.list(callback);
+        Laundry.list(callback);
         return;
     }
 
@@ -169,21 +108,26 @@ Laundry.prototype.create = function(jobName, callback) {
         }
 
     ], function(err, rl, job) {
-        if (!err && job) {
-            job.save();
-        }
-
-        rl.write("\n" + chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), that._wrapOpts)));
-        rl.close();
-        if (callback) {
-            callback();
+        if (err) {
+            callback(err);
+        } else if (job) {
+            allJobs.push(job);
+            Storage.saveConfig(function(err) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+                rl.write("\n" + chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), that._wrapOpts)));
+                rl.close();
+                callback();
+            });
         }
     });
 };
 
 // Tab completion function to complete washer names in the console. Weird.
 // https://nodejs.org/api/readline.html#readline_readline_createinterface_options
-Laundry.prototype._tabComplete = function(mode, line) {
+Laundry._tabComplete = function(mode, line) {
     line = line.toLowerCase();
     if (!line) {
         return [
@@ -213,7 +157,7 @@ Laundry.prototype._tabComplete = function(mode, line) {
 };
 
 // Prompt the user for an input or output washer.
-Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
+Laundry._askForWasher = function(rl, job, mode, callback) {
     var that = this;
 
     var validWashers = [];
@@ -274,7 +218,7 @@ Laundry.prototype._askForWasher = function(rl, job, mode, callback) {
 };
 
 // Given an input or output washer, find other jobs using a similar one and inherit settings from it.
-Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
+Laundry._inheritSettings = function(washer, mode, allJobs) {
     var washerClass = washer.className;
 
     // Collect the base classes that the washer inherits from.
@@ -318,7 +262,7 @@ Laundry.prototype._inheritSettings = function(washer, mode, allJobs) {
 };
 
 // Given a washer and an input/output mode, configure settings on the washer.
-Laundry.prototype._configureWasher = function(rl, job, mode, callback) {
+Laundry._configureWasher = function(rl, job, mode, callback) {
     var that = this;
     var washer = job[mode];
     async.eachSeries(washer[mode].settings, function(item, callback) {
@@ -384,7 +328,7 @@ Laundry.prototype._configureWasher = function(rl, job, mode, callback) {
     });
 };
 
-Laundry.prototype._scheduleJob = function(rl, job, allJobs, callback) {
+Laundry._scheduleJob = function(rl, job, allJobs, callback) {
     var that = this;
     var prompt = '';
     prompt += "Now to set when this job will run.\n";
@@ -449,135 +393,133 @@ Laundry.prototype._scheduleJob = function(rl, job, allJobs, callback) {
 };
 
 // Edit an existing job.
-Laundry.prototype.edit = function(jobName, callback) {
+Laundry.edit = function(jobName, callback) {
     if (!jobName) {
         console.log("Specify a job to edit with " + chalk.bold("laundry edit [job]") + ".\n");
-        this.list(callback);
+        Laundry.list(callback);
         return;
     }
 
-    this.create(jobName, callback);
+    Laundry.create(jobName, callback);
 };
 
 // Run a job.
-Laundry.prototype.run = function(jobName, callback) {
+Laundry.run = function(jobName, callback) {
     if (!jobName) {
         console.log("Specify a job to run with " + chalk.bold("laundry run [job]") + ".\n");
-        this.list(callback);
+        Laundry.list(callback);
         return;
     }
 
     jobName = jobName.toLowerCase();
 
-    var that = this;
     async.waterfall([
 
-            // Find the requested job.
-            function(callback) {
-                // Skip if it's all jobs.
-                if (jobName === 'all') {
-                    callback(null, null);
-                    return;
-                }
+        // Find the requested job.
+        function(callback) {
+            // Skip if it's all jobs.
+            if (jobName === 'all') {
+                callback(null, null);
+                return;
+            }
 
-                var job = allJobs.filter(function(job) {
-                    return job.name.toLowerCase() === jobName;
-                })[0];
-                if (!job) {
-                    console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
-                    that.list();
-                    callback(jobName);
-                } else {
-                    callback(null, job);
-                }
-            },
+            var job = allJobs.filter(function(job) {
+                return job.name.toLowerCase() === jobName;
+            })[0];
+            if (!job) {
+                console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
+                Laundry.list();
+                callback(jobName);
+            } else {
+                callback(null, job);
+            }
+        },
 
-            // Add any jobs which are scheduled to run after others.
-            function(job, callback) {
-                var runJobs = [job];
+        // Add any jobs which are scheduled to run after others.
+        function(job, callback) {
+            var runJobs = [job];
 
-                // If all jobs, select everything that isn't scheduled to run after something else.
-                if (jobName === 'all') {
-                    runJobs = allJobs.filter(function(job1) {
-                        return allJobs.filter(function(job2) {
-                            return job1.schedule.toString().toLowerCase() === job2.name.toLowerCase();
-                        }).length === 0;
-                    });
-                }
-
-                var foundJobs = false;
-                do {
-                    foundJobs = false;
-                    var runJobNames = runJobs.map(function(job, index, a) {
-                        return job.name.toLowerCase();
-                    }); // jshint ignore:line
-                    allJobs.forEach(function(job) {
-                        if (runJobs.indexOf(job) === -1) {
-                            var name = job.schedule ? job.schedule.toString() : '';
-                            name = name.toLowerCase();
-                            var index = runJobNames.indexOf(name);
-                            if (index !== -1) {
-                                runJobs.splice(index + 1, 0, job);
-                                foundJobs = true;
-                            }
-                        }
-                    }); // jshint ignore:line
-                } while (foundJobs);
-                callback(null, runJobs);
-            },
-
-            // Run all the jobs
-            function(jobs, callback) {
-                async.eachSeries(jobs, function(job, callback) {
-                    async.waterfall([
-
-                        function(callback) {
-                            log.info(job.name + "/" + job.input.name + " - input");
-                            job.input.doInput(function(err, items) {
-                                callback(err, job, items);
-                            });
-                        },
-
-                        function(job, items, callback) {
-                            log.info(job.name + "/" + job.output.name + " - output");
-                            job.output.doOutput(items, function(err) {
-                                callback(err, job);
-                            });
-                        }
-                    ], function(err, job) {
-                        if (!err) {
-                            job.lastRun = new Date();
-                            job.save();
-                            log.info(job.name + " - complete");
-                        } else {
-                            log.error(job.name + " - error: " + util.inspect(err, {
-                                depth: 99
-                            }));
-                        }
-
-                        callback(null, job);
-                    });
-                }, function(err) {
-                    callback(err);
+            // If all jobs, select everything that isn't scheduled to run after something else.
+            if (jobName === 'all') {
+                runJobs = allJobs.filter(function(job1) {
+                    return allJobs.filter(function(job2) {
+                        return job1.schedule.toString().toLowerCase() === job2.name.toLowerCase();
+                    }).length === 0;
                 });
             }
-        ],
-        function(err) {
-            if (callback) {
+
+            var foundJobs = false;
+            do {
+                foundJobs = false;
+                var runJobNames = runJobs.map(function(job, index, a) {
+                    return job.name.toLowerCase();
+                }); // jshint ignore:line
+                allJobs.forEach(function(job) {
+                    if (runJobs.indexOf(job) === -1) {
+                        var name = job.schedule ? job.schedule.toString() : '';
+                        name = name.toLowerCase();
+                        var index = runJobNames.indexOf(name);
+                        if (index !== -1) {
+                            runJobs.splice(index + 1, 0, job);
+                            foundJobs = true;
+                        }
+                    }
+                }); // jshint ignore:line
+            } while (foundJobs);
+            callback(null, runJobs);
+        },
+
+        // Run all the jobs
+        function(jobs, callback) {
+            async.eachSeries(jobs, function(job, callback) {
+                async.waterfall([
+
+                    function(callback) {
+                        log.info(job.name + "/" + job.input.name + " - input");
+                        job.input.doInput(function(err, items) {
+                            callback(err, job, items);
+                        });
+                    },
+
+                    function(job, items, callback) {
+                        log.info(job.name + "/" + job.output.name + " - output");
+                        job.output.doOutput(items, function(err) {
+                            callback(err, job);
+                        });
+                    }
+                ], function(err, job) {
+                    if (!err) {
+                        job.lastRun = new Date();
+                        Storage.saveConfig(function() {
+                            callback(null, job);
+                        });
+                        log.info(job.name + " - complete");
+                    } else {
+                        log.error(job.name + " - error: " + util.inspect(err, {
+                            depth: 99
+                        }));
+                        callback(null, job);
+                    }
+                });
+            }, function(err) {
                 callback(err);
-            }
-        });
+            });
+        }
+    ], function(err) {
+        if (callback) {
+            callback(err);
+        }
+    });
 };
 
 // Destroy a job.
-Laundry.prototype.destroy = function(jobName, callback) {
+Laundry.destroy = function(jobName, callback) {
     if (!jobName) {
         console.log("Specify a job to edit with " + chalk.bold("laundry destroy [job]") + ".\n");
-        this.list(callback);
+        Laundry.list(callback);
         return;
     }
 
-    var that = this;
     var job = null;
 
     async.waterfall([
@@ -589,7 +531,7 @@ Laundry.prototype.destroy = function(jobName, callback) {
                 })[0];
                 if (!job) {
                     console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
-                    that.list();
+                    Laundry.list();
                     callback(jobName);
                 } else {
                     callback(null, job);
@@ -608,15 +550,15 @@ Laundry.prototype.destroy = function(jobName, callback) {
 
             // Confirm and destroy.
             function(rl, job, callback) {
-                rl.question(wrap(util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name), that._wrapOpts) + "\n", function(answer) {
+                rl.question(wrap(util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name), Laundry._wrapOpts) + "\n", function(answer) {
                     answer = chalk.stripColor(answer).trim().toLowerCase();
                     if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
                         job.del(function(err) {
-                            rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyd."), job.name), that._wrapOpts) + "\n");
+                            rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyd."), job.name), Laundry._wrapOpts) + "\n");
                             callback(err, rl);
                         });
                     } else {
-                        rl.write(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name), that._wrapOpts) + "\n");
+                        rl.write(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name), Laundry._wrapOpts) + "\n");
                         callback(null, rl);
                     }
                 });
@@ -634,7 +576,7 @@ Laundry.prototype.destroy = function(jobName, callback) {
 };
 
 // List current jobs.
-Laundry.prototype.list = function(callback) {
+Laundry.list = function(callback) {
     var out = 'Current jobs: \n';
 
     if (!allJobs.length) {
@@ -664,7 +606,7 @@ Laundry.prototype.list = function(callback) {
 };
 
 // Run jobs according to their schedule.
-Laundry.prototype.tick = function(callback) {
+Laundry.tick = function(callback) {
     var now = moment();
     var that = this;
 
@@ -718,9 +660,4 @@ Laundry.prototype.tick = function(callback) {
     });
 };
 
-// Run continuously and serve up generated static content.
-Laundry.prototype.server = function(port) {
-
-};
-
-module.exports = new Laundry();
+module.exports = Laundry;

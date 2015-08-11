@@ -62,6 +62,22 @@ Helpers.shortenUrl = function(url, callback) {
         });
 };
 
+// Given a file path, try to write to it.
+Helpers.validateFile = function(file, callback) {
+    file = Helpers.cleanString(file);
+    file = path.resolve(file);
+    fs.mkdirp(path.dirname(file), function(err) {
+        if (err) {
+            callback(null);
+            return;
+        }
+
+        touch(file, {}, function(err) {
+            callback(err ? false : true);
+        });
+    });
+};
+
 // Given a file path, try to create a directory.
 Helpers.validateDirectory = function(dir, callback) {
     dir = Helpers.cleanString(dir);
@@ -97,8 +113,8 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
     }
     log.debug(JSON.stringify(options));
     options.json = true;
-    if (process.argv.indexOf('proxy') !== -1) {
-        options.proxy = 'http://localhost:8888';
+    if (commander.proxy) {
+        options.proxy = commander.proxy;
         options.rejectUnauthorized = false;
     }
     request(options, function(err, response, body) {
