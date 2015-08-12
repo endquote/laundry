@@ -47,7 +47,7 @@ Storage.downloadUrl = function(url, target, cache, useYTDL, callback) {
                 log.debug('Found ' + target);
                 result.newUrl = resultUrl;
 
-                // Don't call the callback syncronously, interesting: https://github.com/caolan/async/issues/75
+                // Don't call the callback synchronously, interesting: https://github.com/caolan/async/issues/75
                 process.nextTick(function() {
                     callback(null, result);
                 });
@@ -95,13 +95,8 @@ Storage.downloadUrl = function(url, target, cache, useYTDL, callback) {
                         return;
                     }
 
-                    console.log(response);
-                    fs.writeFile(target, response, function(err) {
-                        if (!err) {
-                            result.newUrl = resultUrl;
-                        }
-                        callback(err, result);
-                    });
+                    response.pipe(fs.createWriteStream(target));
+                    callback(err, result);
                 });
 
 
@@ -134,7 +129,12 @@ Storage.cacheObjects = function(prefix, callback) {
         prefix = path.join(path.parse(commander.config).dir, prefix);
         fs.exists(prefix, function(exists) {
             if (exists) {
-                fs.readdir(prefix, callback);
+                fs.readdir(prefix, function(err, files) {
+                    files = files.map(function(file) {
+                        return prefix + '/' + file;
+                    });
+                    callback(err, files);
+                });
             } else {
                 callback(null, []);
             }
@@ -173,12 +173,35 @@ Storage.cacheObjects = function(prefix, callback) {
     }
 };
 
-// Delete S3 objects with a last-modified before a given date.
+// Delete files with a last-modified before a given date.
 Storage.deleteBefore = function(prefix, date, callback) {
     if (laundryConfig.settings.storageMode === 'none') {
         callback(null);
     } else if (laundryConfig.settings.storageMode === 'local') {
-        log.error('Implement deleteBefore');
+
+        log.debug('Cleaning ' + prefix);
+
+        prefix = path.join(path.parse(commander.config).dir, prefix);
+        fs.exists(prefix, function(exists) {
+            if (!exists) {
+                callback(null);
+                return;
+            }
+            fs.readdir(prefix, function(err, files) {
+                async.each(files, function(file, callback) {
+                    file = prefix + '/' + file;
+                    fs.stat(file, function(err, stat) {
+                        if (stat.mtime < date) {
+                            fs.unlink(file, callback);
+                        } else {
+                            callback(err);
+                        }
+                    });
+                }, callback);
+            });
+        });
+
+
     } else if (laundryConfig.settings.storageMode === 's3') {
 
         log.debug('Cleaning ' + prefix);
