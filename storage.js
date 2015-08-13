@@ -126,12 +126,12 @@ Storage.cacheObjects = function(prefix, callback) {
             callback(null);
         });
     } else if (laundryConfig.settings.storageMode === 'local') {
-        prefix = path.join(path.parse(commander.config).dir, prefix);
-        fs.exists(prefix, function(exists) {
+        var p = path.join(path.parse(commander.config).dir, prefix);
+        fs.exists(p, function(exists) {
             if (exists) {
-                fs.readdir(prefix, function(err, files) {
+                fs.readdir(p, function(err, files) {
                     files = files.map(function(file) {
-                        return prefix + '/' + file;
+                        return p + '/' + file;
                     });
                     callback(err, files);
                 });
@@ -181,15 +181,15 @@ Storage.deleteBefore = function(prefix, date, callback) {
 
         log.debug('Cleaning ' + prefix);
 
-        prefix = path.join(path.parse(commander.config).dir, prefix);
-        fs.exists(prefix, function(exists) {
+        var p = path.join(path.parse(commander.config).dir, prefix);
+        fs.exists(p, function(exists) {
             if (!exists) {
                 callback(null);
                 return;
             }
-            fs.readdir(prefix, function(err, files) {
+            fs.readdir(p, function(err, files) {
                 async.each(files, function(file, callback) {
-                    file = prefix + '/' + file;
+                    file = p + '/' + file;
                     fs.stat(file, function(err, stat) {
                         if (stat.mtime < date) {
                             fs.unlink(file, callback);
@@ -304,10 +304,6 @@ Storage.loadConfig = function(callback) {
     });
 
     if (commander.config) {
-        if (commander.s3key && commander.s3secret && commander.s3bucket) {
-            log.warn('S3 credentials are specified, but using local config.');
-        }
-
         // Get config from disk
         var loaded = false;
         if (fs.existsSync(commander.config)) {
