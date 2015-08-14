@@ -298,6 +298,8 @@ Storage.loadConfig = function(callback) {
         jobs: []
     };
 
+    var loaded = false;
+
     Storage.s3 = new AWS.S3({
         accessKeyId: commander.s3key,
         secretAccessKey: commander.s3secret
@@ -305,26 +307,46 @@ Storage.loadConfig = function(callback) {
 
     if (commander.config) {
         // Get config from disk
-        var loaded = false;
-        if (fs.existsSync(commander.config)) {
+        fs.readFile(commander.config, {
+            encoding: 'utf8'
+        }, function(err, data) {
             try {
-                laundryConfig = JSON.parse(fs.readFileSync(commander.config));
+                laundryConfig = JSON.parse(data);
                 loaded = true;
             } catch (e) {}
-        }
-        if (!loaded) {
-            log.warn(util.format('Config file %s could not be loaded, using default config.', commander.config));
-        }
+            parseConfig();
+        });
     } else if (commander.s3key && commander.s3secret && commander.s3bucket) {
         // Get config from S3
+        Storage.s3.getObject({
+            Bucket: commander.s3bucket,
+            ResponseContentEncoding: 'utf8',
+            Key: 'jobs/config.json'
+        }, function(err, data) {
+            if (!err) {
+                try {
+                    global.laundryConfig = JSON.parse(data.Body.toString());
+                    loaded = true;
+                } catch (e) {}
+            }
+            parseConfig();
+        });
+    } else {
+        log.warn('No config... bootstrap?');
     }
 
-    laundryConfig.jobs.forEach(function(jobConfig) {
-        allJobs.push(new Job(jobConfig));
-    });
+    function parseConfig() {
+        if (!loaded) {
+            log.warn('Config file could not be loaded, using default config.');
+        }
 
-    if (callback) {
-        callback(laundryConfig);
+        laundryConfig.jobs.forEach(function(jobConfig) {
+            allJobs.push(new Job(jobConfig));
+        });
+
+        if (callback) {
+            callback(laundryConfig);
+        }
     }
 };
 
@@ -338,21 +360,23 @@ Storage.saveConfig = function(callback) {
     if (commander.config) {
         // Save config to disk
         var p = path.parse(commander.config);
-        var saved = false;
-        try {
-            fs.mkdirpSync(p.dir);
-            fs.writeFileSync(commander.config, configString);
-            saved = true;
-        } catch (e) {
-            console.log(e);
-        }
-        if (!saved) {
-            log.error(util.format('Config file %s could not be saved.', commander.config));
-        }
-
-        callback(!saved);
+        fs.mkdir(p.dir, function(err) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            fs.writeFile(commander.config, configString, function(err) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+            });
+        });
     } else if (commander.s3key && commander.s3secret && commander.s3bucket) {
         // Save config to s3
+        Storage.writeFile('/jobs/config.json', configString, callback);
+    } else {
+        log.error('Nowhere to save config...');
     }
 };
 

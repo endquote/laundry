@@ -58,13 +58,10 @@ fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
 // Read the config file
 global.allJobs = [];
 
-var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-var defaultConfig = path.join(home, 'laundry', 'config.json');
-
 // Set up arguments.
 commander
     .version(JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'))).version)
-    .option('--config [path]', 'local config file to use, default is LAUNDRY_CONFIG', process.env.LAUNDRY_CONFIG || defaultConfig)
+    .option('--config [path]', 'local config file to use, default is LAUNDRY_CONFIG', process.env.LAUNDRY_CONFIG)
     .option('--s3key [key]', 'S3 access key ID, default is LAUNDRY_S3_KEY', process.env.LAUNDRY_S3_KEY)
     .option('--s3secret [secret]', 'S3 access key secret, default is LAUNDRY_S3_SECRET', process.env.LAUNDRY_S3_SECRET)
     .option('--s3bucket [bucket]', 'S3 bucket, default is LAUNDRY_S3_BUCKET', process.env.LAUNDRY_S3_BUCKET)
@@ -123,13 +120,6 @@ commander.command('tick')
     });
 
 commander.parse(process.argv);
-
-// Default to local config.
-if (!commander.config && !(commander.s3key && commander.s3secret && commander.s3bucket)) {
-    var home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-    commander.config = path.join(home, 'laundry', 'config.json');
-    commander.parse(process.argv);
-}
 
 // If no command, show help.
 if (commander.args.filter(function(arg) {
