@@ -29,18 +29,16 @@ Washers.RSS = function(config, job) {
 
     this.output = _.merge({
         description: 'Writes data to an RSS feed on disk.',
-        settings: [
-            Washer.storageModeSetting, {
-                name: 'feedname',
-                prompt: 'What do you want the title of the output feed to be?',
-                beforeEntry: function(rl, job, prompt, callback) {
-                    callback(true, prompt, job.name);
-                },
-                afterEntry: function(rl, job, oldValue, newValue, callback) {
-                    callback(validator.isWhitespace(newValue));
-                }
+        settings: [{
+            name: 'feedname',
+            prompt: 'What do you want the title of the output feed to be?',
+            beforeEntry: function(rl, job, prompt, callback) {
+                callback(true, prompt, job.name);
+            },
+            afterEntry: function(rl, job, oldValue, newValue, callback) {
+                callback(validator.isWhitespace(newValue));
             }
-        ]
+        }]
     }, this.output);
 };
 
@@ -164,9 +162,9 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
 
     var target = Item.buildPrefix(this._job.name, this.className) + '/feed.xml';
 
-    Storage.writeFile(this.storageMode, target, xml, function(err, url) {
-        if (url) {
-            log.info('The feed is available at ' + url);
+    Storage.writeFile(target, xml, function(err, destination) {
+        if (destination) {
+            log.info('The feed is available at ' + destination);
         }
         callback(err);
     });

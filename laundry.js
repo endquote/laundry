@@ -4,9 +4,6 @@ var readline = require('readline'); // https://nodejs.org/api/readline.html
 var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 
-var Washer = require('./washer');
-var Job = require('./job');
-
 // Singleton Laundry class, generally the entry point to the whole thing.
 function Laundry() {}
 
@@ -29,8 +26,6 @@ Laundry.create = function(jobName, callback) {
         return;
     }
 
-    var that = this;
-
     // input, output, or null -- used to control the completion behavior
     var mode = null;
 
@@ -42,7 +37,7 @@ Laundry.create = function(jobName, callback) {
                 input: process.stdin,
                 output: process.stdout,
                 completer: function(line) {
-                    return that._tabComplete(mode, line);
+                    return Laundry._tabComplete(mode, line);
                 }
             });
             callback(null, rl);
@@ -54,10 +49,10 @@ Laundry.create = function(jobName, callback) {
                 return job && job.name.toLowerCase() === jobName.toLowerCase();
             })[0];
             if (job) {
-                rl.write(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.\n", jobName), that._wrapOpts));
+                rl.write(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.\n", jobName), Laundry._wrapOpts));
                 callback(null, rl, job);
             } else {
-                rl.write(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".\n", jobName), that._wrapOpts));
+                rl.write(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".\n", jobName), Laundry._wrapOpts));
                 job = new Job({
                     name: jobName
                 });
@@ -68,7 +63,7 @@ Laundry.create = function(jobName, callback) {
         // Ask for the input washer.
         function(rl, job, callback) {
             mode = 'input';
-            that._askForWasher(rl, job, mode, function(err) {
+            Laundry._askForWasher(rl, job, mode, function(err) {
                 callback(err, rl, job);
             });
         },
@@ -76,8 +71,8 @@ Laundry.create = function(jobName, callback) {
         // Configure the input washer.
         function(rl, job, callback) {
             mode = null;
-            that._inheritSettings(job.input, 'input', allJobs);
-            that._configureWasher(rl, job, 'input', function(err) {
+            Laundry._inheritSettings(job.input, 'input', allJobs);
+            Laundry._configureWasher(rl, job, 'input', function(err) {
                 callback(err, rl, job);
             });
         },
@@ -85,7 +80,7 @@ Laundry.create = function(jobName, callback) {
         // Request the output washer.
         function(rl, job, callback) {
             mode = 'output';
-            that._askForWasher(rl, job, mode, function(err) {
+            Laundry._askForWasher(rl, job, mode, function(err) {
                 callback(err, rl, job);
             });
         },
@@ -93,8 +88,8 @@ Laundry.create = function(jobName, callback) {
         // Configure the output washer.
         function(rl, job, callback) {
             mode = null;
-            that._inheritSettings(job.output, 'output', allJobs);
-            that._configureWasher(rl, job, 'output', function(err) {
+            Laundry._inheritSettings(job.output, 'output', allJobs);
+            Laundry._configureWasher(rl, job, 'output', function(err) {
                 callback(err, rl, job);
             });
         },
@@ -102,7 +97,7 @@ Laundry.create = function(jobName, callback) {
         // Configure scheduling.
         function(rl, job, callback) {
             mode = null;
-            that._scheduleJob(rl, job, allJobs, function(err) {
+            Laundry._scheduleJob(rl, job, allJobs, function(err) {
                 callback(err, rl, job);
             });
         }
@@ -111,13 +106,15 @@ Laundry.create = function(jobName, callback) {
         if (err) {
             callback(err);
         } else if (job) {
-            allJobs.push(job);
+            if (allJobs.indexOf(job) === -1) {
+                allJobs.push(job);
+            }
             Storage.saveConfig(function(err) {
                 if (err) {
                     callback(err);
                     return;
                 }
-                rl.write("\n" + chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), that._wrapOpts)));
+                rl.write("\n" + chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), Laundry._wrapOpts)));
                 rl.close();
                 callback();
             });
@@ -158,8 +155,6 @@ Laundry._tabComplete = function(mode, line) {
 
 // Prompt the user for an input or output washer.
 Laundry._askForWasher = function(rl, job, mode, callback) {
-    var that = this;
-
     var validWashers = [];
     for (var i in allWashers) {
         var w = new allWashers[i]();
@@ -187,24 +182,24 @@ Laundry._askForWasher = function(rl, job, mode, callback) {
     }
 
     var list = util.format(prompt, washersList);
-    rl.write("\n" + wrap(list, that._wrapOpts));
+    rl.write("\n" + wrap(list, Laundry._wrapOpts));
 
     var washer = null;
     async.whilst(function() {
             return washer === null || washer === undefined;
         }, function(callback) {
-            rl.question(wrap(question, that._wrapOpts), function(answer) {
+            rl.question(wrap(question, Laundry._wrapOpts), function(answer) {
                 answer = chalk.stripColor(answer).trim();
                 washer = validWashers.filter(function(washer) {
                     return washer.name.toLowerCase() === answer.toLowerCase();
                 })[0];
                 if (washer) {
-                    rl.write(wrap(util.format(confirm, washer.name), that._wrapOpts) + '\n\n');
+                    rl.write(wrap(util.format(confirm, washer.name), Laundry._wrapOpts) + '\n\n');
                     if (!job[mode] || job[mode].name !== washer.name) {
                         job[mode] = washer;
                     }
                 } else {
-                    rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), that._wrapOpts));
+                    rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), Laundry._wrapOpts));
                 }
                 callback();
             });
@@ -263,7 +258,6 @@ Laundry._inheritSettings = function(washer, mode, allJobs) {
 
 // Given a washer and an input/output mode, configure settings on the washer.
 Laundry._configureWasher = function(rl, job, mode, callback) {
-    var that = this;
     var washer = job[mode];
     async.eachSeries(washer[mode].settings, function(item, callback) {
         var valid = false;
@@ -300,14 +294,14 @@ Laundry._configureWasher = function(rl, job, mode, callback) {
                         }
 
                         // Show the prompt...
-                        rl.question(wrap(prompt + ' ', that._wrapOpts), function(answer) {
+                        rl.question(wrap(prompt + ' ', Laundry._wrapOpts), function(answer) {
                             answer = Helpers.cleanString(answer);
                             // Call the after entry method
                             item.afterEntry.apply(washer, [rl, job, washer[item.name], answer,
                                 function(err) {
                                     if (err) {
                                         // Reject the answer
-                                        rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                                        rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), Laundry._wrapOpts));
                                     } else {
                                         // Save the answer
                                         valid = true;
@@ -329,26 +323,25 @@ Laundry._configureWasher = function(rl, job, mode, callback) {
 };
 
 Laundry._scheduleJob = function(rl, job, allJobs, callback) {
-    var that = this;
     var prompt = '';
     prompt += "Now to set when this job will run.\n";
     prompt += "- Leave blank to run only when 'laundry run [job]' is called.\n";
     prompt += "- Enter a number to run after so many minutes. Entering 60 will run the job every hour.\n";
     prompt += "- Enter a time to run at a certain time every day, like '9:30' or '13:00'.\n";
     prompt += "- Enter the name of another job to run after that job runs.\n\n";
-    rl.write("\n" + wrap(prompt, that._wrapOpts));
+    rl.write("\n" + wrap(prompt, Laundry._wrapOpts));
 
     var valid = false;
     async.whilst(function() {
             return !valid;
         },
         function(callback) {
-            rl.question(wrap("How do you want the job to be scheduled? ", that._wrapOpts), function(answer) {
+            rl.question(wrap("How do you want the job to be scheduled? ", Laundry._wrapOpts), function(answer) {
                 answer = chalk.stripColor(answer).trim().toLowerCase();
 
                 if (!answer) {
                     valid = true;
-                    rl.write(wrap(util.format("This job will only be run manually.\n"), that._wrapOpts));
+                    rl.write(wrap(util.format("This job will only be run manually.\n"), Laundry._wrapOpts));
                 } else if (answer.indexOf(':') !== -1) {
                     var time = moment({
                         hour: answer.split(':')[0],
@@ -357,13 +350,13 @@ Laundry._scheduleJob = function(rl, job, allJobs, callback) {
                     valid = time.isValid();
                     if (valid) {
                         answer = time.hour() + ':' + time.minute();
-                        rl.write(wrap(util.format("This job will run every day at %s.\n", answer), that._wrapOpts));
+                        rl.write(wrap(util.format("This job will run every day at %s.\n", answer), Laundry._wrapOpts));
                     }
                 } else if (!isNaN(parseInt(answer))) {
                     answer = parseInt(answer);
                     valid = answer > 0;
                     if (valid) {
-                        rl.write(wrap(util.format("This job will run every %d minutes.\n", answer), that._wrapOpts));
+                        rl.write(wrap(util.format("This job will run every %d minutes.\n", answer), Laundry._wrapOpts));
                     }
                 } else {
                     if (answer !== job.name.toLowerCase()) {
@@ -371,7 +364,7 @@ Laundry._scheduleJob = function(rl, job, allJobs, callback) {
                             if (job.name.toLowerCase() === answer) {
                                 valid = true;
                                 answer = job.name;
-                                rl.write(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".\n", answer), that._wrapOpts));
+                                rl.write(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".\n", answer), Laundry._wrapOpts));
                             }
                         });
                     }
@@ -380,7 +373,7 @@ Laundry._scheduleJob = function(rl, job, allJobs, callback) {
                 if (valid) {
                     job.schedule = answer;
                 } else {
-                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), that._wrapOpts));
+                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), Laundry._wrapOpts));
                 }
                 callback();
             });
@@ -608,7 +601,6 @@ Laundry.list = function(callback) {
 // Run jobs according to their schedule.
 Laundry.tick = function(callback) {
     var now = moment();
-    var that = this;
 
     async.waterfall([
 
@@ -642,7 +634,7 @@ Laundry.tick = function(callback) {
         // Run the jobs
         function(jobs, callback) {
             async.eachSeries(jobs, function(job, callback) {
-                that.run(job.name, callback);
+                Laundry.run(job.name, callback);
             }, function(err) {
                 if (!jobs.length) {
                     log.info('No jobs to run.');

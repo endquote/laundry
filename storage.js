@@ -22,6 +22,9 @@ Storage.downloadUrl = function(url, target, cache, useYTDL, callback) {
         ytdl: null
     };
 
+    callback(result);
+    return;
+
     if (!url) {
         callback(null, result);
         return;
@@ -121,6 +124,8 @@ Storage.downloadUrl = function(url, target, cache, useYTDL, callback) {
 
 // Given a prefix, return all the matching keys.
 Storage.cacheObjects = function(prefix, callback) {
+    callback(null, []);
+    return;
     if (laundryConfig.settings.storageMode === 'none') {
         process.nextTick(function() {
             callback(null);
@@ -175,6 +180,8 @@ Storage.cacheObjects = function(prefix, callback) {
 
 // Delete files with a last-modified before a given date.
 Storage.deleteBefore = function(prefix, date, callback) {
+    callback(null);
+    return;
     if (laundryConfig.settings.storageMode === 'none') {
         callback(null);
     } else if (laundryConfig.settings.storageMode === 'local') {
@@ -265,39 +272,14 @@ Storage.deleteBefore = function(prefix, date, callback) {
 };
 
 // Write some data to a file.
-Storage.writeFile = function(storageMode, target, contents, callback) {
-    if (storageMode === 'local') {
+Storage.writeFile = function(target, contents, callback) {
+    if (commander.local) {
         Storage.Local.writeFile(target, contents, callback);
-    } else if (storageMode === 's3') {
+    } else if (commander.s3key && commander.s3secret && commander.s3bucket) {
         Storage.S3.writeFile(target, contents, callback);
-    } else if (storageMode === 'none') {
-        callback();
     } else {
-        log.error('Invalid storageMode ' + storageMode);
+        callback();
     }
-    /*
-    if (laundryConfig.settings.storageMode === 'none' || laundryConfig.settings.storageMode === 'local') {
-        target = path.join(path.parse(commander.config).dir, target);
-        fs.mkdirp(path.parse(target).dir, function(err) {
-            if (err) {
-                callback(err);
-                return;
-            }
-            fs.writeFile(target, contents, callback);
-        });
-    } else if (laundryConfig.settings.storageMode === 's3') {
-        target = target.replace(/^\//, ''); // remove leading slash for S3
-        var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', commander.s3bucket, target);
-        Storage.s3.upload({
-            Bucket: commander.s3bucket,
-            Key: target,
-            Body: contents,
-            ContentType: mime.lookup(target.split('.').pop())
-        }, function(err) {
-            callback(err, err || resultUrl);
-        });
-    }
-    */
 };
 
 Storage.loadConfig = function(callback) {
@@ -324,62 +306,14 @@ Storage.loadConfig = function(callback) {
     }
 
     if (commander.local) {
-        Storage.Local.readFileString(path.join(commander.local, 'config.json'), parseConfig);
+        log.debug('Loading local config');
+        Storage.Local.readFileString('config.json', parseConfig);
     } else if (commander.s3key && commander.s3secret && commander.s3bucket) {
+        log.debug('Loading S3 config');
         Storage.S3.readFileString('config.json', parseConfig);
     } else {
         callback('Either a local path or S3 credentials must be specified.');
     }
-    /*
-    Storage.s3 = new AWS.S3({
-        accessKeyId: commander.s3key,
-        secretAccessKey: commander.s3secret
-    });
-
-    if (commander.config) {
-        // Get config from disk
-        fs.readFile(commander.config, {
-            encoding: 'utf8'
-        }, function(err, data) {
-            try {
-                laundryConfig = JSON.parse(data);
-                loaded = true;
-            } catch (e) {}
-            parseConfig();
-        });
-    } else if (commander.s3key && commander.s3secret && commander.s3bucket) {
-        // Get config from S3
-        Storage.s3.getObject({
-            Bucket: commander.s3bucket,
-            ResponseContentEncoding: 'utf8',
-            Key: 'jobs/config.json'
-        }, function(err, data) {
-            if (!err) {
-                try {
-                    global.laundryConfig = JSON.parse(data.Body.toString());
-                    loaded = true;
-                } catch (e) {}
-            }
-            parseConfig();
-        });
-    } else {
-        log.warn('No config... bootstrap?');
-    }
-
-    function parseConfig() {
-        if (!loaded) {
-            log.warn('Config file could not be loaded, using default config.');
-        }
-
-        laundryConfig.jobs.forEach(function(jobConfig) {
-            allJobs.push(new Job(jobConfig));
-        });
-
-        if (callback) {
-            callback(laundryConfig);
-        }
-    }
-    */
 };
 
 Storage.saveConfig = function(callback) {
@@ -388,10 +322,12 @@ Storage.saveConfig = function(callback) {
         return value && value.stringify && value.stringify instanceof Function ? value.stringify() : value;
     }, 4);
 
-    if (commander.config) {
-        Storage.Local.writeFile(commander.config, configString, callback);
+    if (commander.local) {
+        log.debug('Saving local config');
+        Storage.Local.writeFile('config.json', configString, callback);
     } else if (commander.s3key && commander.s3secret && commander.s3bucket) {
-        Storage.S3.writeFile('/jobs/config.json', configString, callback);
+        log.debug('Saving S3 config');
+        Storage.S3.writeFile('config.json', configString, callback);
     } else {
         callback('Nowhere to save config...');
     }

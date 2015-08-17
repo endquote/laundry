@@ -4,6 +4,7 @@ ns('Storage', global);
 Storage.Local = function() {};
 
 Storage.Local.readFileString = function(target, callback) {
+    target = path.join(commander.local, target);
     fs.readFile(target, {
         encoding: 'utf8'
     }, callback);
@@ -17,7 +18,9 @@ Storage.Local.writeFile = function(target, contents, callback) {
             callback(err);
             return;
         }
-        fs.writeFile(target, contents, callback);
+        fs.writeFile(target, contents, function(err) {
+            callback(err, target);
+        });
     });
 };
 
