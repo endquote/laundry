@@ -38,6 +38,15 @@ var Washer = function(config, job) {
 
 Washer.className = Helpers.buildClassName(__filename);
 
+Washer.storageModeSetting = {
+    name: 'storageMode',
+    prompt: 'How do you want to save the output? Options are "local", "s3", or "none".',
+    afterEntry: function(rl, job, oldValue, newValue, callback) {
+        newValue = newValue.toLowerCase();
+        callback(newValue !== 'local' && newValue !== 's3' && newValue !== 'none');
+    }
+};
+
 // Remove stuff from the washer that's saved to disk.
 Washer.prototype.stringify = function() {
     var c = _.clone(this);

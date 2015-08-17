@@ -21,8 +21,10 @@ global.commander = require('commander'); // https://www.npmjs.com/package/comman
 
 // Load internal classes into the global namespace.
 global.Helpers = require('./helpers');
-global.Storage = require('./storage');
 global.Job = require('./job');
+
+global.Storage = require('./storage');
+require('./storage/local');
 
 // Configure logging.
 global.log = require('winston'); // https://github.com/winstonjs/winston
@@ -55,13 +57,12 @@ fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
     allItems[c.className] = require(path.join(__dirname, 'items', file));
 });
 
-// Read the config file
 global.allJobs = [];
 
 // Set up arguments.
 commander
     .version(JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'))).version)
-    .option('--config [path]', 'local config file to use, default is LAUNDRY_CONFIG', process.env.LAUNDRY_CONFIG)
+    .option('--local [path]', 'path to use for local file storage, default is LAUNDRY_LOCAL', process.env.LAUNDRY_LOCAL)
     .option('--s3key [key]', 'S3 access key ID, default is LAUNDRY_S3_KEY', process.env.LAUNDRY_S3_KEY)
     .option('--s3secret [secret]', 'S3 access key secret, default is LAUNDRY_S3_SECRET', process.env.LAUNDRY_S3_SECRET)
     .option('--s3bucket [bucket]', 'S3 bucket, default is LAUNDRY_S3_BUCKET', process.env.LAUNDRY_S3_BUCKET)
@@ -74,49 +75,37 @@ commander
 commander.command('create [job]')
     .description('configure a new job')
     .action(function(job) {
-        Storage.loadConfig(function() {
-            Laundry.create(job, onComplete);
-        });
+        runCommand(Laundry.create, job);
     });
 
 commander.command('edit [job]')
     .description('edit an existing job')
     .action(function(job) {
-        Storage.loadConfig(function() {
-            Laundry.edit(job, onComplete);
-        });
+        runCommand(Laundry.edit, job);
     });
 
 commander.command('run [job]')
     .description('run an existing job (or "all" to run all jobs)')
     .action(function(job) {
-        Storage.loadConfig(function() {
-            Laundry.run(job, onComplete);
-        });
+        runCommand(Laundry.run, job);
     });
 
 commander.command('destroy [job]')
     .description('destroy an existing job')
     .action(function(job) {
-        Storage.loadConfig(function() {
-            Laundry.destroy(job, onComplete);
-        });
+        runCommand(Laundry.destroy, job);
     });
 
 commander.command('list')
     .description('list configured jobs')
     .action(function() {
-        Storage.loadConfig(function() {
-            Laundry.list(onComplete);
-        });
+        runCommand(Laundry.list);
     });
 
 commander.command('tick')
     .description('run on an interval or cron to trigger scheduled jobs')
     .action(function() {
-        Storage.loadConfig(function() {
-            Laundry.tick(onComplete);
-        });
+        runCommand(Laundry.tick);
     });
 
 commander.parse(process.argv);
@@ -128,7 +117,23 @@ if (commander.args.filter(function(arg) {
     commander.help();
 }
 
+function runCommand() {
+    var args = Array.prototype.slice.call(arguments);
+    var cmd = args.shift();
+    args.push(onComplete);
+    Storage.loadConfig(function(err) {
+        if (err) {
+            onComplete(err);
+            return;
+        }
+        cmd.apply(null, args);
+    });
+}
+
 // Output execution time.
-function onComplete() {
+function onComplete(err) {
+    if (err) {
+        log.error(err);
+    }
     log.debug(Date.now() - processStart + 'ms');
 }
