@@ -546,7 +546,8 @@ Laundry.destroy = function(jobName, callback) {
                 rl.question(wrap(util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name), Laundry._wrapOpts) + "\n", function(answer) {
                     answer = chalk.stripColor(answer).trim().toLowerCase();
                     if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
-                        job.del(function(err) {
+                        allJobs.splice(allJobs.indexOf(job), 1);
+                        Storage.saveConfig(function(err) {
                             rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyd."), job.name), Laundry._wrapOpts) + "\n");
                             callback(err, rl);
                         });

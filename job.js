@@ -11,8 +11,4 @@ function Job(config) {
     this.output = config && config.output ? new allWashers[config.output.className](config.output, this) : null;
 }
 
-Job.prototype.del = function(callback) {
-    fs.unlink(Job.getPath(this.name), callback);
-};
-
 module.exports = Job;

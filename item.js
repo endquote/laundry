@@ -32,7 +32,7 @@ Item.download = function(itemClass, washer, objects, callback) {
     async.waterfall([
         // Cache existing newKeys so they're not uploaded again.
         function(callback) {
-            Storage.cacheObjects(prefix, function(err, c) {
+            Storage.cacheFiles(prefix, function(err, c) {
                 cache = c;
                 callback(err);
             });

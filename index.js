@@ -24,6 +24,7 @@ commander
     .option('--s3key [key]', 'S3 access key ID, default is LAUNDRY_S3_KEY', process.env.LAUNDRY_S3_KEY)
     .option('--s3secret [secret]', 'S3 access key secret, default is LAUNDRY_S3_SECRET', process.env.LAUNDRY_S3_SECRET)
     .option('--s3bucket [bucket]', 'S3 bucket, default is LAUNDRY_S3_BUCKET', process.env.LAUNDRY_S3_BUCKET)
+    .option('--baseUrl [url]', 'the base URL that maps to the local folder or S3 bucket, default is LAUNDRY_BASEURL', process.env.LAUNDRY_BASEURL)
     .option('--proxy [proxy]', 'proxy to use for API requests')
     .option('-v, --verbose', 'verbose output');
 
@@ -77,13 +78,6 @@ var processStart = Date.now();
 
 function runCommand() {
 
-    // All main logic is in this static class.
-    global.Laundry = require('./laundry');
-
-    // Load internal classes into the global namespace.
-    global.Helpers = require('./helpers');
-    global.Job = require('./job');
-
     // Configure logging.
     global.log = require('winston'); // https://github.com/winstonjs/winston
     log.level = 'info';
@@ -94,6 +88,31 @@ function runCommand() {
     log.add(log.transports.Console, {
         colorize: true
     });
+
+    // Reduce confusion.
+    if (commander.local && (commander.s3key || commander.s3secret || commander.s3bucket)) {
+        log.error('Ambiguous: Provide only local or S3 arguments.');
+        process.exit(1);
+    }
+
+    // Need all of the S3s.
+    if (!commander.local && !(commander.s3key && commander.s3secret && commander.s3bucket)) {
+        log.error('S3 key, secret, and bucket must be provided.');
+        process.exit(1);
+    }
+
+    // Add a slash to baseUrl.
+    commander.baseUrl = commander.baseUrl || '';
+    if (commander.baseUrl && commander.baseUrl[commander.baseUrl.length - 1] !== '/') {
+        commander.baseUrl += '/';
+    }
+
+    // All main logic is in this static class.
+    global.Laundry = require('./laundry');
+
+    // Load internal classes into the global namespace.
+    global.Helpers = require('./helpers');
+    global.Job = require('./job');
 
     // Load washer class files in order of filename length, which also matches the inheritance order.
     global.Washer = require('./washer');
