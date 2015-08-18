@@ -11,40 +11,99 @@ Storage.S3 = function() {};
 
 Storage.S3._client = null;
 
-Storage.S3.init = function() {
+// Set up the S3 client.
+Storage.S3._init = function() {
     Storage.S3._client = new AWS.S3({
         accessKeyId: commander.s3key,
         secretAccessKey: commander.s3secret
     });
-    commander.s3bucket = commander.s3bucket;
     return Storage.S3;
 };
 
-Storage.S3.readFileString = function(target, callback) {
-    Storage.S3._client.getObject({
-        Bucket: commander.s3bucket,
-        ResponseContentEncoding: 'utf8',
-        Key: target
-    }, function(err, data) {
-        callback(null, err ? '' : data.Body.toString());
-    });
-};
+// Given a URL and a target, copy the URL to the target.
+// Cache is an array of files to not upload, since they are there already.
+// Optionally use youtube-dl to transform the url to a media url.
+// The callback is (err, {oldUrl, newUrl, error, ytdl})
+// The ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
+Storage.S3.downloadUrl = function(url, target, cache, useYTDL, callback) {
+    var result = {
+        oldUrl: url,
+        newUrl: url,
+        ytdl: null
+    };
 
-Storage.S3.writeFile = function(target, contents, callback) {
-    target = target.replace(/^\//, ''); // remove leading slash for S3
+    if (!url) {
+        callback(null, result);
+        return;
+    }
+
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', commander.s3bucket, target);
+
     if (commander.baseUrl) {
         resultUrl = commander.baseUrl + target;
     }
 
-    Storage.S3._client.upload({
-        Bucket: commander.s3bucket,
-        Key: target,
-        Body: contents,
-        ContentType: mime.lookup(target.split('.').pop())
-    }, function(err) {
-        callback(err, err || resultUrl);
-    });
+    // See if the file has previously been uploaded
+    if (cache && cache.length) {
+        if (cache.indexOf(target) !== -1) {
+            log.debug('Found ' + target);
+            result.newUrl = resultUrl;
+
+            // Don't call the callback synchronously, interesting: https://github.com/caolan/async/issues/75
+            process.nextTick(function() {
+                callback(null, result);
+            });
+            return;
+        }
+    }
+
+    if (useYTDL) {
+        // Use the youtube-dl to change the url into a media url
+        log.debug('Getting media URL for ' + url);
+        ytdl.getInfo(url, function(err, info) {
+            result.error = err;
+            if (!err && info.url) {
+                url = result.oldUrl = info.url;
+                result.ytdl = info;
+                doDownload();
+            } else {
+                callback(err, result);
+            }
+        });
+    } else {
+        doDownload();
+    }
+
+    function doDownload() {
+        var params = {
+            Bucket: commander.s3bucket,
+            Key: target
+        };
+
+        log.debug('Downloading ' + params.Key);
+        var protocol = require('url').parse(url).protocol;
+        var req = protocol === 'http' ? http.request : https.request;
+        req(url, function(response) {
+            if (response.statusCode !== 200 && response.statusCode !== 302) {
+                callback(response.error, result);
+                return;
+            }
+
+            params.Body = response;
+            params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
+            params.ContentType = response.headers['content-type'];
+            Storage.S3._client.upload(params)
+                .on('httpUploadProgress', function(progress) {
+                    // console.log(progress);
+                }).send(function(err, data) {
+                    result.error = err;
+                    if (!err) {
+                        result.newUrl = resultUrl;
+                    }
+                    callback(err, result);
+                });
+        }).end();
+    }
 };
 
 // Given a directory, return all the files.
@@ -142,90 +201,33 @@ Storage.S3.deleteBefore = function(dir, date, callback) {
     );
 };
 
-// Given a URL and an S3 target, copy the URL to S3.
-// Cache is an array of keys to not upload, since they are there already.
-// Optionally use youtube-dl to transform the url to a media url.
-// The callback is (err, {oldUrl, newUrl, error, ytdl})
-// The ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
-Storage.S3.downloadUrl = function(url, target, cache, useYTDL, callback) {
-    var result = {
-        oldUrl: url,
-        newUrl: url,
-        ytdl: null
-    };
-
-    if (!url) {
-        callback(null, result);
-        return;
-    }
-
+// Write some data to a file.
+Storage.S3.writeFile = function(target, contents, callback) {
+    target = target.replace(/^\//, ''); // remove leading slash for S3
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', commander.s3bucket, target);
-
     if (commander.baseUrl) {
         resultUrl = commander.baseUrl + target;
     }
 
-    // See if the file has previously been uploaded
-    if (cache && cache.length) {
-        if (cache.indexOf(target) !== -1) {
-            log.debug('Found ' + target);
-            result.newUrl = resultUrl;
-
-            // Don't call the callback synchronously, interesting: https://github.com/caolan/async/issues/75
-            process.nextTick(function() {
-                callback(null, result);
-            });
-            return;
-        }
-    }
-
-    if (useYTDL) {
-        // Use the youtube-dl to change the url into a media url
-        log.debug('Getting media URL for ' + url);
-        ytdl.getInfo(url, function(err, info) {
-            result.error = err;
-            if (!err && info.url) {
-                url = result.oldUrl = info.url;
-                result.ytdl = info;
-                doDownload();
-            } else {
-                callback(err, result);
-            }
-        });
-    } else {
-        doDownload();
-    }
-
-    function doDownload() {
-        var params = {
-            Bucket: commander.s3bucket,
-            Key: target
-        };
-
-        log.debug('Downloading ' + params.Key);
-        var protocol = require('url').parse(url).protocol;
-        var req = protocol === 'http' ? http.request : https.request;
-        req(url, function(response) {
-            if (response.statusCode !== 200 && response.statusCode !== 302) {
-                callback(response.error, result);
-                return;
-            }
-
-            params.Body = response;
-            params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
-            params.ContentType = response.headers['content-type'];
-            Storage.S3._client.upload(params)
-                .on('httpUploadProgress', function(progress) {
-                    // console.log(progress);
-                }).send(function(err, data) {
-                    result.error = err;
-                    if (!err) {
-                        result.newUrl = resultUrl;
-                    }
-                    callback(err, result);
-                });
-        }).end();
-    }
+    Storage.S3._client.upload({
+        Bucket: commander.s3bucket,
+        Key: target,
+        Body: contents,
+        ContentType: mime.lookup(target.split('.').pop())
+    }, function(err) {
+        callback(err, err || resultUrl);
+    });
 };
 
-module.exports = Storage.S3.init();
+// Read a file as a string.
+Storage.S3.readFileString = function(target, callback) {
+    Storage.S3._client.getObject({
+        Bucket: commander.s3bucket,
+        ResponseContentEncoding: 'utf8',
+        Key: target
+    }, function(err, data) {
+        callback(null, err ? '' : data.Body.toString());
+    });
+};
+
+module.exports = Storage.S3._init();

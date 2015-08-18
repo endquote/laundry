@@ -135,10 +135,10 @@ function runCommand() {
     });
 
     // Init storage methods.
-    global.allJobs = [];
     global.Storage = require('./storage');
     require('./storage/local');
     require('./storage/s3');
+    Storage.init();
 
     // Load the configuration, then run the command, then call the complete handler.
     var args = Array.prototype.slice.call(arguments);

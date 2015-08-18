@@ -45,7 +45,7 @@ Laundry.create = function(jobName, callback) {
 
         // Get the job
         function(rl, callback) {
-            var job = allJobs.filter(function(job) {
+            var job = laundryConfig.jobs.filter(function(job) {
                 return job && job.name.toLowerCase() === jobName.toLowerCase();
             })[0];
             if (job) {
@@ -71,7 +71,7 @@ Laundry.create = function(jobName, callback) {
         // Configure the input washer.
         function(rl, job, callback) {
             mode = null;
-            Laundry._inheritSettings(job.input, 'input', allJobs);
+            Laundry._inheritSettings(job.input, 'input');
             Laundry._configureWasher(rl, job, 'input', function(err) {
                 callback(err, rl, job);
             });
@@ -88,7 +88,7 @@ Laundry.create = function(jobName, callback) {
         // Configure the output washer.
         function(rl, job, callback) {
             mode = null;
-            Laundry._inheritSettings(job.output, 'output', allJobs);
+            Laundry._inheritSettings(job.output, 'output');
             Laundry._configureWasher(rl, job, 'output', function(err) {
                 callback(err, rl, job);
             });
@@ -97,7 +97,7 @@ Laundry.create = function(jobName, callback) {
         // Configure scheduling.
         function(rl, job, callback) {
             mode = null;
-            Laundry._scheduleJob(rl, job, allJobs, function(err) {
+            Laundry._scheduleJob(rl, job, function(err) {
                 callback(err, rl, job);
             });
         }
@@ -106,8 +106,8 @@ Laundry.create = function(jobName, callback) {
         if (err) {
             callback(err);
         } else if (job) {
-            if (allJobs.indexOf(job) === -1) {
-                allJobs.push(job);
+            if (laundryConfig.jobs.indexOf(job) === -1) {
+                laundryConfig.jobs.push(job);
             }
             Storage.saveConfig(function(err) {
                 if (err) {
@@ -213,7 +213,7 @@ Laundry._askForWasher = function(rl, job, mode, callback) {
 };
 
 // Given an input or output washer, find other jobs using a similar one and inherit settings from it.
-Laundry._inheritSettings = function(washer, mode, allJobs) {
+Laundry._inheritSettings = function(washer, mode) {
     var washerClass = washer.className;
 
     // Collect the base classes that the washer inherits from.
@@ -241,7 +241,7 @@ Laundry._inheritSettings = function(washer, mode, allJobs) {
     });
 
     // Collect the jobs which use this same washer or any of its base classes.
-    var relatedJobs = allJobs.filter(function(job) {
+    var relatedJobs = laundryConfig.jobs.filter(function(job) {
         var jobClass = job[mode].className;
         return baseClasses.filter(function(baseClass) {
             return jobClass.indexOf(baseClass) !== -1;
@@ -322,7 +322,7 @@ Laundry._configureWasher = function(rl, job, mode, callback) {
     });
 };
 
-Laundry._scheduleJob = function(rl, job, allJobs, callback) {
+Laundry._scheduleJob = function(rl, job, callback) {
     var prompt = '';
     prompt += "Now to set when this job will run.\n";
     prompt += "- Leave blank to run only when 'laundry run [job]' is called.\n";
@@ -360,7 +360,7 @@ Laundry._scheduleJob = function(rl, job, allJobs, callback) {
                     }
                 } else {
                     if (answer !== job.name.toLowerCase()) {
-                        allJobs.forEach(function(job) {
+                        laundryConfig.jobs.forEach(function(job) {
                             if (job.name.toLowerCase() === answer) {
                                 valid = true;
                                 answer = job.name;
@@ -416,7 +416,7 @@ Laundry.run = function(jobName, callback) {
                 return;
             }
 
-            var job = allJobs.filter(function(job) {
+            var job = laundryConfig.jobs.filter(function(job) {
                 return job.name.toLowerCase() === jobName;
             })[0];
             if (!job) {
@@ -434,8 +434,8 @@ Laundry.run = function(jobName, callback) {
 
             // If all jobs, select everything that isn't scheduled to run after something else.
             if (jobName === 'all') {
-                runJobs = allJobs.filter(function(job1) {
-                    return allJobs.filter(function(job2) {
+                runJobs = laundryConfig.jobs.filter(function(job1) {
+                    return laundryConfig.jobs.filter(function(job2) {
                         return job1.schedule.toString().toLowerCase() === job2.name.toLowerCase();
                     }).length === 0;
                 });
@@ -447,7 +447,7 @@ Laundry.run = function(jobName, callback) {
                 var runJobNames = runJobs.map(function(job, index, a) {
                     return job.name.toLowerCase();
                 }); // jshint ignore:line
-                allJobs.forEach(function(job) {
+                laundryConfig.jobs.forEach(function(job) {
                     if (runJobs.indexOf(job) === -1) {
                         var name = job.schedule ? job.schedule.toString() : '';
                         name = name.toLowerCase();
@@ -519,7 +519,7 @@ Laundry.destroy = function(jobName, callback) {
 
             // Find the requested job.
             function(callback) {
-                var job = allJobs.filter(function(j) {
+                var job = laundryConfig.jobs.filter(function(j) {
                     return j.name.toLowerCase() === jobName.toLowerCase();
                 })[0];
                 if (!job) {
@@ -546,7 +546,7 @@ Laundry.destroy = function(jobName, callback) {
                 rl.question(wrap(util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name), Laundry._wrapOpts) + "\n", function(answer) {
                     answer = chalk.stripColor(answer).trim().toLowerCase();
                     if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
-                        allJobs.splice(allJobs.indexOf(job), 1);
+                        laundryConfig.jobs.splice(laundryConfig.jobs.indexOf(job), 1);
                         Storage.saveConfig(function(err) {
                             rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyd."), job.name), Laundry._wrapOpts) + "\n");
                             callback(err, rl);
@@ -573,11 +573,11 @@ Laundry.destroy = function(jobName, callback) {
 Laundry.list = function(callback) {
     var out = 'Current jobs: \n';
 
-    if (!allJobs.length) {
+    if (!laundryConfig.jobs.length) {
         out = 'There are no jobs configured. Use "laundry create" to make one.';
     }
 
-    allJobs.forEach(function(job) {
+    laundryConfig.jobs.forEach(function(job) {
         if (job) {
             var schedule = job.schedule;
             if (typeof schedule === 'number') {
@@ -608,7 +608,7 @@ Laundry.tick = function(callback) {
         // Get the jobs that are due to run on schedule
         function(callback) {
 
-            var jobs = allJobs.filter(function(job) {
+            var jobs = laundryConfig.jobs.filter(function(job) {
                 if (!job.schedule) {
                     return false;
                 }

@@ -7,29 +7,8 @@ var https = require('follow-redirects').https; // https://www.npmjs.com/package/
 ns('Storage', global);
 Storage.Local = function() {};
 
-Storage.Local.readFileString = function(target, callback) {
-    target = path.join(commander.local, target);
-    fs.readFile(target, {
-        encoding: 'utf8'
-    }, callback);
-};
-
-Storage.Local.writeFile = function(target, contents, callback) {
-    target = path.join(commander.local, target);
-    var dir = path.parse(target).dir;
-    fs.mkdirp(dir, function(err) {
-        if (err) {
-            callback(err);
-            return;
-        }
-        fs.writeFile(target, contents, function(err) {
-            callback(err, target);
-        });
-    });
-};
-
-// Given a URL and an S3 target, copy the URL to S3.
-// Cache is an array of keys to not upload, since they are there already.
+// Given a URL and a target, copy the URL to the target.
+// Cache is an array of files to not upload, since they are there already.
 // Optionally use youtube-dl to transform the url to a media url.
 // The callback is (err, {oldUrl, newUrl, error, ytdl})
 // The ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
@@ -150,5 +129,27 @@ Storage.Local.deleteBefore = function(dir, date, callback) {
     });
 };
 
+// Write some data to a file.
+Storage.Local.writeFile = function(target, contents, callback) {
+    target = path.join(commander.local, target);
+    var dir = path.parse(target).dir;
+    fs.mkdirp(dir, function(err) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        fs.writeFile(target, contents, function(err) {
+            callback(err, target);
+        });
+    });
+};
+
+// Read a file as a string.
+Storage.Local.readFileString = function(target, callback) {
+    target = path.join(commander.local, target);
+    fs.readFile(target, {
+        encoding: 'utf8'
+    }, callback);
+};
 
 module.exports = Storage.Local;

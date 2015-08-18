@@ -11,7 +11,6 @@
         "Storage": true,
         "allWashers": true,
         "allItems": true,
-        "allJobs": true,
         "laundryConfig": true,
         "commander": true,
         
