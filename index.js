@@ -124,7 +124,6 @@ function runCommand() {
         allWashers[c.className] = c;
     });
 
-// goo
     // Load item class files in order of filename length, which also matches the inheritance order.
     global.Item = require('./item');
     global.allItems = {};

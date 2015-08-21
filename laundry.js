@@ -28,7 +28,6 @@ Laundry.create = function(jobName, callback) {
 
     // input, output, or null -- used to control the completion behavior
     var mode = null;
-    // foo
 
     async.waterfall([
 
