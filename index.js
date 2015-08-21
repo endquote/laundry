@@ -97,7 +97,7 @@ function runCommand() {
 
     // Need all of the S3s.
     if (!commander.local && !(commander.s3key && commander.s3secret && commander.s3bucket)) {
-        log.error('S3 key, secret, and bucket must be provided.');
+        log.error('A local path or S3 key, secret, and bucket must be provided.');
         process.exit(1);
     }
 
