@@ -69,8 +69,8 @@ commander.parse(process.argv);
 
 // If no command, show help.
 if (commander.args.filter(function(arg) {
-    return arg.commands;
-}).length === 0) {
+        return arg.commands;
+    }).length === 0) {
     commander.help();
 }
 
@@ -84,6 +84,7 @@ function runCommand() {
     if (commander.verbose) {
         log.level = 'debug';
     }
+
     log.remove(log.transports.Console);
     log.add(log.transports.Console, {
         colorize: true
@@ -136,8 +137,6 @@ function runCommand() {
 
     // Init storage methods.
     global.Storage = require('./storage');
-    require('./storage/local');
-    require('./storage/s3');
     Storage.init();
 
     // Load the configuration, then run the command, then call the complete handler.
