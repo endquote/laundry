@@ -83,6 +83,11 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, download, call
                 return;
             }
 
+            result.newUrl = resultUrl;
+            response.on('end', function() {
+                callback(response.error, result);
+            });
+
             fs.mkdirp(path.parse(target).dir, function(err) {
                 if (err) {
                     callback(err);
@@ -90,11 +95,7 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, download, call
                 }
 
                 response.pipe(fs.createWriteStream(target));
-                result.newUrl = resultUrl;
-                callback(err, result);
             });
-
-
         }).end();
     }
 };
