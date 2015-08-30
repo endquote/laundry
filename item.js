@@ -59,7 +59,7 @@ Item.download = function(itemClass, washer, objects, callback) {
 
         // Delete any old stuff in the cache.
         function(callback) {
-            Storage.deleteBefore(prefix, moment().subtract(30, 'days').toDate(), callback);
+            Storage.deleteBefore(cache, moment().subtract(30, 'days').toDate(), callback);
         }
     ], function(err) {
         // Return all the constructed items.

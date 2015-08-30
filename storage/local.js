@@ -29,7 +29,10 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, callback) {
 
     // See if the file has previously been uploaded
     if (cache && cache.length) {
-        if (cache.indexOf(target) !== -1) {
+        var cached = cache.filter(function(file) {
+            return file.fileName === target;
+        })[0];
+        if (cached) {
             log.debug('Found ' + target);
             result.newUrl = resultUrl;
 
@@ -88,16 +91,25 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, callback) {
     }
 };
 
-// Given a directory, return all the files.
+// Given a directory, return all the files and their last-modified times.
 Storage.Local.cacheFiles = function(dir, callback) {
     var p = path.join(commander.local, dir);
     fs.exists(p, function(exists) {
         if (exists) {
+            var cache = [];
             fs.readdir(p, function(err, files) {
-                files = files.map(function(file) {
-                    return p + '/' + file;
+                async.each(files, function(file, callback) {
+                    var fileName = p + '/' + file;
+                    fs.stat(fileName, function(err, stats) {
+                        cache.push({
+                            fileName: fileName,
+                            modified: stats ? stats.mtime : 0
+                        });
+                        callback(err);
+                    });
+                }, function(err) {
+                    callback(err, cache);
                 });
-                callback(err, files);
             });
         } else {
             callback(null, []);
@@ -106,27 +118,19 @@ Storage.Local.cacheFiles = function(dir, callback) {
 };
 
 // Delete files with a last-modified before a given date.
-Storage.Local.deleteBefore = function(dir, date, callback) {
-    log.debug('Cleaning ' + dir);
-    var p = path.join(commander.local, dir);
-    fs.exists(p, function(exists) {
-        if (!exists) {
-            callback(null);
-            return;
-        }
-        fs.readdir(p, function(err, files) {
-            async.each(files, function(file, callback) {
-                file = p + '/' + file;
-                fs.stat(file, function(err, stat) {
-                    if (stat.mtime < date) {
-                        fs.unlink(file, callback);
-                    } else {
-                        callback(err);
-                    }
-                });
-            }, callback);
-        });
+Storage.Local.deleteBefore = function(cache, date, callback) {
+    if (!cache.length) {
+        callback();
+        return;
+    }
+    var dir = path.parse(cache[0].fileName).dir;
+    var expired = cache.filter(function(file) {
+        return file.modified < date;
     });
+    log.debug(util.format('Cleaning %d files from %s', expired.length, dir));
+    async.each(expired, function(file, callback) {
+        fs.unlink(file.fileName, callback);
+    }, callback);
 };
 
 // Write some data to a file.

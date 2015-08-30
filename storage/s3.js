@@ -45,7 +45,10 @@ Storage.S3.downloadUrl = function(url, target, cache, useYTDL, callback) {
 
     // See if the file has previously been uploaded
     if (cache && cache.length) {
-        if (cache.indexOf(target) !== -1) {
+        var cached = cache.filter(function(file) {
+            return file.fileName === target;
+        })[0];
+        if (cached) {
             log.debug('Found ' + target);
             result.newUrl = resultUrl;
 
@@ -131,9 +134,13 @@ Storage.S3.cacheFiles = function(dir, callback) {
         },
         function() {
             return lastCount === pageSize;
-        }, function(err) {
+        },
+        function(err) {
             objects = objects.map(function(obj) {
-                return obj.Key;
+                return {
+                    fileName: obj.Key,
+                    modified: obj.LastModified
+                };
             });
             callback(err, objects);
         }
@@ -141,64 +148,34 @@ Storage.S3.cacheFiles = function(dir, callback) {
 };
 
 // Delete files with a last-modified before a given date.
-Storage.S3.deleteBefore = function(dir, date, callback) {
-    log.debug('Cleaning ' + dir);
+Storage.S3.deleteBefore = function(cache, date, callback) {
+    if (!cache.length) {
+        callback();
+        return;
+    }
+    var expired = cache.filter(function(file) {
+        return file.modified < date;
+    });
+    expired = expired.map(function(file) {
+        return {
+            Key: file.fileName
+        };
+    });
+    var dir = path.parse(cache[0].fileName).dir;
+    log.debug(util.format('Cleaning %d files from %s', expired.length, dir));
+    if (!expired.length) {
+        callback();
+        return;
+    }
 
-    // Get all of the objects with a given prefix.
-    var objects = [];
-    var lastCount = 0;
-    var pageSize = 100;
-    async.doWhilst(
-        function(callback) {
-            Storage.S3._client.listObjects({
-                Bucket: commander.s3bucket,
-                Prefix: dir,
-                MaxKeys: pageSize,
-                Marker: objects.length ? objects[objects.length - 1].Key : ''
-            }, function(err, data) {
-                if (err) {
-                    callback(err);
-                } else {
-                    objects = objects.concat(data.Contents);
-                    lastCount = data.Contents.length;
-                    callback(err);
-                }
-            });
-        },
-        function() {
-            return lastCount === pageSize;
-        }, function(err) {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            // Get the objects that are older than the requested date and format them as params.
-            objects = objects.filter(function(obj) {
-                return moment(obj.LastModified).isBefore(date);
-            }).map(function(obj) {
-                return {
-                    Key: obj.Key
-                };
-            });
-
-            if (!objects.length) {
-                callback(err);
-                return;
-            }
-
-            // Delete the old objects.
-            log.debug(util.format('Cleaning %d objects from %s', objects.length, dir));
-            Storage.S3._client.deleteObjects({
-                Bucket: commander.s3bucket,
-                Delete: {
-                    Objects: objects
-                }
-            }, function(err, data) {
-                callback(err);
-            });
+    Storage.S3._client.deleteObjects({
+        Bucket: commander.s3bucket,
+        Delete: {
+            Objects: expired
         }
-    );
+    }, function(err, data) {
+        callback(err);
+    });
 };
 
 // Write some data to a file.
