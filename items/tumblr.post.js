@@ -16,7 +16,12 @@ Items.Tumblr.Post.prototype = Object.create(Item.prototype);
 Items.Tumblr.Post.className = Helpers.buildClassName(__filename);
 
 // An object passed to async.parallel() which handles downloading of files.
-Items.Tumblr.Post.downloadLogic = function(prefix, obj, params, cache, download) {
+// prefix: the directory at which the download will end up, use to construct the target
+// obj: the API response representing the post
+// washer: the parent washer, in case you need properties from it
+// cache: already downloaded files, pass to downloadUrl
+// download: pass to downloadUrl
+Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download) {
     return {
         // Try to extract a video -- this often fails on Tumblr.
         video: function(callback) {
