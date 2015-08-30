@@ -29,13 +29,19 @@ Item.download = function(itemClass, washer, objects, callback) {
     var items = [];
     var cache = [];
 
+    washer.downloadMedia = true;
+
     async.waterfall([
         // Cache existing newKeys so they're not uploaded again.
         function(callback) {
-            Storage.cacheFiles(prefix, function(err, c) {
-                cache = c;
-                callback(err);
-            });
+            if (washer.downloadMedia) {
+                Storage.cacheFiles(prefix, function(err, c) {
+                    cache = c;
+                    callback(err);
+                });
+            } else {
+                callback();
+            }
         },
 
         function(callback) {
@@ -43,7 +49,7 @@ Item.download = function(itemClass, washer, objects, callback) {
             async.eachLimit(objects, 5, function(object, callback) {
                 // Upload files.
                 async.parallel(
-                    itemClass.downloadLogic(prefix, object, washer, cache),
+                    itemClass.downloadLogic(prefix, object, washer, cache, washer.downloadMedia),
                     function(err, uploads) {
                         if (err) {
                             // Carry on when an upload fails.

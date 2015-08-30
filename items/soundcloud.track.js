@@ -16,16 +16,18 @@ Items.SoundCloud.Track.prototype = Object.create(Item.prototype);
 Items.SoundCloud.Track.className = Helpers.buildClassName(__filename);
 
 // An object passed to async.parallel() which handles downloading of files.
-Items.SoundCloud.Track.downloadLogic = function(prefix, obj, params, cache) {
+Items.SoundCloud.Track.downloadLogic = function(prefix, obj, params, cache, download) {
     return {
         artwork: function(callback) {
             var target = prefix + '/' + obj.id + '.jpg';
-            Storage.downloadUrl(obj.artwork_url, target, cache, false, callback);
+            Storage.downloadUrl(obj.artwork_url, target, cache, false, download, callback);
         },
         audio: function(callback) {
             var target = prefix + '/' + obj.id + '.mp3';
             var audioSource = util.format('%s?client_id=%s', obj.stream_url, params.clientId);
-            Storage.downloadUrl(audioSource, target, cache, false, callback);
+
+            // Using ydtl here does get you the original download, but it can often be FLAC or other formats that podcast apps don't like.
+            Storage.downloadUrl(audioSource, target, cache, false, download, callback);
         }
     };
 };

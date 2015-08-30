@@ -8,11 +8,14 @@ ns('Storage', global);
 Storage.Local = function() {};
 
 // Given a URL and a target, copy the URL to the target.
-// Cache is an array of files to not upload, since they are there already.
-// Optionally use youtube-dl to transform the url to a media url.
-// The callback is (err, {oldUrl, newUrl, error, ytdl})
-// The ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
-Storage.Local.downloadUrl = function(url, target, cache, useYTDL, callback) {
+//
+// url: the url to download
+// taget: the path to download to
+// cache: an array of {fileName, modified} objects not to download, since they are there already
+// useYTDL: use youtube-download to transform the url to a media url
+// download: false to not actually download, only construct the result object (weird, but allows for optional downloads without tons of pain)
+// callback: (err, {oldUrl, newUrl, error, ytdl}) - the ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
+Storage.Local.downloadUrl = function(url, target, cache, useYTDL, download, callback) {
     var result = {
         oldUrl: url,
         newUrl: url,
@@ -28,7 +31,7 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, callback) {
     target = path.join(commander.local, target);
 
     // See if the file has previously been uploaded
-    if (cache && cache.length) {
+    if (download && cache && cache.length) {
         var cached = cache.filter(function(file) {
             return file.fileName === target;
         })[0];
@@ -49,7 +52,7 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, callback) {
         log.debug('Getting media URL for ' + url);
         ytdl.getInfo(url, function(err, info) {
             if (!err && info.url) {
-                url = result.oldUrl = info.url;
+                result.newUrl = url = info.url;
                 result.ytdl = info;
                 doDownload();
             } else {
@@ -61,6 +64,11 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, callback) {
     }
 
     function doDownload() {
+        if (!download) {
+            callback(null, result);
+            return;
+        }
+
         var params = {
             Bucket: commander.s3bucket,
             Key: target

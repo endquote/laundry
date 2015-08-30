@@ -21,7 +21,7 @@ Items.Twitter.Tweet.prototype = Object.create(Item.prototype);
 Items.Twitter.Tweet.className = Helpers.buildClassName(__filename);
 
 // An object passed to async.parallel() which handles downloading of files.
-Items.Twitter.Tweet.downloadLogic = function(prefix, obj, params, cache) {
+Items.Twitter.Tweet.downloadLogic = function(prefix, obj, params, cache, download) {
     return {
         media: function(callback) {
             var results = [];
@@ -39,7 +39,7 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, params, cache) {
                 var source = entity.media_url_https + ':' + size;
                 var target = prefix + '/' + obj.id + '.' + entity.media_url_https.split('.').pop();
 
-                Storage.downloadUrl(source, target, cache, false, function(err, res) {
+                Storage.downloadUrl(source, target, cache, false, download, function(err, res) {
                     results.push(res);
                     callback();
                 });

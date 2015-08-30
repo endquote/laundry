@@ -20,15 +20,15 @@ Items.Instagram.Media.prototype = Object.create(Item.prototype);
 Items.Instagram.Media.className = Helpers.buildClassName(__filename);
 
 // An object passed to async.parallel() which handles downloading of files.
-Items.Instagram.Media.downloadLogic = function(prefix, obj, params, cache) {
+Items.Instagram.Media.downloadLogic = function(prefix, obj, params, cache, download) {
     return {
         image: function(callback) {
             var target = prefix + '/' + obj.id + '.jpg';
-            Storage.downloadUrl(obj.images.standard_resolution.url, target, cache, false, callback);
+            Storage.downloadUrl(obj.images.standard_resolution.url, target, cache, false, download, callback);
         },
         video: function(callback) {
             var target = prefix + '/' + obj.id + '.mp4';
-            Storage.downloadUrl(obj.videos ? obj.videos.standard_resolution.url : null, target, cache, false, callback);
+            Storage.downloadUrl(obj.videos ? obj.videos.standard_resolution.url : null, target, cache, false, download, callback);
         }
     };
 };
