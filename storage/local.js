@@ -22,11 +22,6 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, download, call
         ytdl: null
     };
 
-    if (!url) {
-        callback(null, result);
-        return;
-    }
-
     var resultUrl = commander.baseUrl + target;
     target = path.join(commander.local, target);
 
@@ -45,6 +40,14 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, download, call
             });
             return;
         }
+    }
+
+    // No URL requested and the target wasn't cached.
+    if (!url) {
+        process.nextTick(function() {
+            callback(null, result);
+        });
+        return;
     }
 
     if (useYTDL) {

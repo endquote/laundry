@@ -35,11 +35,6 @@ Storage.S3.downloadUrl = function(url, target, cache, useYTDL, download, callbac
         ytdl: null
     };
 
-    if (!url) {
-        callback(null, result);
-        return;
-    }
-
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', commander.s3bucket, target);
 
     if (commander.baseUrl) {
@@ -61,6 +56,14 @@ Storage.S3.downloadUrl = function(url, target, cache, useYTDL, download, callbac
             });
             return;
         }
+    }
+
+    // No URL requested and the target wasn't cached.
+    if (!url) {
+        process.nextTick(function() {
+            callback(null, result);
+        });
+        return;
     }
 
     if (useYTDL) {

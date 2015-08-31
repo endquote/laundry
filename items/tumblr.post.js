@@ -29,9 +29,10 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
             Storage.downloadUrl(obj.type === 'video' ? obj.post_url : null, target, cache, true, download, function(err, res) {
 
                 // If we did get a video, get the thumbnail too.
-                if (res && res.ytdl && res.ytdl.thumbnails && res.ytdl.thumbnails.length) {
+                if (obj.type === 'video' && res.oldUrl !== res.newUrl) {
+                    var url = res.ytdl && res.ytdl.thumbnails && res.ytdl.thumbnails.length ? res.ytdl.thumbnails[0].url : null;
                     var target = prefix + '/' + obj.id + '-thumb.jpg';
-                    Storage.downloadUrl(res.ytdl.thumbnails[0].url, target, cache, false, download, function(thumbErr, thumbRes) {
+                    Storage.downloadUrl(url, target, cache, false, download, function(thumbErr, thumbRes) {
                         res.thumbnail = thumbRes;
                         callback(err, res);
                     });
