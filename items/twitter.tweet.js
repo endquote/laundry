@@ -87,15 +87,17 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
     item.title = item.author + ': ' + Helpers.shortenString(tweet.text, 30);
 
-    item.description = util.format('<p>%s</p>', tweet.text);
-    item.description = item.description.replace(/@([\w]+)/g, '<a href="https://twitter.com/$1">@$1</a>');
-    item.description = item.description.replace(/#([\w]+)/g, '<a href="https://twitter.com/hashtag/$1">#$1</a>');
-
+    item.description = '';
     if (downloads.media) {
         downloads.media.forEach(function(download) {
             item.description += util.format('<p><img src="%s"/></p>', download.newUrl);
         });
     }
+
+    var text = util.format('<p>%s</p>', tweet.text);
+    text = text.replace(/@([\w]+)/g, '<a href="https://twitter.com/$1">@$1</a>');
+    text = text.replace(/#([\w]+)/g, '<a href="https://twitter.com/hashtag/$1">#$1</a>');
+    item.description += text;
 
     return item;
 };
