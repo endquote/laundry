@@ -29,7 +29,7 @@ Item.download = function(itemClass, washer, objects, callback) {
     var items = [];
     var cache = [];
 
-    washer.downloadMedia = false;
+    washer.downloadMedia = true;
 
     async.waterfall([
         // Cache existing newKeys so they're not uploaded again.
