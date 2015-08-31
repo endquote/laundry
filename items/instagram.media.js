@@ -63,7 +63,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
     if (!item.video) {
         item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
     } else {
-        item.description = Item.buildVideo(item.video, item.image);
+        item.description = Item.buildVideo(item.video, item.image, 600, 600);
     }
 
     if (item.caption) {

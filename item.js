@@ -29,7 +29,7 @@ Item.download = function(itemClass, washer, objects, callback) {
     var items = [];
     var cache = [];
 
-    washer.downloadMedia = true;
+    washer.downloadMedia = false;
 
     async.waterfall([
         // Cache existing newKeys so they're not uploaded again.
@@ -84,12 +84,16 @@ Item.buildPrefix = function(jobName, className) {
 };
 
 // Build an HTML video player.
-Item.buildVideo = function(videoUrl, thumbUrl) {
+Item.buildVideo = function(videoUrl, thumbUrl, width, height) {
+    var s = util.format('<p><video controls width="100%" src="%s" autobuffer="false" preload="none"', videoUrl);
     if (thumbUrl) {
-        return util.format('<p><video controls width="100%" poster="%s" src="%s" autobuffer="false" preload="none"></video></p>', thumbUrl, videoUrl);
-    } else {
-        return util.format('<p><video controls width="100%" src="%s" autobuffer="false" preload="none"></video></p>', videoUrl);
+        s += util.format(' poster="%s"', thumbUrl);
     }
+    if (width && height) {
+        s += util.format(' width="%d" height="%d"', width, height);
+    }
+    s += '></video></p>';
+    return s;
 };
 
 // Build an HTML audio player.

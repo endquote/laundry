@@ -169,7 +169,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
         item.description = post.caption;
 
         if (downloads.video) {
-            item.description += Item.buildVideo(downloads.video.newUrl, downloads.video.thumbnail ? downloads.video.thumbnail.newUrl : null);
+            item.description += Item.buildVideo(downloads.video.newUrl, downloads.video.thumbnail ? downloads.video.thumbnail.newUrl : null, 1920, 1080);
             item.mediaUrl = downloads.video.newUrl;
         } else {
             var biggest = post.player.sort(function(a, b) {

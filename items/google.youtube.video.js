@@ -49,7 +49,7 @@ Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, washer, cache, 
 
 // Construct an Item given an API response and any upload info.
 Items.Google.YouTube.Video.factory = function(video, downloads) {
-    var player = Item.buildVideo(downloads.video.newUrl, downloads.thumbnail.newUrl);
+    var player = Item.buildVideo(downloads.video.newUrl, downloads.thumbnail.newUrl, 1920, 1080);
     var description = video.snippet.description;
     description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
     description = description.replace(/[\n\r]/gim, '<br/>');
