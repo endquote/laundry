@@ -12,6 +12,7 @@ Items.Twitter.Tweet = function(config) {
     this.retweets = 0;
     this.isRetweet = false;
     this.isRetweeted = false;
+    this.coordinates = null;
 
     Item.call(this, config);
     this.className = Helpers.buildClassName(__filename);
@@ -70,7 +71,8 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         isQuote: tweet.quoted_status_id ? true : false,
         retweets: tweet.retweet_count,
         isRetweet: tweet.retweeted_status ? true : false,
-        isRetweeted: tweet.retweeted
+        isRetweeted: tweet.retweeted,
+        coordinates: tweet.coordinates ? tweet.coordinates.coordinates : null
     });
 
     if (tweet.entities.media) {
@@ -98,6 +100,15 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
     text = text.replace(/@([\w]+)/g, '<a href="https://twitter.com/$1">@$1</a>');
     text = text.replace(/#([\w]+)/g, '<a href="https://twitter.com/hashtag/$1">#$1</a>');
     item.description += text;
+
+    if (item.location) {
+        item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s</a></p>',
+            encodeURIComponent(item.location.name), item.location.latitude, item.location.longitude, item.location.name);
+    }
+
+    if (item.coordinates) {
+        item.description += util.format('<p>(<a href="http://maps.apple.com/?ll=%s,%s">location</a>)</p>', item.coordinates[0], item.coordinates[1]);
+    }
 
     return item;
 };
