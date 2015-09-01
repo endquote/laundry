@@ -15,24 +15,26 @@ Washers.SoundCloud.Artist = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent sounds from a SoundCloud artist.',
         settings: [{
-            name: 'artistName',
-            prompt: 'What is the name of the artist to follow?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
-            }
-        }, {
-            name: 'minDuration',
-            prompt: 'Only get tracks longer than this many minutes (leave blank to include short tracks).',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(newValue && !validator.isDecimal(newValue));
-            }
-        }, {
-            name: 'maxDuration',
-            prompt: 'Only get tracks shorter than this many minutes (leave blank to include long tracks).',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(newValue && !validator.isDecimal(newValue));
-            }
-        }]
+                name: 'artistName',
+                prompt: 'What is the name of the artist to follow?',
+                afterEntry: function(rl, job, oldValue, newValue, callback) {
+                    callback(validator.isWhitespace(newValue));
+                }
+            }, {
+                name: 'minDuration',
+                prompt: 'Only get tracks longer than this many minutes (leave blank to include short tracks).',
+                afterEntry: function(rl, job, oldValue, newValue, callback) {
+                    callback(newValue && !validator.isDecimal(newValue));
+                }
+            }, {
+                name: 'maxDuration',
+                prompt: 'Only get tracks shorter than this many minutes (leave blank to include long tracks).',
+                afterEntry: function(rl, job, oldValue, newValue, callback) {
+                    callback(newValue && !validator.isDecimal(newValue));
+                }
+            },
+            Washer.downloadMediaOption
+        ]
     });
 };
 

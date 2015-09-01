@@ -13,7 +13,8 @@ Washers.Instagram.Timeline = function(config, job) {
     this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
-        description: 'Loads recent images from your Instagram timeline.'
+        description: 'Loads recent images from your Instagram timeline.',
+        settings: [Washer.downloadMediaOption]
     });
 };
 

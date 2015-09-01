@@ -15,18 +15,20 @@ Washers.SoundCloud.Timeline = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent sounds from your SoundCloud timeline.',
         settings: [{
-            name: 'minDuration',
-            prompt: 'Only get tracks longer than this many minutes (leave blank to include short tracks).',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(newValue && !validator.isDecimal(newValue));
-            }
-        }, {
-            name: 'maxDuration',
-            prompt: 'Only get tracks shorter than this many minutes (leave blank to include long tracks).',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(newValue && !validator.isDecimal(newValue));
-            }
-        }]
+                name: 'minDuration',
+                prompt: 'Only get tracks longer than this many minutes (leave blank to include short tracks).',
+                afterEntry: function(rl, job, oldValue, newValue, callback) {
+                    callback(newValue && !validator.isDecimal(newValue));
+                }
+            }, {
+                name: 'maxDuration',
+                prompt: 'Only get tracks shorter than this many minutes (leave blank to include long tracks).',
+                afterEntry: function(rl, job, oldValue, newValue, callback) {
+                    callback(newValue && !validator.isDecimal(newValue));
+                }
+            },
+            Washer.downloadMediaOption
+        ]
     });
 };
 

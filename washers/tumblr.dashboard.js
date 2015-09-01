@@ -13,7 +13,8 @@ Washers.Tumblr.Dashboard = function(config, job) {
     this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
-        description: 'Loads recent posts from your Tumblr Dashboard.'
+        description: 'Loads recent posts from your Tumblr Dashboard.',
+        settings: [Washer.downloadMediaOption]
     });
 };
 

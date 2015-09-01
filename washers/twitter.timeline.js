@@ -18,20 +18,22 @@ Washers.Twitter.Timeline = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from your Twitter timeline.',
         settings: [{
-            name: 'excludeReplies',
-            prompt: 'Do you want to exclude replies? (y/n)',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                newValue = newValue.toLowerCase();
-                callback(newValue !== 'y' && newValue !== 'n');
+                name: 'excludeReplies',
+                prompt: 'Do you want to exclude replies? (y/n)',
+                afterEntry: function(rl, job, oldValue, newValue, callback) {
+                    newValue = newValue.toLowerCase();
+                    callback(newValue !== 'y' && newValue !== 'n');
+                },
+            }, {
+                name: 'excludeRetweets',
+                prompt: 'Do you want to exclude retweets and quotes? (y/n)',
+                afterEntry: function(rl, job, oldValue, newValue, callback) {
+                    newValue = newValue.toLowerCase();
+                    callback(newValue !== 'y' && newValue !== 'n');
+                }
             },
-        }, {
-            name: 'excludeRetweets',
-            prompt: 'Do you want to exclude retweets and quotes? (y/n)',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                newValue = newValue.toLowerCase();
-                callback(newValue !== 'y' && newValue !== 'n');
-            }
-        }]
+            Washer.downloadMediaOption
+        ]
     });
 };
 

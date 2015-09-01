@@ -68,7 +68,6 @@ Items.Instagram.Media.factory = function(post, downloads) {
         item.description = Item.buildVideo(item.video, item.image, 600, 600);
     }
 
-    console.log(item.location);
     if (item.location) {
         item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s</a></p>',
             encodeURIComponent(item.location.name), item.location.latitude, item.location.longitude, item.location.name);

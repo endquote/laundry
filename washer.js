@@ -38,6 +38,15 @@ var Washer = function(config, job) {
 
 Washer.className = Helpers.buildClassName(__filename);
 
+Washer.downloadMediaOption = {
+    name: 'downloadMedia',
+    prompt: 'Download media? (y/n)',
+    afterEntry: function(rl, job, oldValue, newValue, callback) {
+        newValue = newValue.toLowerCase();
+        callback(newValue !== 'y' && newValue !== 'n');
+    }
+};
+
 // Remove stuff from the washer that's saved to disk.
 Washer.prototype.stringify = function() {
     var c = _.clone(this);

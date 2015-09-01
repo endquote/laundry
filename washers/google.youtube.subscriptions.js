@@ -13,7 +13,8 @@ Washers.Google.YouTube.Subscriptions = function(config, job) {
     this.className = Helpers.buildClassName(__filename);
 
     this.input = _.merge(this.input, {
-        description: 'Loads recent videos from your YouTube subscriptions.'
+        description: 'Loads recent videos from your YouTube subscriptions.',
+        settings: [Washer.downloadMediaOption]
     });
 };
 
