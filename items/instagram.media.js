@@ -11,6 +11,7 @@ Items.Instagram.Media = function(config) {
     this.image = null;
     this.caption = null;
     this.authorpic = null;
+    this.location = null;
 
     Item.call(this, config);
     this.className = Helpers.buildClassName(__filename);
@@ -52,6 +53,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
         caption: post.caption ? post.caption.text : null,
         author: post.user.username,
         authorpic: post.user.profile_picture,
+        location: post.location,
         mediaUrl: downloads.video.newUrl
     });
 
@@ -64,6 +66,12 @@ Items.Instagram.Media.factory = function(post, downloads) {
         item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
     } else {
         item.description = Item.buildVideo(item.video, item.image, 600, 600);
+    }
+
+    console.log(item.location);
+    if (item.location) {
+        item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s</a></p>',
+            encodeURIComponent(item.location.name), item.location.latitude, item.location.longitude, item.location.name);
     }
 
     if (item.caption) {
@@ -84,7 +92,8 @@ Items.Instagram.Media.factory = function(post, downloads) {
     if (item.comments.data.length) {
         item.description += util.format('<p>%d comments:</p>', item.comments.count);
         item.comments.data.forEach(function(comment) {
-            item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>', comment.from.username, comment.from.username, Items.Instagram.Media.linkify(comment.text));
+            item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>',
+                comment.from.username, comment.from.username, Items.Instagram.Media.linkify(comment.text));
         });
     }
 
