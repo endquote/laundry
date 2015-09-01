@@ -85,6 +85,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
     item.sourceUrl = post.source_url;
     item.sourceTitle = post.source_title;
     item.liked = post.liked;
+    item.description = '';
 
     // Use uploaded photos if any
     if (post.photos) {
@@ -95,7 +96,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
 
     if (item.postType === 'text') {
         item.title += util.format(': %s', Helpers.shortenString(S(item.title).stripTags(), titleLength));
-        item.description = post.body;
+        item.description += post.body;
 
 
     } else if (item.postType === 'quote') {
@@ -103,7 +104,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
             item.title += util.format(': %s', Helpers.shortenString(S(post.source).stripTags(), titleLength));
         }
 
-        item.description = util.format('<p>"%s"</p>', post.text);
+        item.description += util.format('<p>"%s"</p>', post.text);
         if (post.source.toLowerCase().indexOf('<p>') !== 0) {
             item.description += util.format('<p>%s</p>', post.source);
         } else {
@@ -115,7 +116,13 @@ Items.Tumblr.Post.factory = function(post, downloads) {
         if (post.title) {
             item.title += util.format(': %s', Helpers.shortenString(S(post.title).stripTags(), titleLength));
         }
-        item.description = util.format('<p><a href="%s">%s</a></p>', post.url, post.title);
+        if (post.photos) {
+            post.photos.forEach(function(photo) {
+                item.description += util.format('<p><img src="%s" width="%d" height="%d" /></p>', photo.url, photo.original_size.width, photo.original_size.height);
+                item.description += photo.caption;
+            });
+        }
+        item.description += util.format('<p><a href="%s">%s</a></p>', post.url, post.title);
         if (post.excerpt) {
             if (post.excerpt.toLowerCase().indexOf('<p>') !== 0) {
                 item.description += util.format('<p>%s</p>', post.excerpt);
@@ -129,12 +136,6 @@ Items.Tumblr.Post.factory = function(post, downloads) {
             } else {
                 item.description += post.publisher;
             }
-        }
-        if (post.photos) {
-            post.photos.forEach(function(photo) {
-                item.description += util.format('<p><img src="%s" width="%d" height="%d" /></p>', photo.url, photo.original_size.width, photo.original_size.height);
-                item.description += photo.caption;
-            });
         }
         if (post.description) {
             if (post.description.toLowerCase().indexOf('<p>') !== 0) {
@@ -166,8 +167,6 @@ Items.Tumblr.Post.factory = function(post, downloads) {
             item.title += util.format(': %s', Helpers.shortenString(S(post.caption).stripTags(), titleLength));
         }
 
-        item.description = post.caption;
-
         if (downloads.video) {
             item.description += Item.buildVideo(downloads.video.newUrl, downloads.video.thumbnail ? downloads.video.thumbnail.newUrl : null, 1920, 1080);
             item.mediaUrl = downloads.video.newUrl;
@@ -178,13 +177,13 @@ Items.Tumblr.Post.factory = function(post, downloads) {
             item.description += biggest.embed_code;
         }
 
+        item.description += post.caption;
+
 
     } else if (item.postType === 'audio') {
         if (post.caption) {
             item.title += util.format(': %s', Helpers.shortenString(S(post.caption).stripTags(), titleLength));
         }
-
-        item.description = post.caption;
 
         if (downloads.audio) {
             item.description += Item.buildAudio(downloads.audio.newUrl);
@@ -193,16 +192,19 @@ Items.Tumblr.Post.factory = function(post, downloads) {
             item.description += post.player;
         }
 
+        item.description += post.caption;
+
 
     } else if (item.postType === 'photo') {
-        if (post.caption) {
-            item.title += util.format(': %s', Helpers.shortenString(S(post.caption).stripTags(), titleLength));
-            item.description += post.caption;
-        }
         post.photos.forEach(function(photo, index) {
             item.description += util.format('<p><img src="%s" width="%d" height="%d" /></p>', photo.url, photo.original_size.width, photo.original_size.height);
             item.description += photo.caption;
         });
+
+        if (post.caption) {
+            item.title += util.format(': %s', Helpers.shortenString(S(post.caption).stripTags(), titleLength));
+            item.description += post.caption;
+        }
     } else if (item.postType === 'chat') {
 
     }
