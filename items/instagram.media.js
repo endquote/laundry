@@ -68,13 +68,13 @@ Items.Instagram.Media.factory = function(post, downloads) {
         item.description = Item.buildVideo(item.video, item.image, 600, 600);
     }
 
+    if (item.caption) {
+        item.description += util.format('<p>%s</p>', Items.Instagram.Media.linkify(item.caption));
+    }
+
     if (item.location) {
         item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s</a></p>',
             encodeURIComponent(item.location.name), item.location.latitude, item.location.longitude, item.location.name);
-    }
-
-    if (item.caption) {
-        item.description += util.format('<p>%s</p>', Items.Instagram.Media.linkify(item.caption));
     }
 
     if (item.likes.data.length) {
