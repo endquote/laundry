@@ -51,8 +51,12 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
                     }
                 }, that._requestOptions),
                 function(result) {
-                    var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
-                    callback(null, playlistId);
+                    if (!result.items.length) {
+                        callback('Channel not found.');
+                    } else {
+                        var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
+                        callback(null, playlistId);
+                    }
                 },
                 callback);
         },
