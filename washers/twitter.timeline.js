@@ -20,16 +20,24 @@ Washers.Twitter.Timeline = function(config, job) {
         settings: [{
                 name: 'excludeReplies',
                 prompt: 'Do you want to exclude replies? (y/n)',
+                beforeEntry: function(rl, job, prompt, callback) {
+                    callback(true, prompt, this.excludeReplies === undefined ? 'y' : (this.excludeReplies ? 'y' : 'n'));
+                },
                 afterEntry: function(rl, job, oldValue, newValue, callback) {
                     newValue = newValue.toLowerCase();
-                    callback(newValue !== 'y' && newValue !== 'n', newValue);
-                },
+                    var valid = newValue === 'y' || newValue === 'n';
+                    callback(!valid, newValue === 'y');
+                }
             }, {
                 name: 'excludeRetweets',
                 prompt: 'Do you want to exclude retweets and quotes? (y/n)',
+                beforeEntry: function(rl, job, prompt, callback) {
+                    callback(true, prompt, this.excludeRetweets === undefined ? 'y' : (this.excludeRetweets ? 'y' : 'n'));
+                },
                 afterEntry: function(rl, job, oldValue, newValue, callback) {
                     newValue = newValue.toLowerCase();
-                    callback(newValue !== 'y' && newValue !== 'n', newValue);
+                    var valid = newValue === 'y' || newValue === 'n';
+                    callback(!valid, newValue === 'y');
                 }
             },
             Washer.downloadMediaOption
@@ -81,10 +89,10 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
                     tweets.forEach(function(tweet) {
                         maxId = tweet.id_str;
                         var include = true;
-                        if (that.excludeReplies === 'y' && tweet.in_reply_to_screen_name) {
+                        if (that.excludeReplies && tweet.in_reply_to_screen_name) {
                             include = false;
                         }
-                        if (that.excludeRetweets === 'y' && (tweet.retweeted_status || tweet.quoted_status_id)) {
+                        if (that.excludeRetweets && (tweet.retweeted_status || tweet.quoted_status_id)) {
                             include = false;
                         }
                         if (include) {

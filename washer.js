@@ -41,9 +41,13 @@ Washer.className = Helpers.buildClassName(__filename);
 Washer.downloadMediaOption = {
     name: 'downloadMedia',
     prompt: 'Download media? (y/n)',
+    beforeEntry: function(rl, job, prompt, callback) {
+        callback(true, prompt, this.downloadMedia === undefined ? 'y' : (this.downloadMedia ? 'y' : 'n'));
+    },
     afterEntry: function(rl, job, oldValue, newValue, callback) {
         newValue = newValue.toLowerCase();
-        callback(newValue !== 'y' && newValue !== 'n', newValue);
+        var valid = newValue === 'y' || newValue === 'n';
+        callback(!valid, newValue === 'y');
     }
 };
 
