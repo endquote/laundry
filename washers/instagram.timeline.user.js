@@ -47,8 +47,12 @@ Washers.Instagram.Timeline.User.prototype.getUserId = function(username, callbac
             }
         },
         function(response) {
-            that.userId = response.data[0].id;
-            callback();
+            if (response.data.length) {
+                that.userId = response.data[0].id;
+                callback();
+            } else {
+                callback('User not found.');
+            }
         },
         callback);
 };
