@@ -316,7 +316,7 @@ Laundry._configureWasher = function(rl, job, mode, callback) {
                             ]);
                         });
 
-                        rl.write((washer[item.name] ? washer[item.name] : suggest).toString());
+                        rl.write((suggest ? suggest : washer[item.name]).toString());
                     }
                 ]);
             }, function(err) {
