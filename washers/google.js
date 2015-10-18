@@ -21,7 +21,7 @@ Washers.Google = function(config, job) {
     this.input = _.merge({
         settings: [{
             name: 'clientId',
-            prompt: 'Go to https://console.developers.google.com/project. Click "Create Project" and enter a name. Under "APIs & auth" click "APIs" and activate YouTube. Under "Credentials", click "Create new Client ID". Choose "Installed Application." The client ID and secret will appear.\nWhat is the client ID?',
+            prompt: 'Go to https://console.developers.google.com/project. Click "Create Project" and enter a name. Under "APIs & auth" click "APIs" and activate YouTube and Gmail. Under "Credentials", click "Create new Client ID". Choose "Installed Application." The client ID and secret will appear.\nWhat is the client ID?',
             beforeEntry: function(rl, job, prompt, callback) {
                 callback(this.token ? false : true, prompt);
             },
@@ -57,7 +57,7 @@ Washers.Google = function(config, job) {
                     response_type: 'code',
                     redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
                     access_type: 'offline',
-                    scope: 'https://www.googleapis.com/auth/youtube.readonly'
+                    scope: 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/gmail.readonly'
                 });
 
                 var that = this;
