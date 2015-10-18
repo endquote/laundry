@@ -14,6 +14,7 @@ Laundry._wrapOpts = {
 
 // Create a new job.
 Laundry.create = function(jobName, callback) {
+    jobName = jobName || '';
     // Convert name to confirm to S3 bucket naming best practices
     jobName = jobName.toLowerCase(); // No capital letters (A-Z)
     jobName = jobName.replace('.', '-'); // No periods (.)
