@@ -22,14 +22,14 @@ Washers.Twitter.Timeline = function(config, job) {
                 prompt: 'Do you want to exclude replies? (y/n)',
                 afterEntry: function(rl, job, oldValue, newValue, callback) {
                     newValue = newValue.toLowerCase();
-                    callback(newValue !== 'y' && newValue !== 'n');
+                    callback(newValue !== 'y' && newValue !== 'n', newValue);
                 },
             }, {
                 name: 'excludeRetweets',
                 prompt: 'Do you want to exclude retweets and quotes? (y/n)',
                 afterEntry: function(rl, job, oldValue, newValue, callback) {
                     newValue = newValue.toLowerCase();
-                    callback(newValue !== 'y' && newValue !== 'n');
+                    callback(newValue !== 'y' && newValue !== 'n', newValue);
                 }
             },
             Washer.downloadMediaOption

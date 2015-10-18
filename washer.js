@@ -19,7 +19,7 @@ var Washer = function(config, job) {
             name: 'url',
             prompt: 'What RSS feed URL do you want to launder?',
             beforeEntry: function(rl, job, prompt, callback(required, prompt, suggest)),
-            afterEntry: function(rl, job, oldValue, newValue, callback(err))
+            afterEntry: function(rl, job, oldValue, newValue, callback(err, newValue))
         }]
     */
     this.input = null;
@@ -43,7 +43,7 @@ Washer.downloadMediaOption = {
     prompt: 'Download media? (y/n)',
     afterEntry: function(rl, job, oldValue, newValue, callback) {
         newValue = newValue.toLowerCase();
-        callback(newValue !== 'y' && newValue !== 'n');
+        callback(newValue !== 'y' && newValue !== 'n', newValue);
     }
 };
 

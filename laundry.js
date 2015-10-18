@@ -298,7 +298,11 @@ Laundry._configureWasher = function(rl, job, mode, callback) {
                             answer = Helpers.cleanString(answer);
                             // Call the after entry method
                             item.afterEntry.apply(washer, [rl, job, washer[item.name], answer,
-                                function(err) {
+                                function(err, newAnswer) {
+                                    if (newAnswer !== undefined) {
+                                        answer = newAnswer;
+                                    }
+
                                     if (err) {
                                         // Reject the answer
                                         rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), Laundry._wrapOpts));
