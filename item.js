@@ -80,7 +80,11 @@ Item.factory = function(obj, uploads) {
 
 // Build the S3 object prefix for a media type.
 Item.buildPrefix = function(jobName, className) {
-    return ('jobs.' + jobName + '.' + className).toLowerCase().split('.').join('/');
+    if (className) {
+        return ('jobs.' + jobName + '.' + className).toLowerCase().split('.').join('/');
+    } else {
+        return ('jobs.' + jobName).toLowerCase().split('.').join('/');
+    }
 };
 
 // Build an HTML video player.

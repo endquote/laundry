@@ -547,11 +547,31 @@ Laundry.destroy = function(jobName, callback) {
                 rl.question(wrap(util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name), Laundry._wrapOpts) + "\n", function(answer) {
                     answer = chalk.stripColor(answer).trim().toLowerCase();
                     if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
-                        laundryConfig.jobs.splice(laundryConfig.jobs.indexOf(job), 1);
-                        Storage.saveConfig(function(err) {
-                            rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyd."), job.name), Laundry._wrapOpts) + "\n");
+
+                        async.waterfall([
+                            // Get any media files in this job.
+                            function(callback) {
+                                var prefix = Item.buildPrefix(job.name);
+                                Storage.cacheFiles(prefix, callback);
+                            },
+                            // Delete media files.
+                            function(cache, callback) {
+                                Storage.deleteBefore(cache, new Date(), callback);
+                            },
+                            // Delete the job from the config.
+                            function(callback) {
+                                laundryConfig.jobs.splice(laundryConfig.jobs.indexOf(job), 1);
+                                Storage.saveConfig(callback);
+                            },
+                            // Tell the user about it.
+                            function(url, callback) {
+                                rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyed."), job.name), Laundry._wrapOpts) + "\n");
+                                callback(null, rl);
+                            }
+                        ], function(err, rl) {
                             callback(err, rl);
                         });
+
                     } else {
                         rl.write(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name), Laundry._wrapOpts) + "\n");
                         callback(null, rl);
