@@ -317,7 +317,15 @@ Laundry._configureWasher = function(rl, job, mode, callback) {
                             ]);
                         });
 
-                        rl.write((suggest ? suggest : washer[item.name]).toString());
+                        // Default to the suggestion returned by beforeEntry, or the existing value for the property.
+                        var def = '';
+                        if (suggest) {
+                            def = suggest;
+                        } else if (washer[item.name]) {
+                            def = washer[item.name];
+                        }
+
+                        rl.write(def.toString());
                     }
                 ]);
             }, function(err) {
