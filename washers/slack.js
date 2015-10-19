@@ -1,16 +1,16 @@
 'use strict';
 
 /*
-Slack washer
-input: converts the contents of a Slack channel into Items
-output: sends Items to a Slack channel
+Base class for Slack washers containing common methods.
+input: none
+output: none
 */
 
 ns('Washers', global);
 Washers.Slack = function(config, job) {
     Washer.call(this, config, job);
 
-    this.name = 'Slack';
+    this.name = '';
     this.className = Helpers.buildClassName(__filename);
 
     this._callbackUri = 'http://laundry.endquote.com/callbacks/slack.html';
@@ -72,13 +72,11 @@ Washers.Slack = function(config, job) {
     }];
 
     this.input = _.merge({
-        description: 'Loads items from a Slack channel.',
-        settings: _.merge(authSettings, [])
+        settings: authSettings
     }, this.input);
 
     this.output = _.merge({
-        description: 'Sends data to a Slack channel.',
-        settings: _.merge(authSettings, [])
+        settings: authSettings
     }, this.output);
 };
 
@@ -103,14 +101,6 @@ Washers.Slack.prototype.refreshToken = function(code, callback) {
             callback();
         },
         callback);
-};
-
-Washers.Slack.prototype.doInput = function(callback) {
-    callback();
-};
-
-Washers.Slack.prototype.doOutput = function(items, callback) {
-    callback();
 };
 
 module.exports = Washers.Slack;
