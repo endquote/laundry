@@ -1,6 +1,6 @@
 'use strict';
 
-// Item which describes an RSS object
+// Item which describes a Slack message
 
 ns('Items.Slack', global);
 Items.Slack.Message = function(config) {
@@ -42,24 +42,29 @@ Items.Slack.Message.factory = function(item, downloads) {
         }
 
         // Within those sequences, format content starting with @U as a user link: https://endquote.slack.com/team/josh
-        if (matches[1].indexOf('@U') === 0) {
+        else if (matches[1].indexOf('@U') === 0) {
             var name = matches[1].split('|')[1];
             formatted = formatted.replace(matches[0], util.format('<a href="https://%s.slack.com/team/%s">@%s</a>', item.teamInfo.name, name, name));
         }
 
         // Within those sequences, format content starting with ! according to the rules for the special command.
+        else if (matches[1].indexOf('!') === 0) {
+            formatted = formatted.replace(matches[0], '@' + matches[1].substr(1));
+        }
+
         // For remaining sequences, format as a link
         // Once the format has been determined, check for a pipe - if present, use the text following the pipe as the link label
+        else {
+            var url = matches[1].split('|')[0];
+            var label = matches[1].split('|')[1];
+            formatted = formatted.replace(matches[0], util.format('<a href="%s">%s</a>', url, label || url));
+        }
     }
-
-    console.log(item.text);
-    console.log(formatted);
-
 
     return new Items.Slack.Message({
         title: item.userInfo.name + ': ' + Helpers.shortenString(S(formatted).stripTags(), 30),
         description: formatted,
-        link: null,
+        url: util.format('https://%s.slack.com/archives/general/p%s', item.teamInfo.name, item.ts.replace('.', '')),
         date: moment(new Date(1000 * parseInt(item.ts.split('.')[0]))),
         author: item.userInfo.name
     });

@@ -99,6 +99,8 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
         // https://api.slack.com/methods/users.info
         function(messages, callback) {
             async.eachLimit(messages, 1, function(message, callback) {
+
+                // Augment the message with higher-level info which is used in the slack.message factory.
                 message.teamInfo = teamInfo;
                 message.channelInfo = channelInfo;
                 message.channelsInfo = channelsInfo;
