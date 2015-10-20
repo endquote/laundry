@@ -15,6 +15,13 @@ Washers.Slack = function(config, job) {
 
     this._callbackUri = 'http://laundry.endquote.com/callbacks/slack.html';
 
+    this._requestOptions = {
+        baseUrl: 'https://slack.com/api/',
+        qs: {
+            token: this.token
+        }
+    };
+
     var authSettings = [{
         name: 'clientId',
         prompt: util.format('Go to https://api.slack.com/applications/new. For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Create Application". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri),
