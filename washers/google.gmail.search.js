@@ -40,6 +40,7 @@ Washers.Google.Gmail.Search.prototype.doInput = function(callback) {
         function(callback) {
             // https://developers.google.com/gmail/api/v1/reference/users/messages/list
             log.debug('Getting messages for query ' + that.query);
+            var messages = [];
 
             // Request messages matching the query -- seems to return 100 by default, fine for now.
             Helpers.jsonRequest(
@@ -60,85 +61,24 @@ Washers.Google.Gmail.Search.prototype.doInput = function(callback) {
                                     format: 'full'
                                 }
                             }, that._requestOptions),
-
-                            // Parse out each message.
                             function(result) {
-
-                                // Grab date header
-                                var date = result.payload.headers.filter(function(header) {
-                                    return header.name === 'Date';
-                                })[0];
-                                date = moment(new Date(date.value));
-
-                                // Grab subject header
-                                var subject = result.payload.headers.filter(function(header) {
-                                    return header.name === 'Subject';
-                                })[0];
-                                subject = subject ? subject.value : '';
-
-                                // Get the message body.
-                                var body = '';
-                                if (result.payload.body.size) {
-                                    // It's just in the main payload
-                                    body = new Buffer(result.payload.body.data, 'base64').toString('utf8');
-                                } else {
-                                    var parts = result.payload.parts;
-                                    // Maybe it's buried in a multipart section
-                                    var multipart = parts.filter(function(part) {
-                                        return part.mimeType === 'multipart/alternative';
-                                    })[0];
-                                    parts = multipart ? multipart.parts : parts;
-
-                                    // Get html and text, prefer html
-                                    var htmlPart = parts.filter(function(part) {
-                                        return part.mimeType === 'text/html';
-                                    })[0];
-                                    var textPart = parts.filter(function(part) {
-                                        return part.mimeType === 'text/plain';
-                                    })[0];
-                                    var part = htmlPart || textPart;
-                                    body = new Buffer(part.body.data, 'base64').toString('utf8');
-                                }
-
-                                // Get the address the message was sent to
-                                var to = result.payload.headers.filter(function(header) {
-                                    return header.name === 'To';
-                                })[0];
-                                to = to.value;
-                                to = to.match(/\b([A-Za-z0-9%+._-])+[@]+([%+a-z0-9A-Z.-]*)\b/g)[0];
-
-                                // Build the web link to the message
-                                var link = util.format('https://mail.google.com/mail/?authuser=%s#all/%s', to, result.threadId);
-
-                                // Figure out who it's from
-                                var from = result.payload.headers.filter(function(header) {
-                                    return header.name === 'From';
-                                })[0];
-                                from = from.value;
-                                from = from.replace(/<.*>/, '').trim(); // remove email address
-                                from = from.replace(/^"|"$/gm, ''); // remove quotes at beginning and end
-
-                                items.push({
-                                    title: subject,
-                                    description: body,
-                                    link: link,
-                                    date: date,
-                                    author: from
-                                });
-
+                                messages.push(result);
                                 callback();
-                            });
-                    }, callback);
+                            },
+                            callback);
+                    }, function(err) {
+                        callback(err, messages);
+                    });
                 },
                 callback);
         }
-    ], function(err) {
+    ], function(err, messages) {
         if (err) {
             callback(err);
             return;
         }
 
-        Item.download(Items.RSS, that, items, callback);
+        Item.download(Items.Google.Gmail.Message, that, messages, callback);
     });
 };
 
