@@ -55,7 +55,7 @@ Washers.Slack = function(config, job) {
                 return;
             }
 
-            var url = util.format('https://slack.com/oauth/authorize?client_id=%s&redirect_uri=%s&scope=read,post', this.clientId, this._callbackUri);
+            var url = util.format('https://slack.com/oauth/authorize?client_id=%s&redirect_uri=%s&scope=read,post,identify,client', this.clientId, this._callbackUri);
             var that = this;
             Helpers.shortenUrl(url, function(url) {
                 prompt = util.format(prompt, url);

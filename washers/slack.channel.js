@@ -98,7 +98,7 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
         // Get the post users with users.info
         // https://api.slack.com/methods/users.info
         function(messages, callback) {
-            async.eachLimit(messages, 1, function(message, callback) {
+            async.eachSeries(messages, function(message, callback) {
 
                 // Augment the message with higher-level info which is used in the slack.message factory.
                 message.teamInfo = teamInfo;
@@ -144,7 +144,55 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
 };
 
 Washers.Slack.Channel.prototype.doOutput = function(items, callback) {
-    callback();
+    var that = this;
+
+    async.waterfall([
+
+        // Get channel ID with channels.list
+        // https://api.slack.com/methods/channels.list
+        function(callback) {
+            Helpers.jsonRequest(
+                extend({
+                    url: 'channels.list'
+                }, that._requestOptions),
+                function(response) {
+                    var channelInfo = response.channels.filter(function(c) {
+                        return c.name.toLowerCase() === that.channel.toLowerCase();
+                    })[0];
+                    callback(channelInfo ? null : util.format('Channel "%s" not found.', that.channel), channelInfo);
+                },
+                callback);
+        },
+
+        // Post items with chat.postMessage
+        // https://api.slack.com/methods/chat.postMessage
+        function(channelInfo, callback) {
+
+            async.eachSeries(items, function(item, callback) {
+                if (item.date.isBefore(that._job.lastRun)) {
+                    // This item was already posted.
+                    process.nextTick(function() {
+                        callback();
+                    });
+                } else {
+                    Helpers.jsonRequest(
+                        extend({
+                            url: 'chat.postMessage',
+                            qs: {
+                                channel: channelInfo.id,
+                                text: S(item.description).stripTags().s,
+                                parse: 'full',
+                                as_user: true
+                            }
+                        }, that._requestOptions),
+                        function(response) {
+                            callback();
+                        },
+                        callback);
+                }
+            }, callback);
+        }
+    ], callback);
 };
 
 module.exports = Washers.Slack.Channel;

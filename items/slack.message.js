@@ -32,6 +32,7 @@ Items.Slack.Message.factory = function(item, downloads) {
     var matches;
     var formatted = item.text;
     while (matches = regex.exec(item.text)) { // jshint ignore:line
+
         // Within those sequences, format content starting with #C as a channel link: https://endquote.slack.com/archives/general
         if (matches[1].indexOf('#C') === 0) {
             var channelId = matches[1].substr(1);
