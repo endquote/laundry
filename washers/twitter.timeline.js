@@ -21,7 +21,7 @@ Washers.Twitter.Timeline = function(config, job) {
                 name: 'excludeReplies',
                 prompt: 'Do you want to exclude replies? (y/n)',
                 beforeEntry: function(rl, job, prompt, callback) {
-                    callback(true, prompt, this.excludeReplies === undefined ? 'y' : (this.excludeReplies ? 'y' : 'n'));
+                    callback(true, prompt, this.excludeReplies === undefined ? 'n' : (this.excludeReplies ? 'y' : 'n'));
                 },
                 afterEntry: function(rl, job, oldValue, newValue, callback) {
                     newValue = newValue.toLowerCase();
@@ -32,7 +32,7 @@ Washers.Twitter.Timeline = function(config, job) {
                 name: 'excludeRetweets',
                 prompt: 'Do you want to exclude retweets and quotes? (y/n)',
                 beforeEntry: function(rl, job, prompt, callback) {
-                    callback(true, prompt, this.excludeRetweets === undefined ? 'y' : (this.excludeRetweets ? 'y' : 'n'));
+                    callback(true, prompt, this.excludeRetweets === undefined ? 'n' : (this.excludeRetweets ? 'y' : 'n'));
                 },
                 afterEntry: function(rl, job, oldValue, newValue, callback) {
                     newValue = newValue.toLowerCase();
