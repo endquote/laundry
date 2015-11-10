@@ -53,7 +53,6 @@ Washers.Tumblr.Blog.prototype.doInput = function(callback) {
             },
             callback);
     }, function() {
-        console.log(lastResponse.posts.length, posts.length, quantity, limit);
         return lastResponse.posts.length === limit && posts.length < quantity;
     }, function(err) {
         if (err) {

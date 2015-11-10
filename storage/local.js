@@ -11,11 +11,12 @@ Storage.Local = function() {};
 //
 // url: the url to download
 // taget: the path to download to
+// targetDate: a date object to use as the last modified time of the file
 // cache: an array of {fileName, modified} objects not to download, since they are there already
 // useYTDL: use youtube-download to transform the url to a media url
 // download: false to not actually download, only construct the result object (weird, but allows for optional downloads without tons of pain)
 // callback: (err, {oldUrl, newUrl, error, ytdl}) - the ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
-Storage.Local.downloadUrl = function(url, target, cache, useYTDL, download, callback) {
+Storage.Local.downloadUrl = function(url, target, targetDate, cache, useYTDL, download, callback) {
     var result = {
         oldUrl: url,
         newUrl: url,
@@ -88,7 +89,14 @@ Storage.Local.downloadUrl = function(url, target, cache, useYTDL, download, call
 
             result.newUrl = resultUrl;
             response.on('end', function() {
-                callback(response.error, result);
+                if (response.error || !targetDate) {
+                    callback(response.error, result);
+                    return;
+                }
+
+                fs.utimes(target, Date.now(), targetDate, function() {
+                    callback(response.error, result);
+                });
             });
 
             fs.mkdirp(path.parse(target).dir, function(err) {

@@ -37,12 +37,12 @@ Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, washer, cache, 
 
             // Upload the thumbnail
             var target = prefix + '/' + obj.contentDetails.videoId + '.jpg';
-            Storage.downloadUrl(thumbnail.url, target, cache, false, download, callback);
+            Storage.downloadUrl(thumbnail.url, target, null, cache, false, download, callback);
         },
         video: function(callback) {
             // Upload the video
             var target = prefix + '/' + obj.contentDetails.videoId + '.mp4';
-            Storage.downloadUrl('https://youtube.com/watch?v=' + obj.contentDetails.videoId, target, cache, true, download, callback);
+            Storage.downloadUrl('https://youtube.com/watch?v=' + obj.contentDetails.videoId, target, null, cache, true, download, callback);
         }
     };
 };

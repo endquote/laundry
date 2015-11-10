@@ -24,11 +24,12 @@ Storage.S3._init = function() {
 //
 // url: the url to download
 // taget: the path to download to
+// targetDate: a date object to use as the last modified time of the file
 // cache: an array of {fileName, modified} objects not to download, since they are there already
 // useYTDL: use youtube-download to transform the url to a media url
 // download: false to not actually download, only construct the result object (weird, but allows for optional downloads without tons of pain)
 // callback: (err, {oldUrl, newUrl, error, ytdl}) - the ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
-Storage.S3.downloadUrl = function(url, target, cache, useYTDL, download, callback) {
+Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, download, callback) {
     var result = {
         oldUrl: url,
         newUrl: url,
@@ -106,10 +107,14 @@ Storage.S3.downloadUrl = function(url, target, cache, useYTDL, download, callbac
             params.Body = response;
             params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
             params.ContentType = response.headers['content-type'];
+            params.Metadata = {
+                'last-modified': targetDate.getTime().toString()
+            };
             Storage.S3._client.upload(params)
                 .on('httpUploadProgress', function(progress) {
                     // console.log(progress);
-                }).send(function(err, data) {
+                })
+                .send(function(err, data) {
                     result.error = err;
                     if (!err) {
                         result.newUrl = resultUrl;
@@ -125,7 +130,7 @@ Storage.S3.cacheFiles = function(dir, callback) {
     log.debug('Caching ' + dir);
     var objects = [];
     var lastCount = 0;
-    var pageSize = 100;
+    var pageSize = 1000;
     async.doWhilst(
         function(callback) {
             Storage.S3._client.listObjects({
@@ -150,7 +155,7 @@ Storage.S3.cacheFiles = function(dir, callback) {
             objects = objects.map(function(obj) {
                 return {
                     fileName: obj.Key,
-                    modified: obj.LastModified
+                    modified: obj.LastModified // TODO: Get last-modified that's specified in downloadUrl, hopefully not by calling headObject on every file?
                 };
             });
             callback(err, objects);

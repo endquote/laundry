@@ -45,7 +45,7 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
                 var source = entity.media_url_https + ':' + size;
                 var target = prefix + '/' + obj.id + '.' + entity.media_url_https.split('.').pop();
 
-                Storage.downloadUrl(source, target, cache, false, download, function(err, res) {
+                Storage.downloadUrl(source, target, null, cache, false, download, function(err, res) {
                     results.push(res);
                     callback();
                 });

@@ -45,12 +45,12 @@ Item.download = function(itemClass, washer, objects, callback) {
         function(callback) {
             // Process each object.
             async.eachLimit(objects, 5, function(object, callback) {
-                // Upload files.
+                // Download files.
                 async.parallel(
                     itemClass.downloadLogic(prefix, object, washer, cache, washer.downloadMedia),
                     function(err, uploads) {
                         if (err) {
-                            // Carry on when an upload fails.
+                            // Carry on when an download fails.
                             log.warn(err);
                             callback();
                             return;

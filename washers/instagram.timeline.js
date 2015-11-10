@@ -28,7 +28,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
 Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
     var that = this;
 
-    var quantity = 150;
+    var quantity = 1;
     var posts = [];
     var nextMax = null;
     async.whilst(function() {
