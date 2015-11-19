@@ -55,7 +55,9 @@ Items.Google.Gmail.Message.factory = function(item, downloads) {
             return part.mimeType === 'text/plain';
         })[0];
         var part = htmlPart || textPart;
-        body = new Buffer(part.body.data, 'base64').toString('utf8');
+        if (part) {
+            body = new Buffer(part.body.data, 'base64').toString('utf8');
+        }
     }
 
     // Get the address the message was sent to
