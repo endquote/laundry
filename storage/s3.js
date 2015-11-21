@@ -107,7 +107,7 @@ Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, downl
             params.Body = response;
             params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
             params.ContentType = response.headers['content-type'];
-            if (targetDate) {
+            if (targetDate && targetDate.getTime) {
                 params.Metadata = {
                     'last-modified': targetDate.getTime().toString()
                 };
