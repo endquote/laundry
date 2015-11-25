@@ -4,8 +4,6 @@ var touch = require('touch'); // https://github.com/isaacs/node-touch
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 var mime = require('mime-types'); // https://www.npmjs.com/package/mime-types
 var ytdl = require('youtube-dl'); // https://github.com/fent/node-youtube-dl
-var http = require('follow-redirects').http; // https://www.npmjs.com/package/follow-redirects
-var https = require('follow-redirects').https; // https://www.npmjs.com/package/follow-redirects
 
 // Misc static helper functions.
 function Helpers() {}

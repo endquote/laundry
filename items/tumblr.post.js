@@ -55,9 +55,7 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
                     target += '-' + (obj.photos.indexOf(photo) + 1);
                 }
                 target += '.jpg';
-                // "protocol mismatch" error in follow-redirects if it's http
-                var url = photo.original_size.url.replace('http:', 'https:');
-                Storage.downloadUrl(url, target, null, cache, false, download, function(err, res) {
+                Storage.downloadUrl(photo.original_size.url, target, null, cache, false, download, function(err, res) {
                     results.push(res);
                     callback();
                 });

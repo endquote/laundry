@@ -98,7 +98,15 @@ Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, downl
         log.debug('Downloading ' + params.Key);
         var protocol = require('url').parse(url).protocol;
         var req = protocol === 'http' ? http.request : https.request;
-        req(url, function(response) {
+        request({
+            url: url,
+            followRedirects: true,
+            followAllRedirects: true
+        }, function(err, response, body) {
+            if (err || !response) {
+                callback(err, result);
+                return;
+            }
             if (response.statusCode !== 200 && response.statusCode !== 302) {
                 callback(response.error, result);
                 return;
