@@ -94,8 +94,6 @@ Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, downl
         };
 
         log.debug('Downloading ' + params.Key);
-        var protocol = require('url').parse(url).protocol;
-        var req = protocol === 'http' ? http.request : https.request;
         request({
             url: url,
             followRedirects: true,
