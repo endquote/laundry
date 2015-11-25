@@ -80,7 +80,7 @@ Storage.Local.downloadUrl = function(url, target, targetDate, cache, useYTDL, do
 
         log.debug('Downloading ' + params.Key);
         var protocol = require('url').parse(url).protocol;
-        var req = protocol === 'http' ? http.request : https.request;
+        var req = protocol === 'http:' ? http.request : https.request;
         req(url, function(response) {
             if (response.statusCode !== 200 && response.statusCode !== 302) {
                 callback(response.error, result);
