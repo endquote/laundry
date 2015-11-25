@@ -1,8 +1,6 @@
 'use strict';
 
 var ytdl = require('youtube-dl'); // https://github.com/fent/node-youtube-dl
-var http = require('follow-redirects').http; // https://www.npmjs.com/package/follow-redirects
-var https = require('follow-redirects').https; // https://www.npmjs.com/package/follow-redirects
 var AWS = require('aws-sdk'); // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html
 var mime = require('mime-types'); // https://www.npmjs.com/package/mime-types
 
