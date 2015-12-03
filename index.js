@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 'use strict';
 
 // Loading lots of utiltiies into global.
@@ -69,8 +67,8 @@ commander.parse(process.argv);
 
 // If no command, show help.
 if (commander.args.filter(function(arg) {
-        return arg.commands;
-    }).length === 0) {
+    return arg.commands;
+}).length === 0) {
     commander.help();
 }
 
