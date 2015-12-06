@@ -139,6 +139,37 @@ function runCommand() {
     global.Storage = require('./storage');
     Storage.init();
 
+    if (Storage.mode === Storage.S3) {
+        // Using S3, set up S3 logging.
+        // https://www.npmjs.com/package/s3-streamlogger
+        var S3StreamLogger = require('s3-streamlogger').S3StreamLogger;
+        log.add(log.transports.File, {
+            level: 'debug',
+            stream: new S3StreamLogger({
+                bucket: commander.s3bucket,
+                access_key_id: commander.s3key,
+                secret_access_key: commander.s3secret,
+                upload_every: 5000,
+                name_format: 'logs/%Y-%m-%d-%H-%M.log'
+            })
+        });
+    } else if (Storage.mode === Storage.Local) {
+        // Using local storage, set up local logging.
+        // https://github.com/winstonjs/winston/blob/master/docs/transports.md#file-transport
+        var logPath = path.join(commander.local, 'logs');
+        if (!fs.existsSync(logPath)) {
+            fs.mkdirSync(logPath);
+        }
+
+        log.add(log.transports.File, {
+            level: 'debug',
+            filename: path.join(logPath, 'laundry.log'),
+            maxsize: 100000,
+            maxFiles: 10,
+            tailable: true
+        });
+    }
+
     // Load the configuration, then run the command, then call the complete handler.
     var args = Array.prototype.slice.call(arguments);
     var cmd = args.shift();

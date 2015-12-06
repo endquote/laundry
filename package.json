@@ -34,6 +34,7 @@
     "qs": "^6.0.1",
     "request": "^2.67.0",
     "rss": "^1.2.1",
+    "s3-streamlogger": "^0.2.1",
     "sanitize-filename": "^1.5.3",
     "simple-namespace": "^0.2.0",
     "string": "^3.3.1",
