@@ -173,7 +173,9 @@ Storage.Local.readFileString = function(target, callback) {
     target = path.join(commander.local, target);
     fs.readFile(target, {
         encoding: 'utf8'
-    }, callback);
+    }, function(err, data) {
+        callback(null, err ? '' : data);
+    });
 };
 
 module.exports = Storage.Local;
