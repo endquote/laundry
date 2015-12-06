@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 'use strict';
 
 // Loading lots of utiltiies into global.
