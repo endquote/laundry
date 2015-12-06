@@ -5,19 +5,19 @@ function Storage() {}
 
 // Set the storage class to use.
 Storage.init = function() {
-    var mode = null;
+    Storage.mode = null;
     if (commander.local) {
-        mode = require('./storage/local');
+        Storage.mode = require('./storage/local');
     } else if (commander.s3key) {
-        mode = require('./storage/s3');
+        Storage.mode = require('./storage/s3');
     }
 
-    if (!mode) {
+    if (!Storage.mode) {
         throw new Error("Couldn't find a storage mode.");
     }
 
-    for (var i in mode) {
-        Storage[i] = mode[i];
+    for (var i in Storage.mode) {
+        Storage[i] = Storage.mode[i];
     }
 };
 
