@@ -149,7 +149,10 @@ Storage.S3.cacheFiles = function(dir, callback) {
                 if (err) {
                     callback(err);
                 } else {
-
+                    objects = objects.concat(data.Contents);
+                    lastCount = data.Contents.length;
+                    callback(err);
+                    /* // This is just too slow.
                     // Replace the last-modified with the custom one set in downloadUrl.
                     async.eachLimit(data.Contents, 10, function(obj, callback) {
                         Storage.S3._client.headObject({
@@ -168,6 +171,7 @@ Storage.S3.cacheFiles = function(dir, callback) {
                         lastCount = data.Contents.length;
                         callback(err);
                     });
+                    */
                 }
             });
         },
