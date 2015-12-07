@@ -81,7 +81,7 @@ Items.Google.Gmail.Message.factory = function(item, downloads) {
     return new Items.Google.Gmail.Message({
         title: subject,
         description: body,
-        link: link,
+        url: link,
         date: date,
         author: from
     });
