@@ -107,11 +107,14 @@ Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, downl
             params.Body = response;
             params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
             params.ContentType = response.headers['content-type'];
+
+            // You can't set the last modfied date, but you can add custom metadata which represents it.
             if (targetDate && targetDate.getTime) {
                 params.Metadata = {
                     'last-modified': targetDate.getTime().toString()
                 };
             }
+
             Storage.S3._client.upload(params)
                 .on('httpUploadProgress', function(progress) {
                     // console.log(progress);
@@ -135,6 +138,8 @@ Storage.S3.cacheFiles = function(dir, callback) {
     var pageSize = 1000;
     async.doWhilst(
         function(callback) {
+
+            // Get a pile of objects.
             Storage.S3._client.listObjects({
                 Bucket: commander.s3bucket,
                 Prefix: dir,
@@ -144,9 +149,25 @@ Storage.S3.cacheFiles = function(dir, callback) {
                 if (err) {
                     callback(err);
                 } else {
-                    objects = objects.concat(data.Contents);
-                    lastCount = data.Contents.length;
-                    callback(err);
+
+                    // Replace the last-modified with the custom one set in downloadUrl.
+                    async.eachLimit(data.Contents, 10, function(obj, callback) {
+                        Storage.S3._client.headObject({
+                            Bucket: commander.s3bucket,
+                            Key: obj.Key
+                        }, function(err, data) {
+                            if (data.Metadata && data.Metadata['last-modified']) {
+                                obj.LastModified = new Date(parseInt(data.Metadata['last-modified']));
+                            }
+                            callback(err);
+                        });
+                    }, function(err) {
+
+                        // Add this pile to the rest.
+                        objects = objects.concat(data.Contents);
+                        lastCount = data.Contents.length;
+                        callback(err);
+                    });
                 }
             });
         },
