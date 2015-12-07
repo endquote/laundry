@@ -104,7 +104,7 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
             },
             callback);
     }, function() {
-        return retrievedTotal < that._quantity || retrievedLast === 0;
+        return retrievedTotal < that._quantity && retrievedLast > 1;
     }, function(err) {
         if (err) {
             callback(err);
