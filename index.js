@@ -157,10 +157,7 @@ function runCommand() {
         // Using local storage, set up local logging.
         // https://github.com/winstonjs/winston/blob/master/docs/transports.md#file-transport
         var logPath = path.join(commander.local, 'logs');
-        if (!fs.existsSync(logPath)) {
-            fs.mkdirSync(logPath);
-        }
-
+        fs.ensureDirSync(logPath);
         log.add(log.transports.File, {
             level: 'debug',
             filename: path.join(logPath, 'laundry.log'),
