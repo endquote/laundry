@@ -40,6 +40,7 @@
     "string": "^3.3.1",
     "touch": "1.0.0",
     "validator": "^4.4.0",
+    "walk": "^2.3.9",
     "winston": "^2.1.1",
     "word-wrap": "^1.1.0",
     "youtube-dl": "^1.10.5"

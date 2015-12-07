@@ -3,6 +3,7 @@
 var ytdl = require('youtube-dl'); // https://github.com/fent/node-youtube-dl
 var http = require('follow-redirects').http; // https://www.npmjs.com/package/follow-redirects
 var https = require('follow-redirects').https; // https://www.npmjs.com/package/follow-redirects
+var walk = require('walk'); // https://github.com/coolaj86/node-walk
 
 ns('Storage', global);
 Storage.Local = function() {};
@@ -114,26 +115,36 @@ Storage.Local.downloadUrl = function(url, target, targetDate, cache, useYTDL, do
 // Given a directory, return all the files and their last-modified times.
 Storage.Local.cacheFiles = function(dir, callback) {
     var p = path.join(commander.local, dir);
-    fs.exists(p, function(exists) {
-        if (exists) {
-            var cache = [];
-            fs.readdir(p, function(err, files) {
-                async.each(files, function(file, callback) {
-                    var fileName = p + '/' + file;
-                    fs.stat(fileName, function(err, stats) {
-                        cache.push({
-                            fileName: fileName,
-                            modified: stats ? stats.mtime : 0
-                        });
-                        callback(err);
-                    });
-                }, function(err) {
-                    callback(err, cache);
+    var files = [];
+    var directories = [];
+    var walker = walk.walk(p, {
+        followLinks: false,
+    });
+    walker.on('file', function(root, stat, next) {
+        files.push({
+            fileName: path.join(root, stat.name),
+            modified: stat.mtime
+        });
+        next();
+    });
+    walker.on('directory', function(root, stat, next) {
+        directories.push({
+            fileName: path.join(root, stat.name),
+            modified: stat.mtime
+        });
+        next();
+    });
+    walker.on('end', function() {
+        directories.reverse();
+        fs.stat(p, function(err, stat) {
+            if (stat) {
+                directories.push({
+                    fileName: p,
+                    modified: stat.mtime
                 });
-            });
-        } else {
-            callback(null, []);
-        }
+            }
+            callback(null, files.concat(directories));
+        });
     });
 };
 
@@ -149,7 +160,7 @@ Storage.Local.deleteBefore = function(cache, date, callback) {
     });
     log.debug(util.format('Cleaning %d files from %s', expired.length, dir));
     async.each(expired, function(file, callback) {
-        fs.unlink(file.fileName, callback);
+        fs.remove(file.fileName, callback);
     }, callback);
 };
 
