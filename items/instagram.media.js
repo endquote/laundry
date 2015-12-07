@@ -101,7 +101,19 @@ Items.Instagram.Media.factory = function(post, downloads) {
 
 // Link usernames, tags, and urls.
 Items.Instagram.Media.linkify = function(str) {
-    str = str.replace(/@([\w.]+)/g, '<a href="http://instagram.com/$1">@$1</a>');
+    var re = /@([\w.]+)/g; // Usernames can be letters, numbers, underscores, and periods.
+    var match;
+    var copy = str;
+    while (match = re.exec(str)) { // jshint ignore:line
+        var user = match[0].substr(1);
+        // If the username is followed by a period, the period isn't part of the username.
+        if (user.lastIndexOf('.') === user.length - 1) {
+            user = user.substr(0, user.length - 1);
+        }
+        copy = copy.replace('@' + user, '<a href="https://instagram.com/' + user + '">@' + user + '</a>');
+    }
+    str = copy;
+
     str = str.replace(/#([\w]+)/g, '<a href="https://instagram.com/explore/tags/$1/">#$1</a>');
     str = Autolinker.link(str);
     return str;
