@@ -143,15 +143,17 @@ function runCommand() {
         // Using S3, set up S3 logging.
         // https://www.npmjs.com/package/s3-streamlogger
         var S3StreamLogger = require('s3-streamlogger').S3StreamLogger;
+        var stream = new S3StreamLogger({
+            bucket: commander.s3bucket,
+            access_key_id: commander.s3key,
+            secret_access_key: commander.s3secret,
+            upload_every: 5000,
+            name_format: 'logs/%Y-%m-%d-%H-%M.log'
+        });
+        log.s3stream = stream;
         log.add(log.transports.File, {
             level: 'debug',
-            stream: new S3StreamLogger({
-                bucket: commander.s3bucket,
-                access_key_id: commander.s3key,
-                secret_access_key: commander.s3secret,
-                upload_every: 5000,
-                name_format: 'logs/%Y-%m-%d-%H-%M.log'
-            })
+            stream: stream
         });
     } else if (Storage.mode === Storage.Local) {
         // Using local storage, set up local logging.
@@ -184,6 +186,9 @@ function runCommand() {
 function onComplete(err) {
     if (err) {
         log.error(err);
+    }
+    if (log.s3stream) {
+        log.s3stream.flushFile();
     }
     log.debug(Date.now() - processStart + 'ms');
 }
