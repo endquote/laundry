@@ -59,6 +59,7 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
 // Construct an Item given an API response and any upload info.
 Items.Twitter.Tweet.factory = function(tweet, downloads) {
     var item = new Items.Twitter.Tweet({
+        title: tweet.user.screen_name + ': ' + Helpers.shortenString(tweet.text, 30),
         date: moment(new Date(tweet.created_at)),
         author: tweet.user.screen_name,
         favorites: tweet.favorite_count,
@@ -75,31 +76,63 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         coordinates: tweet.coordinates ? tweet.coordinates.coordinates : null
     });
 
-    if (tweet.entities.media) {
-        tweet.entities.media.forEach(function(media) {
-            tweet.text = tweet.text.replace(media.url, '');
-        });
+    var parsed = '';
+    var mediaTags = [];
+    var len = tweet.text.length;
+    for (var i = 0; i < len; i++) {
+        var media = tweet.entities.media && tweet.entities.media.filter(function(media) {
+            return i >= media.indices[0] && i <= media.indices[1];
+        })[0];
+        if (media) {
+            if (i === media.indices[0]) {
+                mediaTags.push(util.format('<p><a href="%s"><img src="%s"/></a></p>', media.expanded_url, media.media_url_https + ':large'));
+            }
+            continue;
+        }
+
+        var url = tweet.entities.urls && tweet.entities.urls.filter(function(url) {
+            return url.indices[0] === i;
+        })[0];
+        if (url) {
+            parsed += util.format('<a href="%s">%s</a>', url.expanded_url, url.display_url);
+            i = url.indices[1] - 1;
+            continue;
+        }
+
+        var mention = tweet.entities.user_mentions && tweet.entities.user_mentions.filter(function(mention) {
+            return mention.indices[0] === i;
+        })[0];
+        if (mention) {
+            parsed += util.format('<a href="https://twitter.com/%s">@%s</a>', mention.screen_name, mention.screen_name);
+            i = mention.indices[1] - 1;
+            continue;
+        }
+
+        var hashtag = tweet.entities.hashtags && tweet.entities.hashtags.filter(function(hashtag) {
+            return hashtag.indices[0] === i;
+        })[0];
+        if (hashtag) {
+            parsed += util.format('<a href="https://twitter.com/hashtag/%s">#%s</a>', hashtag.text, hashtag.text);
+            i = hashtag.indices[1] - 1;
+            continue;
+        }
+
+        var symbol = tweet.entities.symbols && tweet.entities.symbols.filter(function(symbol) {
+            return symbol.indices[0] === i;
+        })[0];
+        if (symbol) {
+            parsed += util.format('<a href="http://finance.yahoo.com/q?s=%s">%s</a>', symbol.text, symbol.text);
+            i = symbol.indices[1] - 1;
+            continue;
+        }
+
+        parsed += tweet.text[i];
     }
 
-    if (tweet.entities.urls) {
-        tweet.entities.urls.forEach(function(link) {
-            tweet.text = tweet.text.replace(link.url, util.format('<a href="%s">%s</a>', link.expanded_url, link.expanded_url));
-        });
-    }
-
-    item.title = item.author + ': ' + Helpers.shortenString(tweet.text, 30);
-
-    item.description = '';
-    if (downloads.media) {
-        downloads.media.forEach(function(download) {
-            item.description += util.format('<p><img src="%s"/></p>', download.newUrl);
-        });
-    }
-
-    var text = util.format('<p>%s</p>', tweet.text);
-    text = text.replace(/@([\w]+)/g, '<a href="https://twitter.com/$1">@$1</a>');
-    text = text.replace(/#([\w]+)/g, '<a href="https://twitter.com/hashtag/$1">#$1</a>');
-    item.description += text;
+    item.description = util.format('<p>%s</p>', parsed);
+    mediaTags.forEach(function(mediaTag) {
+        item.description += mediaTag;
+    });
 
     if (item.coordinates) {
         item.description += util.format('<p>(<a href="http://maps.apple.com/?ll=%s,%s">location</a>)</p>', item.coordinates[0], item.coordinates[1]);
