@@ -57,7 +57,7 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
                 }
                 target += '.jpg';
 
-                Storage.downloadUrl(photo.original_size.url, target, null, cache, false, download, function(err, res) {
+                Storage.downloadUrl(photo.original_size.url, target, targetDate, cache, false, download, function(err, res) {
                     results.push(res);
                     callback();
                 });
