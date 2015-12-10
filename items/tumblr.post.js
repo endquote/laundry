@@ -95,7 +95,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
     }
 
     if (item.postType === 'text') {
-        item.title += util.format(': %s', Helpers.shortenString(S(item.title).stripTags(), titleLength));
+        item.title += util.format(': %s', Helpers.shortenString(S(post.title).stripTags(), titleLength));
         item.description += post.body;
 
 
