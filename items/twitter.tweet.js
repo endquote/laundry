@@ -31,7 +31,19 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
     return {
         media: function(callback) {
             var results = [];
-            async.each(obj.entities.media, function(entity, callback) {
+            var target = '';
+            if (!obj.extended_entities || !obj.extended_entities.media) {
+                callback(null, results);
+                return;
+            }
+
+            // Use the extended_entities field to download good media.
+            var targetDate = new Date(obj.created_at);
+            async.each(obj.extended_entities.media, function(entity, callback) {
+
+                // Add ".x" to the filename if there are multiple media items.
+                var mediaIndex = obj.extended_entities.media.length > 1 ? '.' + obj.extended_entities.media.indexOf(entity) : '';
+
                 // Figure out the biggest size (probably always 'large')
                 var width = 0;
                 var size = 'thumb';
@@ -42,12 +54,26 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
                     }
                 }
 
+                // Download the image.
                 var source = entity.media_url_https + ':' + size;
-                var target = prefix + '/' + obj.id + '.' + entity.media_url_https.split('.').pop();
-
-                Storage.downloadUrl(source, target, null, cache, false, download, function(err, res) {
+                target = prefix + '/' + obj.id + mediaIndex + '.' + entity.media_url_https.split('.').pop();
+                Storage.downloadUrl(source, target, targetDate, cache, false, download, function(err, res) {
                     results.push(res);
-                    callback();
+
+                    // If there's a video, download the video... the image was the poster frame.
+                    if (entity.type === 'video' || entity.type === 'animated_gif') {
+                        var variant = entity.video_info.variants.filter(function(variant) {
+                            return variant.content_type === 'video/mp4';
+                        })[0];
+                        target = prefix + '/' + obj.id + mediaIndex + '.' + variant.url.split('.').pop();
+                        Storage.downloadUrl(variant.url, target, targetDate, cache, false, download, function(err, video) {
+                            res.video = video;
+                            callback();
+                        });
+                    } else {
+                        callback();
+                    }
+
                 });
             }, function(err) {
                 callback(err, results);
@@ -60,6 +86,7 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
 Items.Twitter.Tweet.factory = function(tweet, downloads) {
     var item = new Items.Twitter.Tweet({
         title: tweet.user.screen_name + ': ' + Helpers.shortenString(tweet.text, 30),
+        description: '',
         date: moment(new Date(tweet.created_at)),
         author: tweet.user.screen_name,
         favorites: tweet.favorite_count,
@@ -76,17 +103,26 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         coordinates: tweet.coordinates ? tweet.coordinates.coordinates : null
     });
 
+    // Start with media, then tweet text.
+    downloads.media.forEach(function(media) {
+        if (media.video) {
+            item.description += Item.buildVideo(media.video.newUrl, media.newUrl);
+        } else {
+            item.description += util.format('<p><img src="%s"/></p>', media.newUrl);
+        }
+    });
+
+    // Parse all the various entities in tweet text to link to hashtags, users, and urls.
     var parsed = '';
     var mediaTags = [];
     var len = tweet.text.length;
     for (var i = 0; i < len; i++) {
-        var media = tweet.entities.media && tweet.entities.media.filter(function(media) {
+
+        // Skip media, it gets added at the end.
+        var media = tweet.extended_entities && tweet.extended_entities.media && tweet.extended_entities.media.filter(function(media) {
             return i >= media.indices[0] && i <= media.indices[1];
         })[0];
         if (media) {
-            if (i === media.indices[0]) {
-                mediaTags.push(util.format('<p><a href="%s"><img src="%s"/></a></p>', media.expanded_url, media.media_url_https + ':large'));
-            }
             continue;
         }
 
@@ -129,11 +165,9 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         parsed += tweet.text[i];
     }
 
-    item.description = util.format('<p>%s</p>', parsed);
-    mediaTags.forEach(function(mediaTag) {
-        item.description += mediaTag;
-    });
+    item.description += util.format('<p>%s</p>', parsed);
 
+    // Add link to geolocation data.
     if (item.coordinates) {
         item.description += util.format('<p>(<a href="http://maps.apple.com/?ll=%s,%s">location</a>)</p>', item.coordinates[0], item.coordinates[1]);
     }
