@@ -22,17 +22,18 @@ Items.Tumblr.Post.className = Helpers.buildClassName(__filename);
 // cache: already downloaded files, pass to downloadUrl
 // download: pass to downloadUrl
 Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download) {
+    var targetDate = new Date(obj.date);
     return {
         // Try to extract a video -- this often fails on Tumblr.
         video: function(callback) {
             var target = prefix + '/' + obj.id + '.mp4';
-            Storage.downloadUrl(obj.type === 'video' ? obj.post_url : null, target, null, cache, true, download, function(err, res) {
+            Storage.downloadUrl(obj.type === 'video' ? obj.post_url : null, target, targetDate, cache, true, download, function(err, res) {
 
                 // If we did get a video, get the thumbnail too.
                 if (obj.type === 'video' && res.oldUrl !== res.newUrl) {
                     var url = res.ytdl && res.ytdl.thumbnails && res.ytdl.thumbnails.length ? res.ytdl.thumbnails[0].url : null;
                     var target = prefix + '/' + obj.id + '-thumb.jpg';
-                    Storage.downloadUrl(url, target, null, cache, false, download, function(thumbErr, thumbRes) {
+                    Storage.downloadUrl(url, target, targetDate, cache, false, download, function(thumbErr, thumbRes) {
                         res.thumbnail = thumbRes;
                         callback(err, res);
                     });
@@ -44,7 +45,7 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
 
         audio: function(callback) {
             var target = prefix + '/' + obj.id + '.mp3';
-            Storage.downloadUrl(obj.type === 'audio' ? obj.post_url : null, target, null, cache, true, download, callback);
+            Storage.downloadUrl(obj.type === 'audio' ? obj.post_url : null, target, targetDate, cache, true, download, callback);
         },
 
         photos: function(callback) {
@@ -55,9 +56,8 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
                     target += '-' + (obj.photos.indexOf(photo) + 1);
                 }
                 target += '.jpg';
-                // "protocol mismatch" error in follow-redirects if it's http
-                var url = photo.original_size.url.replace('http:', 'https:');
-                Storage.downloadUrl(url, target, null, cache, false, download, function(err, res) {
+
+                Storage.downloadUrl(photo.original_size.url, target, null, cache, false, download, function(err, res) {
                     results.push(res);
                     callback();
                 });
