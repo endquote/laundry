@@ -9,6 +9,7 @@ var Item = function(config) {
     this.author = null;
     this.tags = null;
     this.mediaUrl = null;
+    this.mediaBytes = 0;
     this.description = '';
 
     if (config) {

@@ -66,6 +66,7 @@ Items.Google.YouTube.Video.factory = function(video, downloads) {
         author: video.snippet.channelTitle,
         thumbnail: downloads.thumbnail.newUrl,
         mediaUrl: downloads.video.newUrl,
+        mediaBytes: downloads.video.bytes,
         duration: video.duration
     });
 

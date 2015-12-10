@@ -54,7 +54,8 @@ Items.Instagram.Media.factory = function(post, downloads) {
         author: post.user.username,
         authorpic: post.user.profile_picture,
         location: post.location,
-        mediaUrl: downloads.video.newUrl
+        mediaUrl: downloads.video.newUrl,
+        mediaBytes: downloads.video.bytes
     });
 
     item.title = item.author;

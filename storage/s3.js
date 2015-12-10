@@ -28,12 +28,13 @@ Storage.S3._init = function() {
 // cache: an array of {fileName, modified} objects not to download, since they are there already
 // useYTDL: use youtube-download to transform the url to a media url
 // download: false to not actually download, only construct the result object (weird, but allows for optional downloads without tons of pain)
-// callback: (err, {oldUrl, newUrl, error, ytdl}) - the ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
+// callback: (err, {oldUrl, newUrl, error, ytdl, bytes}) - the ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
 Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, download, callback) {
     var result = {
         oldUrl: url,
         newUrl: url,
-        ytdl: null
+        ytdl: null,
+        bytes: 0
     };
 
     var resultUrl = util.format('https://%s.s3.amazonaws.com/%s', commander.s3bucket, target);
@@ -122,6 +123,7 @@ Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, downl
                 .send(function(err, data) {
                     result.error = err;
                     if (!err) {
+                        result.bytes = response.headers['content-length'];
                         result.newUrl = resultUrl;
                     }
                     callback(err, result);

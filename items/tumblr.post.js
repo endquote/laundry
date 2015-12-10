@@ -170,6 +170,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
         if (downloads.video) {
             item.description += Item.buildVideo(downloads.video.newUrl, downloads.video.thumbnail ? downloads.video.thumbnail.newUrl : null, 1920, 1080);
             item.mediaUrl = downloads.video.newUrl;
+            item.mediaBytes = downloads.video.bytes;
         } else {
             var biggest = post.player.sort(function(a, b) {
                 return a.width - b.width;
@@ -188,6 +189,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
         if (downloads.audio) {
             item.description += Item.buildAudio(downloads.audio.newUrl);
             item.mediaUrl = downloads.audio.newUrl;
+            item.mediaBytes = downloads.audio.bytes;
         } else {
             item.description += post.player;
         }

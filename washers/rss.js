@@ -140,7 +140,8 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
             // Set up enclosures.
             if (item.mediaUrl) {
                 entry.enclosure = {
-                    url: item.mediaUrl
+                    url: item.mediaUrl,
+                    size: item.mediaBytes
                 };
 
                 entry.custom_elements = [{
