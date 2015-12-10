@@ -52,7 +52,7 @@ Storage.Local.downloadUrl = function(url, target, targetDate, cache, useYTDL, do
         return;
     }
 
-    if (useYTDL) {
+    if (download && useYTDL) {
         // Use the youtube-dl to change the url into a media url
         log.debug('Getting media URL for ' + url);
         ytdl.getInfo(url, function(err, info) {

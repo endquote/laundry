@@ -67,7 +67,7 @@ Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, downl
         return;
     }
 
-    if (useYTDL) {
+    if (download && useYTDL) {
         // Use the youtube-dl to change the url into a media url
         log.debug('Getting media URL for ' + url);
         ytdl.getInfo(url, function(err, info) {
