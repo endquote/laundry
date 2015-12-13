@@ -131,7 +131,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         })[0];
         if (url) {
             parsed += util.format('<a href="%s">%s</a>', url.expanded_url, url.display_url);
-            i = url.indices[1] - 1;
+            i = url.indices[1];
             continue;
         }
 
@@ -140,7 +140,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         })[0];
         if (mention) {
             parsed += util.format('<a href="https://twitter.com/%s">@%s</a>', mention.screen_name, mention.screen_name);
-            i = mention.indices[1] - 1;
+            i = mention.indices[1];
             continue;
         }
 
@@ -149,7 +149,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         })[0];
         if (hashtag) {
             parsed += util.format('<a href="https://twitter.com/hashtag/%s">#%s</a>', hashtag.text, hashtag.text);
-            i = hashtag.indices[1] - 1;
+            i = hashtag.indices[1];
             continue;
         }
 
@@ -158,7 +158,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         })[0];
         if (symbol) {
             parsed += util.format('<a href="http://finance.yahoo.com/q?s=%s">%s</a>', symbol.text, symbol.text);
-            i = symbol.indices[1] - 1;
+            i = symbol.indices[1];
             continue;
         }
 
