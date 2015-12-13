@@ -95,13 +95,13 @@ Items.Tumblr.Post.factory = function(post, downloads) {
     }
 
     if (item.postType === 'text') {
-        item.title += util.format(': %s', Helpers.shortenString(S(post.title).stripTags(), titleLength));
+        item.title += util.format(': %s', S(post.title).stripTags());
         item.description += post.body;
 
 
     } else if (item.postType === 'quote') {
         if (post.source) {
-            item.title += util.format(': %s', Helpers.shortenString(S(post.source).stripTags(), titleLength));
+            item.title += util.format(': %s', S(post.source).stripTags());
         }
 
         item.description += util.format('<p>"%s"</p>', post.text);
@@ -114,7 +114,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
 
     } else if (item.postType === 'link') {
         if (post.title) {
-            item.title += util.format(': %s', Helpers.shortenString(S(post.title).stripTags(), titleLength));
+            item.title += util.format(': %s', S(post.title).stripTags());
         }
         if (post.photos) {
             post.photos.forEach(function(photo) {
@@ -183,7 +183,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
 
     } else if (item.postType === 'audio') {
         if (post.caption) {
-            item.title += util.format(': %s', Helpers.shortenString(S(post.caption).stripTags(), titleLength));
+            item.title += util.format(': %s', S(post.caption).stripTags());
         }
 
         if (downloads.audio) {
