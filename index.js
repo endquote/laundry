@@ -25,7 +25,7 @@ commander
     .option('--s3secret [secret]', 'S3 access key secret, default is LAUNDRY_S3_SECRET', process.env.LAUNDRY_S3_SECRET)
     .option('--s3bucket [bucket]', 'S3 bucket, default is LAUNDRY_S3_BUCKET', process.env.LAUNDRY_S3_BUCKET)
     .option('--baseUrl [url]', 'the base URL that maps to the local folder or S3 bucket, default is LAUNDRY_BASEURL', process.env.LAUNDRY_BASEURL)
-    .option('--proxy [proxy]', 'proxy to use for API requests')
+    .option('--proxy [proxy]', 'proxy to use for API requests, use "http://localhost:8888" when debugging with Charles')
     .option('-v, --verbose', 'verbose output');
 
 // Set up all the commands.
