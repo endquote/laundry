@@ -162,7 +162,11 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
             continue;
         }
 
-        parsed += tweet.text[i];
+        if(tweet.text[i] === '\n') {
+            parsed += '<br/>';
+        } else {
+            parsed += tweet.text[i];
+        }
     }
 
     item.description += util.format('<p>%s</p>', parsed);
