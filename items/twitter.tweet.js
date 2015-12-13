@@ -163,6 +163,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         }
 
         if(tweet.text[i] === '\n') {
+            // BUG: If a linebreak is immediately after an emoji it doesn't get seen here for some reason.
             parsed += '<br/>';
         } else {
             parsed += tweet.text[i];
