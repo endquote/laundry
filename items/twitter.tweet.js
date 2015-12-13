@@ -174,7 +174,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
     // Add link to geolocation data.
     if (item.coordinates) {
-        item.description += util.format('<p>(<a href="http://maps.apple.com/?ll=%s,%s">location</a>)</p>', item.coordinates[0], item.coordinates[1]);
+        item.description += util.format('<p>(<a href="http://maps.apple.com/?ll=%s,%s">location</a>)</p>', item.coordinates[1], item.coordinates[0]);
     }
 
     return item;
