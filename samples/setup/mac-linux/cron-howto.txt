@@ -5,7 +5,3 @@ every five minutes:
 
 */5 * * * * /Users/me/laundry/laundry-tick.sh
 
-The youtube-dl script is used for downloading media and is updated regularly.
-"sudo crontab -e" and add something like this to check for updates daily.
-
-30 0 * * * node /usr/local/lib/node_modules/laundry/node_modules/youtube-dl/scripts/download.js

@@ -3,6 +3,7 @@
 var readline = require('readline'); // https://nodejs.org/api/readline.html
 var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
+var child_process = require('child_process'); // https://nodejs.org/api/child_process.html
 
 // Singleton Laundry class, generally the entry point to the whole thing.
 function Laundry() {}
@@ -437,6 +438,22 @@ Laundry.run = function(jobName, callback) {
                 console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
                 Laundry.list();
                 callback(jobName);
+            } else {
+                callback(null, job);
+            }
+        },
+
+        function(job, callback) {
+            // Update youtube-dl every day.
+            if(moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
+                var ytdldl = path.join(__dirname, 'node_modules/youtube-dl/scripts/download.js');
+                child_process.exec('node ' + ytdldl, function(err, stdout, stderr) {
+                    log.info(err ? stderr : stdout);
+                    if(!err) {
+                        laundryConfig.settings.ytdlupdate = moment();
+                    }
+                    callback(null, job);
+                });
             } else {
                 callback(null, job);
             }
