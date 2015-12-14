@@ -444,6 +444,8 @@ Laundry.run = function(jobName, callback) {
         },
 
         function(job, callback) {
+            callback(null, job);
+            return;
             // Update youtube-dl every day.
             if(moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
                 var ytdldl = path.join(__dirname, 'node_modules/youtube-dl/scripts/download.js');
