@@ -27,30 +27,45 @@ Storage.loadConfig = function(callback) {
         settings: {},
         jobs: []
     };
-
-    function parseConfig(err, contents) {
+    
+    Storage.readFileString('config.json', function parseConfig(err, contents) {
         if (err) {
             callback(err);
             return;
         }
+
+        var loaded = false;
         try {
             laundryConfig = JSON.parse(contents);
             laundryConfig.jobs.forEach(function(jobConfig, i) {
                 laundryConfig.jobs[i] = new Job(jobConfig);
             });
-            callback(null, laundryConfig);
+            loaded = true;
         } catch (e) {
+            loaded = false;
             log.warn('Config not found, using default.');
-            callback(null, laundryConfig);
         }
-    }
 
-    Storage.readFileString('config.json', parseConfig);
+        // Set defaults for any newly-added settings.
+        if(!laundryConfig.settings.ytdlupdate) {
+            laundryConfig.settings.ytdlupdate = new Date().getTime();
+        }
+
+        // Deserialize any settings.
+        laundryConfig.settings.ytdlupdate = moment(new Date(laundryConfig.settings.ytdlupdate));
+
+        callback(null, laundryConfig);
+    });
 };
 
 // Save the global config file.
 Storage.saveConfig = function(callback) {
-    var configString = JSON.stringify(laundryConfig, function(key, value) {
+    var c = _.clone(laundryConfig);
+
+    // Serialize any settings.
+    c.settings.ytdlupdate = c.settings.ytdlupdate.valueOf();
+
+    var configString = JSON.stringify(c, function(key, value) {
         return value && value.stringify && value.stringify instanceof Function ? value.stringify() : value;
     }, 4);
 
