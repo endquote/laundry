@@ -115,8 +115,10 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
     // Parse all the various entities in tweet text to link to hashtags, users, and urls.
     var parsed = '';
     var mediaTags = [];
-    var len = tweet.text.length;
+    var s = new Helpers.wString(tweet.text);
+    var len = s.length;
     for (var i = 0; i < len; i++) {
+        var c = s.substr(i,1);
 
         // Skip media, it gets added at the end.
         var media = tweet.extended_entities && tweet.extended_entities.media && tweet.extended_entities.media.filter(function(media) {
@@ -162,11 +164,11 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
             continue;
         }
 
-        if(tweet.text[i] === '\n') {
+        if(c === '\n') {
             // BUG: If a linebreak is immediately after an emoji it doesn't get seen here for some reason.
             parsed += '<br/>';
         } else {
-            parsed += tweet.text[i];
+            parsed += c;
         }
     }
 
