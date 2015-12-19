@@ -626,6 +626,11 @@ Laundry.list = function(callback) {
             } else {
                 out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.name, schedule);
             }
+
+            if (job.lastRun) {
+                out += util.format(' Last run %s.', job.lastRun.format('l LTS'));
+            }
+
             out += '\n';
         }
     });
