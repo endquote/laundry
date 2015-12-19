@@ -443,24 +443,6 @@ Laundry.run = function(jobName, callback) {
             }
         },
 
-        function(job, callback) {
-            callback(null, job);
-            return;
-            // Update youtube-dl every day.
-            if(moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
-                var ytdldl = path.join(__dirname, 'node_modules/youtube-dl/scripts/download.js');
-                child_process.exec('node ' + ytdldl, function(err, stdout, stderr) {
-                    log.info(err ? stderr : stdout);
-                    if(!err) {
-                        laundryConfig.settings.ytdlupdate = moment();
-                    }
-                    callback(null, job);
-                });
-            } else {
-                callback(null, job);
-            }
-        },
-
         // Add any jobs which are scheduled to run after others.
         function(job, callback) {
             var runJobs = [job];
