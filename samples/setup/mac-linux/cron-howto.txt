@@ -3,5 +3,4 @@ On a Linux/Mac system, you'll want to run Laundry on an interval.
 Run "crontab -e" and use something like this to run the laundry-tick script
 every five minutes:
 
-*/5 * * * * /Users/me/laundry/laundry-tick.sh
-
+*/5 * * * * /Users/me/laundry/laundry-tick.sh>>/var/log/laundry.log 2>>/var/log/laundry.log
