@@ -1,15 +1,16 @@
 {
-    "folders": [
-        {
-            "path": ".",
-            "folder_exclude_patterns": ["node_modules", "bin"]
-        }
-    ],
-    "settings": {
-        "todoreview": {
-            "exclude_folders": [
-                "*node_modules*"
-            ]
-        }
-    }
+	"folders":
+	[
+		{
+			"folder_exclude_patterns":
+			[
+				"node_modules",
+				"bin"
+			],
+			"path": "."
+		},
+		{
+			"path": "/Users/josh/Downloads/foo.glsl"
+		}
+	]
 }
