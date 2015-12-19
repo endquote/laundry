@@ -127,63 +127,64 @@ Helpers.jsonRequest = function(options, callback, errorCallback) {
 // A class which deals with surrogate pairs in Unicode strings, needed if you're parsing strings with emoji and such.
 // Used in Items.Twitter.Tweet, probably should be used elsewhere too.
 // http://stackoverflow.com/a/6889627/468472
-Helpers.wString = function(str){
-  var T = this; //makes 'this' visible in functions
-  T.cp = [];    //code point array
-  T.length = 0; //length attribute
-  T.wString = true; // (item.wString) tests for wString object
+Helpers.wString = function(str) {
+    var T = this; //makes 'this' visible in functions
+    T.cp = []; //code point array
+    T.length = 0; //length attribute
+    T.wString = true; // (item.wString) tests for wString object
 
-//member functions
-  var sortSurrogates = function(s){  //returns array of utf-16 code points
-    var chrs = [];
-    while(s.length){             // loop till we've done the whole string
-      if(/[\uD800-\uDFFF]/.test(s.substr(0,1))){ // test the first character
-                                 // High surrogate found low surrogate follows
-        chrs.push(s.substr(0,2)); // push the two onto array
-        s = s.substr(2);         // clip the two off the string
-      }else{                     // else BMP code point
-        chrs.push(s.substr(0,1)); // push one onto array
-        s = s.substr(1);         // clip one from string 
-      }
-    }                            // loop
-    return chrs;
-  };
-//end member functions
+    var sortSurrogates = function(s) { //returns array of utf-16 code points
+        var chrs = [];
+        while (s.length) { // loop till we've done the whole string
+            if (/[\uD800-\uDFFF]/.test(s.substr(0, 1))) { // test the first character
+                // High surrogate found low surrogate follows
+                chrs.push(s.substr(0, 2)); // push the two onto array
+                s = s.substr(2); // clip the two off the string
+            } else { // else BMP code point
+                chrs.push(s.substr(0, 1)); // push one onto array
+                s = s.substr(1); // clip one from string 
+            }
+        } // loop
+        return chrs;
+    };
 
-//prototype functions
-  T.substr = function(start,len){
-    if(len){
-      return T.cp.slice(start,start+len).join('') ;
-    }else{
-      return T.cp.slice(start).join('');
-    }
-  };
+    T.substr = function(start, len) {
+        if (len) {
+            return T.cp.slice(start, start + len).join('');
+        } else {
+            return T.cp.slice(start).join('');
+        }
+    };
 
-  T.substring = function(start,end){
-    return T.cp.slice(start,end).join('');
-  };
+    T.substring = function(start, end) {
+        return T.cp.slice(start, end).join('');
+    };
 
-  T.replace = function(target,str){
-    //allow wStrings as parameters
-    if(str.wString){ str = str.cp.join('');}
-    if(target.wString){ target = target.cp.join('');}
-    return T.toString().replace(target,str);
-  };
+    T.replace = function(target, str) {
+        if (str.wString) {
+            str = str.cp.join('');
+        }
+        if (target.wString) {
+            target = target.cp.join('');
+        }
+        return T.toString().replace(target, str);
+    };
 
-  T.equals = function(s){
-    if(!s.wString){
-      s = sortSurrogates(s);
-      T.cp = s;
-    }else{
-        T.cp = s.cp;
-    }
-    T.length = T.cp.length;
-  };
+    T.equals = function(s) {
+        if (!s.wString) {
+            s = sortSurrogates(s);
+            T.cp = s;
+        } else {
+            T.cp = s.cp;
+        }
+        T.length = T.cp.length;
+    };
 
-  T.toString = function(){return T.cp.join('');};
-//end prototype functions
+    T.toString = function() {
+        return T.cp.join('');
+    };
 
-  T.equals(str);
+    T.equals(str);
 };
 
 // Test for empty strings.

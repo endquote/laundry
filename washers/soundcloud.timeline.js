@@ -44,7 +44,8 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
             Helpers.jsonRequest(
                 extend({
                     uri: '/me'
-                }, that._requestOptions), function(response) {
+                }, that._requestOptions),
+                function(response) {
                     callback(null, response.id);
                 }, callback);
         },

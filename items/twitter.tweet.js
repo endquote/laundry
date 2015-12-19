@@ -118,7 +118,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
     var s = new Helpers.wString(tweet.text);
     var len = s.length;
     for (var i = 0; i < len; i++) {
-        var c = s.substr(i,1);
+        var c = s.substr(i, 1);
 
         // Skip media, it gets added at the end.
         var media = tweet.extended_entities && tweet.extended_entities.media && tweet.extended_entities.media.filter(function(media) {
@@ -164,7 +164,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
             continue;
         }
 
-        if(c === '\n') {
+        if (c === '\n') {
             // BUG: If a linebreak is immediately after an emoji it doesn't get seen here for some reason.
             parsed += '<br/>';
         } else {

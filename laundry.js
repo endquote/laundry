@@ -329,7 +329,8 @@ Laundry._configureWasher = function(rl, job, mode, callback) {
                         rl.write(def.toString());
                     }
                 ]);
-            }, function(err) {
+            },
+            function(err) {
                 callback(err);
             });
     }, function(err) {
@@ -395,7 +396,8 @@ Laundry._scheduleJob = function(rl, job, callback) {
             if (job.schedule) {
                 rl.write(job.schedule.toString());
             }
-        }, function(err) {
+        },
+        function(err) {
             callback(err, rl, job);
         });
 };

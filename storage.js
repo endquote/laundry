@@ -27,7 +27,7 @@ Storage.loadConfig = function(callback) {
         settings: {},
         jobs: []
     };
-    
+
     Storage.readFileString('config.json', function parseConfig(err, contents) {
         if (err) {
             callback(err);
@@ -47,7 +47,7 @@ Storage.loadConfig = function(callback) {
         }
 
         // Set defaults for any newly-added settings.
-        if(!laundryConfig.settings.ytdlupdate) {
+        if (!laundryConfig.settings.ytdlupdate) {
             laundryConfig.settings.ytdlupdate = new Date().getTime();
         }
 

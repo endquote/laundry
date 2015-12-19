@@ -53,7 +53,8 @@ Washers.SoundCloud.Artist.prototype.doInput = function(callback) {
                         qs: {
                             q: that.artistName
                         }
-                    }, that._requestOptions), function(response) {
+                    }, that._requestOptions),
+                    function(response) {
                         var user = response.filter(function(u) {
                             return u.permalink.toLowerCase() === that.artistName.toLowerCase();
                         })[0];
