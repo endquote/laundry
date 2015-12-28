@@ -9,4 +9,4 @@ Media downloads rely on the youtube-dl library, which is updated regularly to
 keep up with changes on media sites. You can update this daily by doing
 "sudo crontab -e" and including this:
 
-30 0 * * * node /usr/local/lib/node_modules/laundry/node_modules/youtube-dl/scripts/download.js
+30 0 * * * /usr/local/bin/node /usr/local/lib/node_modules/laundry/node_modules/youtube-dl/scripts/download.js
