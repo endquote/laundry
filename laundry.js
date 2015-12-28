@@ -627,7 +627,7 @@ Laundry.list = function(callback) {
                 out += util.format(chalk.bold("%s") + " runs after another job called %s.", job.name, schedule);
             }
 
-            if (job.lastRun) {
+            if (job.lastRun && job.lastRun.format) {
                 out += util.format(' Last run %s.', job.lastRun.format('l LTS'));
             }
 

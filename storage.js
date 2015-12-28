@@ -37,9 +37,17 @@ Storage.loadConfig = function(callback) {
         var loaded = false;
         try {
             laundryConfig = JSON.parse(contents);
+            var jobs = [];
             laundryConfig.jobs.forEach(function(jobConfig, i) {
-                laundryConfig.jobs[i] = new Job(jobConfig);
+                try {
+                    jobs.push(new Job(jobConfig));
+                } catch (e) {
+                    log.error('Job could not be created from config:');
+                    log.error(jobConfig);
+                    log.error(e);
+                }
             });
+            laundryConfig.jobs = jobs;
             loaded = true;
         } catch (e) {
             loaded = false;
