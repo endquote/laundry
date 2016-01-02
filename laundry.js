@@ -365,7 +365,7 @@ Laundry._scheduleJob = function(rl, job, callback) {
                     });
                     valid = time.isValid();
                     if (valid) {
-                        answer = time.hour() + ':' + time.minute();
+                        answer = time.format('HH:mm');
                         rl.write(wrap(util.format("This job will run every day at %s.\n", answer), Laundry._wrapOpts));
                     }
                 } else if (!isNaN(parseInt(answer))) {
