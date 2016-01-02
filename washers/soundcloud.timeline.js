@@ -54,24 +54,25 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
         function(userid, callback) {
             var limit = 200;
             var following = [];
-            var pageLength = 0;
+            var endpoint = extend({
+                uri: util.format('/users/%d/followings', userid),
+                qs: {
+                    limit: limit
+                }
+            }, that._requestOptions);
+
             async.doWhilst(function(callback) {
-                Helpers.jsonRequest(
-                    extend({
-                        uri: util.format('/users/%d/followings', userid),
-                        qs: {
-                            limit: limit,
-                            offset: following.length
-                        }
-                    }, that._requestOptions),
+                Helpers.jsonRequest(endpoint,
                     function(response) {
-                        pageLength = response.length;
-                        following = following.concat(response);
+                        endpoint = {
+                            uri: response.next_href
+                        };
+                        following = following.concat(response.collection);
                         callback();
                     },
                     callback);
             }, function() {
-                return pageLength === limit;
+                return endpoint.uri;
             }, function(err) {
                 callback(err, following);
             });
