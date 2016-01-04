@@ -7,12 +7,15 @@ ns('Items.Twitter', global);
 Items.Twitter.Tweet = function(config) {
     this.favorites = 0;
     this.isFavorited = false;
-    this.isReply = null;
-    this.isQuote = null;
+    this.isReply = false;
+    this.isQuote = false;
     this.retweets = 0;
     this.isRetweet = false;
     this.isRetweeted = false;
-    this.coordinates = null;
+    this.coordinates = {
+        lat: 0,
+        lon: 0
+    };
 
     Item.call(this, config);
     this.className = Helpers.buildClassName(__filename);
@@ -100,7 +103,10 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         retweets: tweet.retweet_count,
         isRetweet: tweet.retweeted_status ? true : false,
         isRetweeted: tweet.retweeted,
-        coordinates: tweet.coordinates ? tweet.coordinates.coordinates : null
+        coordinates: tweet.coordinates ? {
+            lat: tweet.coordinates.coordinates[1],
+            lon: tweet.coordinates.coordinates[0]
+        } : null
     });
 
     // Start with media, then tweet text.
@@ -180,7 +186,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
     // Add link to geolocation data.
     if (item.coordinates) {
-        item.description += util.format('<p>(<a href="http://maps.apple.com/?ll=%s,%s">location</a>)</p>', item.coordinates[1], item.coordinates[0]);
+        item.description += util.format('<p>(<a href="http://maps.apple.com/?ll=%s,%s">location</a>)</p>', item.coordinates.lat, item.coordinates.lon);
     }
 
     return item;

@@ -2,10 +2,10 @@
 
 ns('Items.Tumblr', global);
 Items.Tumblr.Post = function(config) {
-    this.postType = null;
-    this.reblogKey = null;
-    this.sourceUrl = null;
-    this.sourceTitle = null;
+    this.postType = '';
+    this.reblogKey = '';
+    this.sourceUrl = '';
+    this.sourceTitle = '';
     this.liked = false;
 
     Item.call(this, config);

@@ -2,13 +2,13 @@
 
 // Basic class representing an item from anywhere.
 var Item = function(config) {
-    this.title = null;
-    this.description = null;
-    this.url = null;
-    this.date = null;
-    this.author = null;
-    this.tags = null;
-    this.mediaUrl = null;
+    this.title = '';
+    this.description = '';
+    this.url = '';
+    this.date = moment();
+    this.author = '';
+    this.tags = [];
+    this.mediaUrl = '';
     this.mediaBytes = 0;
     this.description = '';
 

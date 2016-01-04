@@ -5,7 +5,7 @@ var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolin
 // Item which describes an Instagram object
 ns('Items.SoundCloud', global);
 Items.SoundCloud.Track = function(config) {
-    this.artwork = null;
+    this.artwork = '';
     this.duration = 0;
 
     Item.call(this, config);

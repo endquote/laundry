@@ -5,13 +5,18 @@ var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolin
 // Item which describes an Instagram object
 ns('Items.Instagram', global);
 Items.Instagram.Media = function(config) {
-    this.type = null;
-    this.comments = null;
+    this.type = '';
+    this.comments = [];
     this.likes = 0;
-    this.image = null;
-    this.caption = null;
-    this.authorpic = null;
-    this.location = null;
+    this.image = '';
+    this.caption = '';
+    this.authorpic = '';
+    this.location = {
+        latitude: 0,
+        name: '',
+        longitude: 0,
+        id: 0
+    };
 
     Item.call(this, config);
     this.className = Helpers.buildClassName(__filename);
@@ -58,6 +63,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
         mediaBytes: downloads.video.bytes
     });
 
+    console.log(post);
     item.title = item.author;
     if (item.caption) {
         item.title += ': ' + Helpers.shortenString(item.caption, 30);

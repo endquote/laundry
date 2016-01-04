@@ -7,7 +7,7 @@ var AWS = require('aws-sdk');
 // Item which describes a YouTube video
 ns('Items.Google.YouTube', global);
 Items.Google.YouTube.Video = function(config) {
-    this.thumbnail = null;
+    this.thumbnail = '';
     this.duration = 0;
 
     Item.call(this, config);
