@@ -6,11 +6,17 @@ var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolin
 ns('Items.Instagram', global);
 Items.Instagram.Media = function(config) {
     this.type = '';
-    this.comments = [];
-    this.likes = 0;
     this.image = '';
     this.caption = '';
     this.authorpic = '';
+    this.comments = {
+        count: 0,
+        data: []
+    };
+    this.likes = {
+        count: 0,
+        data: []
+    };
     this.location = {
         latitude: 0,
         name: '',
@@ -63,7 +69,6 @@ Items.Instagram.Media.factory = function(post, downloads) {
         mediaBytes: downloads.video.bytes
     });
 
-    console.log(post);
     item.title = item.author;
     if (item.caption) {
         item.title += ': ' + Helpers.shortenString(item.caption, 30);
