@@ -163,6 +163,38 @@ Helpers.wString = function(str) {
     T.equals(str);
 };
 
+// Given an object, return a map of property values and types.
+Helpers.typeMap = function(obj, level, types) {
+    if (!types) {
+        types = {};
+    }
+
+    level = level || '';
+    if (level) {
+        obj = obj[level];
+    }
+
+    for (var name in obj) {
+        if (name[0] === '_' || typeof(obj[name]) === 'function' || name === 'className') {
+            continue;
+        }
+        var type = typeof(obj[name]);
+        if (moment.isMoment(obj[name])) {
+            type = 'date';
+        } else if (_.isArray(obj[name])) {
+            type = 'array';
+        }
+
+        if (type !== 'object') {
+            types[level + (level ? '_' : '') + name] = type;
+        } else {
+            Helpers.typeMap(obj, name, types);
+        }
+    }
+
+    return types;
+};
+
 // Test for empty strings.
 validator.extend('isWhitespace', function(str) {
     return /^\s*$/.test(str);
