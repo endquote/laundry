@@ -493,9 +493,13 @@ Laundry.run = function(jobName, callback) {
 
                     function(job, items, callback) {
                         log.info(job.name + "/" + job.output.name + " - output");
-                        job.output.doOutput(items, function(err) {
-                            callback(err, job);
-                        });
+                        if (!items || !items.length) {
+                            callback(null, job);
+                        } else {
+                            job.output.doOutput(items, function(err) {
+                                callback(err, job);
+                            });
+                        }
                     }
                 ], function(err, job) {
                     if (!err) {
