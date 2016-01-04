@@ -60,31 +60,6 @@ Helpers.shortenUrl = function(url, callback) {
         });
 };
 
-// Given a file path, try to write to it.
-Helpers.validateFile = function(file, callback) {
-    file = Helpers.cleanString(file);
-    file = path.resolve(file);
-    fs.mkdirp(path.dirname(file), function(err) {
-        if (err) {
-            callback(null);
-            return;
-        }
-
-        touch(file, {}, function(err) {
-            callback(err ? false : true);
-        });
-    });
-};
-
-// Given a file path, try to create a directory.
-Helpers.validateDirectory = function(dir, callback) {
-    dir = Helpers.cleanString(dir);
-    dir = path.resolve(dir);
-    fs.mkdirp(dir, function(err) {
-        callback(err ? false : true);
-    });
-};
-
 // Remove chalk stuff from a string.
 Helpers.cleanString = function(s) {
     if (!s) {
