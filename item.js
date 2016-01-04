@@ -10,13 +10,14 @@ var Item = function(config) {
     this.tags = [];
     this.mediaUrl = '';
     this.mediaBytes = 0;
-    this.description = '';
 
     if (config) {
         for (var i in config) {
             this[i] = config[i];
         }
     }
+
+    this.className = Helpers.buildClassName(__filename);
 };
 
 // An object passed to async.parallel() which handles downloading of files.
