@@ -1,9 +1,6 @@
 'use strict';
 
-var touch = require('touch'); // https://github.com/isaacs/node-touch
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
-var mime = require('mime-types'); // https://www.npmjs.com/package/mime-types
-var ytdl = require('youtube-dl'); // https://github.com/fent/node-youtube-dl
 
 // Misc static helper functions.
 function Helpers() {}
