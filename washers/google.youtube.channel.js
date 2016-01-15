@@ -16,7 +16,7 @@ Washers.Google.YouTube.Channel = function(config, job) {
         description: 'Loads recent videos from a YouTube channel.',
         settings: [{
                 name: 'channelName',
-                prompt: 'What is the name of the channel to watch?',
+                prompt: 'What is the name or ID of the channel to watch?',
                 afterEntry: function(rl, job, oldValue, newValue, callback) {
                     callback(validator.isWhitespace(newValue));
                 }
@@ -41,13 +41,43 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
         // Get the playlist id for the channel
         function(callback) {
             // https://developers.google.com/youtube/v3/docs/channels/list
-            log.debug('Getting playlist for channel ' + that.channelName);
+            log.debug('Getting playlist for channel name ' + that.channelName);
             Helpers.jsonRequest(
                 extend({
                     url: '/channels',
                     qs: {
                         part: 'contentDetails',
                         forUsername: that.channelName
+                    }
+                }, that._requestOptions),
+                function(result) {
+                    if (!result.items.length) {
+                        callback(null, 0);
+                    } else {
+                        var playlistId = result.items[0].contentDetails.relatedPlaylists.uploads;
+                        callback(null, playlistId);
+                    }
+                },
+                callback);
+        },
+
+        function(playlistId, callback) {
+
+            if (playlistId) {
+                // Got the default channel for the username, carry on...
+                callback(null, playlistId);
+                return;
+            }
+
+            // Get the playlist id from a channel id.
+            // https://developers.google.com/youtube/v3/docs/channels/list
+            log.debug('Getting playlist for channel ID ' + that.channelName);
+            Helpers.jsonRequest(
+                extend({
+                    url: '/channels',
+                    qs: {
+                        part: 'contentDetails',
+                        id: that.channelName
                     }
                 }, that._requestOptions),
                 function(result) {
