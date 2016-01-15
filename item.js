@@ -11,6 +11,9 @@ var Item = function(config) {
     this.mediaUrl = '';
     this.mediaBytes = 0;
 
+    // The primary key is used in the MySQL (and maybe similar) washers to prevent the insertion of duplicate entries into a table.
+    this._primaryKey = 'url';
+
     if (config) {
         for (var i in config) {
             this[i] = config[i];

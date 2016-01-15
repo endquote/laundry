@@ -70,6 +70,24 @@ Washers.MySQL.prototype = Object.create(Washer.prototype);
 Washers.MySQL.className = Helpers.buildClassName(__filename);
 
 Washers.MySQL.prototype.doOutput = function(items, callback) {
+
+    // The schema is a mapping of object properties to JavaScript types.
+    var schema = new allItems[items[0].className]();
+    var primaryKey = schema._primaryKey;
+    schema = Helpers.typeMap(schema);
+
+    var table = mysql.escapeId(this._job.name);
+
+    // A mapping of JavaScript types to MySQL types.
+    var typeMap = {
+        string: 'MEDIUMTEXT',
+        date: 'DATETIME',
+        array: 'MEDIUMTEXT', // Someday JSON? http://dev.mysql.com/doc/refman/5.7/en/json.html
+        object: 'MEDIUMTEXT', // Someday JSON? http://dev.mysql.com/doc/refman/5.7/en/json.html
+        number: 'NUMERIC',
+        boolean: 'BOOL'
+    };
+
     var connection = mysql.createConnection({
         host: this.hostname,
         port: this.port,
@@ -82,26 +100,67 @@ Washers.MySQL.prototype.doOutput = function(items, callback) {
     async.waterfall([
 
         function(callback) {
-            // Connect to the database
+            // Connect to the database.
             connection.connect(function(err) {
                 callback(err);
             });
         },
+
         function(callback) {
-            // create table
-            var query = 'CREATE TABLE IF NOT EXISTS ' + connection.escape(items[0].className);
+            // Create the table.
+            var query = 'CREATE TABLE IF NOT EXISTS ' + table + ' (\n';
+            Object.keys(schema).forEach(function(column, i) {
+                if (i > 0) {
+                    query += ',\n';
+                }
+                query += mysql.escapeId(column);
+                query += ' ' + typeMap[schema[column]];
+            });
 
-            var schema = new allItems[items[0].className]();
-            console.log(Helpers.typeMap(schema));
+            // Define the primary key to prevent duplicates.
+            if (primaryKey) {
+                if (schema[primaryKey] !== 'number' && schema[primaryKey] !== 'date') {
+                    query += ', PRIMARY KEY (' + mysql.escapeId(primaryKey) + ' (100))';
+                } else {
+                    query += ', PRIMARY KEY (' + mysql.escapeId(primaryKey) + ')';
+                }
+            }
 
-            callback();
+            query += ')';
+
+            log.debug(query);
+            connection.query(query, function(err, results) {
+                callback(err);
+            });
         },
+
         function(callback) {
-            // insert items
-            callback();
+            // Insert items.
+            async.eachSeries(items, function(item, callback) {
+                var query = 'INSERT INTO ' + table + '(' + Object.keys(schema).join(', ') + ') VALUES (';
+                query += Object.keys(schema).map(function(key) {
+                    var val = item[key];
+                    if (schema[key] === 'date') {
+                        val = item[key].format();
+                    } else if (schema[key] === 'array' || schema[key] === 'object') {
+                        val = JSON.stringify(item[key]);
+                    }
+                    return connection.escape(val);
+                }).join(', ');
+                query += ')';
+                log.debug(query);
+
+                // Handle errors, if it's a duplicate that's fine, continue on.
+                connection.query(query, function(err, result) {
+                    if (err && err.code === 'ER_DUP_ENTRY') {
+                        err = null;
+                    }
+                    callback(err);
+                });
+            }, callback);
         }
     ], function(err) {
-        // Disconnect and exit
+        // Disconnect and exit.
         connection.destroy();
         callback(err);
     });
