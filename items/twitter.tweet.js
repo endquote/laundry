@@ -120,7 +120,6 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
     // Parse all the various entities in tweet text to link to hashtags, users, and urls.
     var parsed = '';
-    var title = '';
     var mediaTags = [];
     var s = new Helpers.wString(tweet.text);
     var len = s.length;
@@ -174,15 +173,14 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         if (c === '\n') {
             // BUG: If a linebreak is immediately after an emoji it doesn't get seen here for some reason.
             parsed += '<br/>';
-            title += ' ';
         } else {
             parsed += c;
-            title += c;
         }
     }
 
     item.description += util.format('<p>%s</p>', parsed);
-    item.title += Helpers.shortenString(title, 30);
+
+    item.title = Helpers.shortenString(tweet.text, 30);
 
     // Add link to geolocation data.
     if (item.coordinates) {
