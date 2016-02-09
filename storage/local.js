@@ -11,7 +11,7 @@ Storage.Local = function() {};
 // Given a URL and a target, copy the URL to the target.
 //
 // url: the url to download
-// taget: the path to download to
+// target: the path to download to
 // targetDate: a date object to use as the last modified time of the file
 // cache: an array of {fileName, modified} objects not to download, since they are there already
 // useYTDL: use youtube-download to transform the url to a media url
@@ -75,12 +75,7 @@ Storage.Local.downloadUrl = function(url, target, targetDate, cache, useYTDL, do
             return;
         }
 
-        var params = {
-            Bucket: commander.s3bucket,
-            Key: target
-        };
-
-        log.debug('Downloading ' + params.Key);
+        log.debug('Downloading ' + target);
         var protocol = require('url').parse(url).protocol;
         var req = protocol === 'http:' ? http.request : https.request;
         req(url, function(response) {
