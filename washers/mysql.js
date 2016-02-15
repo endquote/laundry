@@ -21,7 +21,7 @@ Washers.MySQL = function(config, job) {
             name: 'hostname',
             prompt: 'What\'s the hostname of the MySQL server?',
             beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, 'localhost');
+                callback(true, prompt, this.hostname || 'localhost');
             },
             afterEntry: function(rl, job, oldValue, newValue, callback) {
                 callback(validator.isWhitespace(newValue));
@@ -30,7 +30,7 @@ Washers.MySQL = function(config, job) {
             name: 'port',
             prompt: 'What port is the MySQL server listening on?',
             beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, 3306);
+                callback(true, prompt, this.port || 3306);
             },
             afterEntry: function(rl, job, oldValue, newValue, callback) {
                 callback(!validator.isInt(newValue));

@@ -226,6 +226,10 @@ Laundry._inheritSettings = function(washer, mode) {
     }
     baseClasses.pop();
 
+    if (baseClasses.length === 0) {
+        baseClasses = [washer.className];
+    }
+
     // Collect the settings in those base classes.
     var settings = ['token'];
     baseClasses.forEach(function(baseClass) {
