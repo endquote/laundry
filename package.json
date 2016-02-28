@@ -1,6 +1,6 @@
 {
   "name": "laundry",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Illegal data transfers.",
   "main": "index.js",
   "repository": {
