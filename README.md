@@ -16,7 +16,7 @@ Input | Output
 gMail search | MySQL database
 Instagram hashtag | RSS (with enclosures)
 Instagram timeline | Slack channel
-Instagram likes | Web socket
+Instagram likes | Web socket ([example](https://github.com/endquote/laundry/tree/master/samples/socket))
 Instagram user | 
 RSS | 
 Slack channel | 
@@ -83,5 +83,5 @@ You'll want to configure a storage solution as well. If you're using local stora
 
 If using S3 storage, it's the same idea, but using `--s3key`, `--s3secret`, and `--s3bucket` arguments.
 
-Most likely, you'll then need laundry to run every so often to trigger jobs. On Mac/Linux, you'll probably want to use a [wrapper script](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/laundry-tick.sh) which you [run via cron](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/cron-howto.txt). On Windows, something something.
+You'll then need to run `laundry tick` every so often to trigger jobs. On Mac/Linux, you'll probably want to use a [wrapper script](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/laundry-tick.sh) which you [run via cron](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/cron-howto.txt). On Windows, something something.
 
