@@ -19,7 +19,7 @@ Washers.Slack.Channel = function(config, job) {
             name: 'channel',
             prompt: 'What is the name of the channel to follow?',
             afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+                callback(validator.isWhitespace(newValue), newValue.replace('#', ''));
             }
         }]
     }, this.input);
