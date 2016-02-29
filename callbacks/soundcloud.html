@@ -2,11 +2,11 @@
 <html>
 <head>
 <title>laundry + soundcloud</title>
+<link rel="stylesheet" href="https://cdn.rawgit.com/endquote/laundry/master/callbacks/styles.css" />
 <script type="text/javascript">
 
 document.addEventListener('DOMContentLoaded', function(event) {
-	console.log("DOM fully loaded and parsed");
-	window.alert('hi');
+	document.body.innerText = document.location.search.split('=')[1];
 });
 
 </script>
