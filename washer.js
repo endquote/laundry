@@ -14,6 +14,7 @@ var Washer = function(config, job) {
     // An object describing the input function of this washer, if any. It contains a user-facing
     // description of the functionality, and an array of settings required to configure it.
     /*
+    {
         description: 'Loads data from an RSS feed.',
         settings: [{
             name: 'url',
@@ -21,6 +22,7 @@ var Washer = function(config, job) {
             beforeEntry: function(rl, job, prompt, callback(required, prompt, suggest)),
             afterEntry: function(rl, job, oldValue, newValue, callback(err, newValue))
         }]
+    }
     */
     this.input = null;
 
