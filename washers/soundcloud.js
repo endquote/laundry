@@ -15,7 +15,7 @@ Washers.SoundCloud = function(config, job) {
 
     this.name = '';
     this.className = Helpers.buildClassName(__filename);
-    this._callbackUri = 'http://tinyurl.com/laundry-soundcloud';
+    this._callbackUri = 'http://tinyurl.com/washer-soundcloud';
 
     this._requestOptions = {
         baseUrl: 'https://api.soundcloud.com',
