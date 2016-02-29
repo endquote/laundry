@@ -66,7 +66,10 @@ Helpers.cleanString = function(s) {
 };
 
 Helpers.buildClassName = function(file) {
-    var parts = path.parse(file.toLowerCase()).name.split('.');
+    file = path.parse(file.toLowerCase());
+    var parts = file.dir.split(/[\/\\]/);
+    parts = parts.slice(parts.lastIndexOf('laundry') + 1);
+    parts = parts.concat(file.name.split('.'));
     parts.forEach(function(p, i) {
         parts[i] = p[0].toUpperCase() + p.substr(1);
     });
