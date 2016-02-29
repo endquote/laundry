@@ -122,8 +122,11 @@ function runCommand() {
     fs.readdirSync(path.join(__dirname, 'washers')).sort(function(a, b) {
         return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
     }).forEach(function(file) {
-        var c = require(path.join(__dirname, 'washers', file));
-        allWashers[c.className] = c;
+        file = path.join(__dirname, 'washers', file);
+        if (path.extname(file) === '.js') {
+            var c = require(file);
+            allWashers[c.className] = c;
+        }
     });
 
     // Load item class files in order of filename length, which also matches the inheritance order.
@@ -132,8 +135,11 @@ function runCommand() {
     fs.readdirSync(path.join(__dirname, 'items')).sort(function(a, b) {
         return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
     }).forEach(function(file) {
-        var c = require(path.join(__dirname, 'items', file));
-        allItems[c.className] = require(path.join(__dirname, 'items', file));
+        file = path.join(__dirname, 'items', file);
+        if (path.extname(file) === '.js') {
+            var c = require(file);
+            allItems[c.className] = c;
+        }
     });
 
     // Init storage methods.
