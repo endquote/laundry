@@ -19,7 +19,7 @@ Washers.Tumblr = function(config, job) {
 
     this.name = '';
     this.className = Helpers.buildClassName(__filename);
-    this._callbackUri = 'http://bit.ly/laundry-tumblr';
+    this._callbackUri = 'http://tinyurl.com/laundry-tumblr';
 
     this._requestOptions = {
         baseUrl: 'http://api.tumblr.com/v2/',
