@@ -99,8 +99,8 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
     var feedSettings = {
         title: this.feedname,
         description: this.feedname,
-        feed_url: 'http://laundry.endquote.com',
-        site_url: 'http://laundry.endquote.com',
+        feed_url: 'http://github.com/endquote/laundry',
+        site_url: 'http://github.com/endquote/laundry',
         generator: 'Laundry'
     };
 
@@ -114,7 +114,7 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
         feedSettings.custom_elements = [{
             'itunes:image': {
                 _attr: {
-                    href: 'http://laundry.endquote.com/favicons/apple-touch-icon.png'
+                    href: 'https://cdn.rawgit.com/endquote/laundry/master/icons/apple-touch-icon.png'
                 }
             }
         }];
