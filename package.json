@@ -1,7 +1,7 @@
 {
     "name": "laundry",
     "version": "1.0.1",
-    "description": "Illegal data transfers.",
+    "description": "Data laundering tools",
     "main": "index.js",
     "repository": {
         "type": "git",
