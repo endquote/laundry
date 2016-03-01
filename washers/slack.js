@@ -13,7 +13,7 @@ Washers.Slack = function(config, job) {
     this.name = '';
     this.className = Helpers.buildClassName(__filename);
 
-    this._callbackUri = 'http://tinyurl.com/washer-slack';
+    this._callbackUri = 'https://endquote.github.io/laundry/callbacks/slack.html';
 
     this._requestOptions = {
         baseUrl: 'https://slack.com/api/',

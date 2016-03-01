@@ -11,7 +11,7 @@ Washers.Instagram = function(config, job) {
 
     this.name = '';
     this.className = Helpers.buildClassName(__filename);
-    this._callbackUri = 'http://tinyurl.com/washer-instagram';
+    this._callbackUri = 'https://endquote.github.io/laundry/callbacks/instagram.html';
 
     this._requestOptions = {
         baseUrl: 'https://api.instagram.com/v1/',
