@@ -14,15 +14,28 @@ var Washer = function(config, job) {
     // An object describing the input function of this washer, if any. It contains a user-facing
     // description of the functionality, and an array of settings required to configure it.
     /*
-    {
+    this.input = _.merge({
+            // Shown in the list of washers
         description: 'Loads data from an RSS feed.',
+
+        // An array of settings to ask about
         settings: [{
+            // The property name to save this setting as. 
             name: 'url',
+
+            // The prompt to give the user.
             prompt: 'What RSS feed URL do you want to launder?',
+
+            // Called before asking the user for a value, callback indicating whether a
+            // response is required, what the prompt should be, and a suggested default.
             beforeEntry: function(rl, job, prompt, callback(required, prompt, suggest)),
+
+            // Called after the user has entered a value, so it can be validated, modified
+            // or acted upon in some way. Callback indicating whether the value is valid,
+            // and what the new value is.
             afterEntry: function(rl, job, oldValue, newValue, callback(err, newValue))
         }]
-    }
+    }, this.input);
     */
     this.input = null;
 

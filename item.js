@@ -23,8 +23,14 @@ var Item = function(config) {
     this.className = Helpers.buildClassName(__filename);
 };
 
-// An object passed to async.parallel() which handles downloading of files.
-Item.downloadLogic = function(prefix, obj, params) {
+/*
+Defines logic for downloading any files associated with this item.
+* prefix: The directory at which the download will end up. Add a filename to this.
+* obj: The API response from the washer which represents the item.
+* cache: Information about already downloaded files -- just pass on to Storage.downloadUrl.
+* download: Whether or not to actually perform the download -- just pass on to Storage.downloadUrl.
+*/
+Items.downloadLogic = function(prefix, obj, washer, cache, download) {
     return {};
 };
 
