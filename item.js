@@ -30,7 +30,7 @@ Defines logic for downloading any files associated with this item.
 * cache: Information about already downloaded files -- just pass on to Storage.downloadUrl.
 * download: Whether or not to actually perform the download -- just pass on to Storage.downloadUrl.
 */
-Items.downloadLogic = function(prefix, obj, washer, cache, download) {
+Item.downloadLogic = function(prefix, obj, washer, cache, download) {
     return {};
 };
 
