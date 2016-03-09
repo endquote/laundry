@@ -45,6 +45,6 @@
     "walk": "^2.3.9",
     "winston": "^2.1.1",
     "word-wrap": "^1.1.0",
-    "youtube-dl": "git+https://github.com/fent/node-youtube-dl.git"
+    "youtube-dl": "git+https://github.com/endquote/node-youtube-dl.git"
   }
 }
