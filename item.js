@@ -74,7 +74,6 @@ Item.download = function(itemClass, washer, objects, callback) {
 
         // Delete any old stuff in the cache.
         function(callback) {
-            console.log(commander.mediaAge);
             Storage.deleteBefore(cache, moment().subtract(commander.mediaAge, 'days').toDate(), callback);
         }
     ], function(err) {
