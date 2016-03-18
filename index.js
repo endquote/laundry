@@ -185,7 +185,26 @@ function runCommand() {
             onComplete(err);
             return;
         }
-        Laundry[cmd].apply(null, args);
+
+        function doCmd() {
+            Laundry[cmd].apply(null, args);
+        }
+
+        // Update youtube-dl every day.
+        if (moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
+            var downloader = require('youtube-dl/lib/downloader');
+            downloader(function error(err, done) {
+                if (err) {
+                    return console.log(err.stack);
+                }
+                console.log(done);
+                laundryConfig.settings.ytdlupdate = moment();
+                doCmd();
+            });
+        } else {
+            doCmd();
+        }
+
     });
 }
 
