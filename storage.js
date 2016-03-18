@@ -112,7 +112,7 @@ Storage.initLog = function(job) {
         fs.ensureDirSync(logPath);
         opts = {
             level: global.log.level,
-            filename: path.join(logPath, 'laundry.log'),
+            filename: path.join(logPath, moment().format('YYYY-MM-DD-HH-mm') + '.log'),
             maxsize: 100000,
             maxFiles: 10,
             tailable: true
