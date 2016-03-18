@@ -161,11 +161,11 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
         indent: true
     });
 
-    var target = Item.buildPrefix(this._job.name, this.className) + '/feed.xml';
-
+    var target = Item.buildPrefix(this.job.name, this.className) + '/feed.xml';
+    var that = this;
     Storage.writeFile(target, xml, function(err, destination) {
         if (destination) {
-            log.info('The feed is available at ' + destination);
+            that.job.log.info('The feed is available at ' + destination);
         }
         callback(err);
     });

@@ -36,7 +36,7 @@ Item.downloadLogic = function(prefix, obj, washer, cache, download) {
 
 // Given a collection of API responses, perform downloads and construct Item objects.
 Item.download = function(itemClass, washer, objects, callback) {
-    var prefix = Item.buildPrefix(washer._job.name, itemClass.className);
+    var prefix = Item.buildPrefix(washer.job.name, itemClass.className);
     var items = [];
     var cache = [];
 

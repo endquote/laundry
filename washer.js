@@ -3,7 +3,7 @@
 // Base class for washers. Washers can accept input from the web, parse it into general-purpose objects,
 // and return it to other washers which output those objects to other formats.
 var Washer = function(config, job) {
-    this._job = job;
+    this.job = job;
 
     // The user-facing name of the washer. Leave empty to not show it as an option.
     this.name = null;
@@ -72,6 +72,7 @@ Washer.prototype.stringify = function() {
     delete c.input;
     delete c.output;
     delete c.name;
+    delete c.job;
     for (var i in c) {
         if (i.indexOf('_') === 0) {
             delete(c[i]);

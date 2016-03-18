@@ -76,7 +76,7 @@ Washers.MySQL.prototype.doOutput = function(items, callback) {
     var primaryKey = schema._primaryKey;
     schema = Helpers.typeMap(schema);
 
-    var table = mysql.escapeId(this._job.name);
+    var table = mysql.escapeId(this.job.name);
 
     // A mapping of JavaScript types to MySQL types.
     var typeMap = {

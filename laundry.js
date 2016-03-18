@@ -488,15 +488,23 @@ Laundry.run = function(jobName, callback) {
             async.eachSeries(jobs, function(job, callback) {
                 async.waterfall([
 
+                    // Set up the logger for the job.
                     function(callback) {
-                        log.info(job.name + "/" + job.input.name + " - input");
+                        Storage.initLog(job);
+                        callback();
+                    },
+
+                    // Do the job's input task.
+                    function(callback) {
+                        job.log.info(job.name + "/" + job.input.name + " - input");
                         job.input.doInput(function(err, items) {
                             callback(err, job, items);
                         });
                     },
 
+                    // Do the job's output task.
                     function(job, items, callback) {
-                        log.info(job.name + "/" + job.output.name + " - output");
+                        job.log.info(job.name + "/" + job.output.name + " - output");
                         if (!items || !items.length) {
                             callback(null, job);
                         } else {
@@ -511,9 +519,9 @@ Laundry.run = function(jobName, callback) {
                         Storage.saveConfig(function() {
                             callback(null, job);
                         });
-                        log.info(job.name + " - complete");
+                        job.log.info(job.name + " - complete");
                     } else {
-                        log.error(job.name + " - error: " + util.inspect(err, {
+                        job.log.error(job.name + " - error: " + util.inspect(err, {
                             depth: 99
                         }));
                         callback(null, job);

@@ -19,6 +19,8 @@ Storage.init = function() {
     for (var i in Storage.mode) {
         Storage[i] = Storage.mode[i];
     }
+
+    Storage.initLog();
 };
 
 // Load the global config file.
@@ -78,6 +80,62 @@ Storage.saveConfig = function(callback) {
     }, 4);
 
     Storage.writeFile('config.json', configString, callback);
+};
+
+// Create a logger using the current storage mode. If a job is passed, create the category for that job.
+Storage.initLog = function(job) {
+    var opts;
+
+    if (Storage.mode === Storage.S3) {
+        // Using S3, set up S3 logging.
+        // https://www.npmjs.com/package/s3-streamlogger
+        var S3StreamLogger = require('s3-streamlogger').S3StreamLogger;
+        var stream = new S3StreamLogger({
+            bucket: commander.s3bucket,
+            access_key_id: commander.s3key,
+            secret_access_key: commander.s3secret,
+            upload_every: 5000,
+            name_format: (job ? job.name + '/' : '') + 'logs/%Y-%m-%d-%H-%M.log'
+        });
+        opts = {
+            stream: stream,
+            level: global.log.level
+        };
+        log.s3stream = stream;
+    } else if (Storage.mode === Storage.Local) {
+        // Using local storage, set up local logging.
+        // https://github.com/winstonjs/winston/blob/master/docs/transports.md#file-transport
+        var logPath = path.join(commander.local, 'logs');
+        if (job) {
+            logPath = path.join(commander.local, 'jobs', job.name, 'logs');
+        }
+        fs.ensureDirSync(logPath);
+        opts = {
+            level: global.log.level,
+            filename: path.join(logPath, 'laundry.log'),
+            maxsize: 100000,
+            maxFiles: 10,
+            tailable: true
+        };
+    }
+
+    if (!job) {
+        log.add(log.transports.File, opts);
+        log.add(log.transports.Console, {
+            colorize: true,
+            level: global.log.level
+        });
+    } else {
+        var category = 'job-' + job.name;
+        log.loggers.add(category, {
+            file: opts,
+            console: {
+                colorize: true,
+                level: global.log.level
+            }
+        });
+        job.log = log.loggers.get(category);
+    }
 };
 
 module.exports = Storage;

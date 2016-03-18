@@ -169,7 +169,7 @@ Washers.Slack.Channel.prototype.doOutput = function(items, callback) {
         function(channelInfo, callback) {
 
             async.eachSeries(items, function(item, callback) {
-                if (item.date.isBefore(that._job.lastRun)) {
+                if (item.date.isBefore(that.job.lastRun)) {
                     // This item was already posted.
                     process.nextTick(function() {
                         callback();

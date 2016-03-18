@@ -76,6 +76,11 @@ Helpers.buildClassName = function(file) {
     return parts.join('.');
 };
 
+Helpers.jsonRequestNewLog = function(job, options, callback, errorCallback) {
+    job.log.debug(JSON.stringify(options));
+    Helpers.jsonRequest(options, callback, errorCallback);
+};
+
 // Make an HTTP request that expects JSON back, and handle the errors well.
 Helpers.jsonRequest = function(options, callback, errorCallback) {
     var validStatusCodes = [200, 201, undefined];
