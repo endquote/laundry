@@ -83,5 +83,8 @@ You'll want to configure a storage solution as well. If you're using local stora
 
 If using S3 storage, it's the same idea, but using `--s3key`, `--s3secret`, and `--s3bucket` arguments.
 
-You'll then need to run `laundry tick` every so often to trigger jobs. On Mac/Linux, you'll probably want to use a [wrapper script](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/laundry-tick.sh) which you [run via cron](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/cron-howto.txt). On Windows, something something.
+You'll then need to run `laundry tick` every so often to trigger jobs.
 
+On Mac/Linux, you'll probably want to use a [wrapper script](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/laundry-tick.sh) which you [run via cron](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/cron-howto.txt).
+
+On Windows, you can use a [batch file](https://github.com/endquote/laundry/blob/master/samples/setup/windows/laundry-tick.bat) that runs on an interval via the [task scheduler](http://windows.microsoft.com/en-US/windows/schedule-task). Try importing [this task](https://github.com/endquote/laundry/blob/master/samples/setup/windows/laundry-task.xml) and modifying as needed.
