@@ -38,6 +38,7 @@ Washers.Tumblr.Blog.prototype.doInput = function(callback) {
     async.doWhilst(function(callback) {
         // https://www.tumblr.com/docs/en/api/v2
         Helpers.jsonRequest(
+            that.job.log,
             extend({
                 uri: '/blog/' + that.blogHost + '/posts',
                 qs: {

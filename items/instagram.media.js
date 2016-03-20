@@ -35,11 +35,11 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
     return {
         image: function(callback) {
             var target = prefix + '/' + obj.id + '.jpg';
-            Storage.downloadUrl(obj.images.standard_resolution.url, target, moment.unix(obj.created_time).toDate(), cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.images.standard_resolution.url, target, moment.unix(obj.created_time).toDate(), cache, false, download, callback);
         },
         video: function(callback) {
             var target = prefix + '/' + obj.id + '.mp4';
-            Storage.downloadUrl(obj.videos ? obj.videos.standard_resolution.url : null, target, moment.unix(obj.created_time).toDate(), cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.videos ? obj.videos.standard_resolution.url : null, target, moment.unix(obj.created_time).toDate(), cache, false, download, callback);
         }
     };
 };

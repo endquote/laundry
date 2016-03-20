@@ -19,6 +19,12 @@ Items.Slack.Message.factory = function(item, downloads) {
     // items are message objects with this bonus info:
     // item.teamInfo, item.channelInfo, item.channelsInfo, item.userInfo
 
+    if (!item.userInfo) {
+        item.userInfo = {
+            name: 'bot'
+        };
+    }
+
     // Format text: https://api.slack.com/docs/formatting
     // To display messages in a web-client, the client should take the following steps:
     // Detect all sequences matching <(.*?)>
@@ -59,7 +65,7 @@ Items.Slack.Message.factory = function(item, downloads) {
     return new Items.Slack.Message({
         title: item.userInfo.name + ': ' + Helpers.shortenString(S(formatted).stripTags(), 30),
         description: formatted,
-        url: util.format('https://%s.slack.com/archives/general/p%s', item.teamInfo.name, item.ts.replace('.', '')),
+        url: util.format('https://%s.slack.com/archives/%s/p%s', item.teamInfo.name, item.channelInfo.name, item.ts.replace('.', '')),
         date: moment(new Date(1000 * parseInt(item.ts.split('.')[0]))),
         author: item.userInfo.name
     });

@@ -42,6 +42,7 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
         // Get my userid
         function(callback) {
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     uri: '/me'
                 }, that._requestOptions),
@@ -62,7 +63,9 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
             }, that._requestOptions);
 
             async.doWhilst(function(callback) {
-                Helpers.jsonRequest(endpoint,
+                Helpers.jsonRequest(
+                    that.job.log,
+                    endpoint,
                     function(response) {
                         endpoint = {
                             uri: response.next_href
@@ -83,6 +86,7 @@ Washers.SoundCloud.Timeline.prototype.doInput = function(callback) {
             var tracks = [];
             async.eachLimit(following, 10, function(following, callback) {
                 Helpers.jsonRequest(
+                    that.job.log,
                     extend({
                         uri: util.format('/users/%d/tracks', following.id)
                     }, that._requestOptions),

@@ -39,11 +39,12 @@ Washers.Google.Gmail.Search.prototype.doInput = function(callback) {
 
         function(callback) {
             // https://developers.google.com/gmail/api/v1/reference/users/messages/list
-            log.debug('Getting messages for query ' + that.query);
+            that.job.log.debug('Getting messages for query ' + that.query);
             var messages = [];
 
             // Request messages matching the query -- seems to return 100 by default, fine for now.
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: '/users/me/messages',
                     qs: {
@@ -55,6 +56,7 @@ Washers.Google.Gmail.Search.prototype.doInput = function(callback) {
                     // Request each actual message.
                     async.eachLimit(result.messages, 10, function(message, callback) {
                         Helpers.jsonRequest(
+                            that.job.log,
                             extend({
                                 url: '/users/me/messages/' + message.id,
                                 qs: {

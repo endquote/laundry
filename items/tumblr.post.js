@@ -21,13 +21,13 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
         // Try to extract a video -- this often fails on Tumblr.
         video: function(callback) {
             var target = prefix + '/' + obj.id + '.mp4';
-            Storage.downloadUrl(obj.type === 'video' ? obj.post_url : null, target, targetDate, cache, true, download, function(err, res) {
+            Storage.downloadUrl(washer.job.log, obj.type === 'video' ? obj.post_url : null, target, targetDate, cache, true, download, function(err, res) {
 
                 // If we did get a video, get the thumbnail too.
                 if (obj.type === 'video' && res.oldUrl !== res.newUrl) {
                     var url = res.ytdl && res.ytdl.thumbnails && res.ytdl.thumbnails.length ? res.ytdl.thumbnails[0].url : null;
                     var target = prefix + '/' + obj.id + '-thumb.jpg';
-                    Storage.downloadUrl(url, target, targetDate, cache, false, download, function(thumbErr, thumbRes) {
+                    Storage.downloadUrl(washer.job.log, url, target, targetDate, cache, false, download, function(thumbErr, thumbRes) {
                         res.thumbnail = thumbRes;
                         callback(err, res);
                     });
@@ -39,7 +39,7 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
 
         audio: function(callback) {
             var target = prefix + '/' + obj.id + '.mp3';
-            Storage.downloadUrl(obj.type === 'audio' ? obj.post_url : null, target, targetDate, cache, true, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.type === 'audio' ? obj.post_url : null, target, targetDate, cache, true, download, callback);
         },
 
         photos: function(callback) {
@@ -51,7 +51,7 @@ Items.Tumblr.Post.downloadLogic = function(prefix, obj, washer, cache, download)
                 }
                 target += '.jpg';
 
-                Storage.downloadUrl(photo.original_size.url, target, targetDate, cache, false, download, function(err, res) {
+                Storage.downloadUrl(washer.job.log, photo.original_size.url, target, targetDate, cache, false, download, function(err, res) {
                     results.push(res);
                     callback();
                 });

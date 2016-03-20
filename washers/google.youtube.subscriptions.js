@@ -40,6 +40,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
             async.doWhilst(function(callback) {
                 // https://developers.google.com/youtube/v3/docs/subscriptions/list
                 Helpers.jsonRequest(
+                    that.job.log,
                     extend({
                         url: '/subscriptions',
                         qs: {
@@ -58,7 +59,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
                             });
                         });
 
-                        log.debug('Got ' + subscriptions.length + ' subscriptions');
+                        that.job.log.debug('Got ' + subscriptions.length + ' subscriptions');
                         callback();
                     },
                     callback);
@@ -77,8 +78,9 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
                 subscriptions[index].channelId = channelId;
 
                 // https://developers.google.com/youtube/v3/docs/channels/list
-                log.debug('Getting playlist for channel ' + channelId);
+                that.job.log.debug('Getting playlist for channel ' + channelId);
                 Helpers.jsonRequest(
+                    that.job.log,
                     extend({
                         url: '/channels',
                         qs: {
@@ -103,8 +105,9 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
                 var index = subscriptions.indexOf(subscription);
 
                 // https://developers.google.com/youtube/v3/docs/playlistItems/list
-                log.debug('Getting videos for playlist ' + subscription.playlistId);
+                that.job.log.debug('Getting videos for playlist ' + subscription.playlistId);
                 Helpers.jsonRequest(
+                    that.job.log,
                     extend({
                         url: '/playlistItems',
                         qs: {
@@ -131,7 +134,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
                 videos = videos.concat(subscription.videos);
             });
 
-            log.debug('Reducing ' + videos.length + ' videos to ' + maxVideos);
+            that.job.log.debug('Reducing ' + videos.length + ' videos to ' + maxVideos);
 
             videos.sort(function(a, b) {
                 return new Date(b.snippet.publishedAt).getTime() - new Date(a.snippet.publishedAt).getTime();
@@ -147,8 +150,9 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
             });
 
             // https://developers.google.com/youtube/v3/docs/videos/list
-            log.debug('Getting video durations.');
+            that.job.log.debug('Getting video durations.');
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: '/videos',
                     qs: {

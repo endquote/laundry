@@ -34,8 +34,8 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
     async.whilst(function() {
             return !posts.length || (posts.length < quantity && nextMax);
         }, function(callback) {
-            Helpers.jsonRequestNewLog(
-                that.job,
+            Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: method,
                     qs: {

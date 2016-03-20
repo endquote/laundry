@@ -75,6 +75,7 @@ Storage.saveConfig = function(callback) {
     // Serialize any settings.
     c.settings.ytdlupdate = c.settings.ytdlupdate.valueOf();
 
+    // Serialize the jobs -- stringify methods on Job and Washer return cleaned-up objects.
     var configString = JSON.stringify(c, function(key, value) {
         return value && value.stringify && value.stringify instanceof Function ? value.stringify() : value;
     }, 4);
@@ -84,40 +85,8 @@ Storage.saveConfig = function(callback) {
 
 // Create a logger using the current storage mode. If a job is passed, create the category for that job.
 Storage.initLog = function(job) {
-    var opts;
-
-    if (Storage.mode === Storage.S3) {
-        // Using S3, set up S3 logging.
-        // https://www.npmjs.com/package/s3-streamlogger
-        var S3StreamLogger = require('s3-streamlogger').S3StreamLogger;
-        var stream = new S3StreamLogger({
-            bucket: commander.s3bucket,
-            access_key_id: commander.s3key,
-            secret_access_key: commander.s3secret,
-            upload_every: 5000,
-            name_format: (job ? job.name + '/' : '') + 'logs/%Y-%m-%d-%H-%M.log'
-        });
-        opts = {
-            stream: stream,
-            level: global.log.level
-        };
-        log.s3stream = stream;
-    } else if (Storage.mode === Storage.Local) {
-        // Using local storage, set up local logging.
-        // https://github.com/winstonjs/winston/blob/master/docs/transports.md#file-transport
-        var logPath = path.join(commander.local, 'logs');
-        if (job) {
-            logPath = path.join(commander.local, 'jobs', job.name, 'logs');
-        }
-        fs.ensureDirSync(logPath);
-        opts = {
-            level: global.log.level,
-            filename: path.join(logPath, moment().format('YYYY-MM-DD-HH-mm') + '.log'),
-            maxsize: 100000,
-            maxFiles: 10,
-            tailable: true
-        };
-    }
+    // Storage modes define configLog to set different options.
+    var opts = Storage.configLog(job);
 
     if (!job) {
         log.add(log.transports.File, opts);

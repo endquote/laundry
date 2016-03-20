@@ -20,6 +20,24 @@ Storage.S3._init = function() {
     return Storage.S3;
 };
 
+Storage.S3.configLog = function(job) {
+    // https://www.npmjs.com/package/s3-streamlogger
+    var S3StreamLogger = require('s3-streamlogger').S3StreamLogger;
+    var stream = new S3StreamLogger({
+        bucket: commander.s3bucket,
+        access_key_id: commander.s3key,
+        secret_access_key: commander.s3secret,
+        upload_every: 5000,
+        name_format: (job ? 'jobs/' + job.name + '/' : '') + 'logs/%Y-%m-%d-%H-%M.log'
+    });
+    var opts = {
+        stream: stream,
+        level: global.log.level
+    };
+    log.s3stream = stream;
+    return opts;
+};
+
 // Given a URL and a target, copy the URL to the target.
 //
 // url: the url to download
@@ -29,7 +47,7 @@ Storage.S3._init = function() {
 // useYTDL: use youtube-download to transform the url to a media url
 // download: false to not actually download, only construct the result object (weird, but allows for optional downloads without tons of pain)
 // callback: (err, {oldUrl, newUrl, error, ytdl, bytes}) - the ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
-Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, download, callback) {
+Storage.S3.downloadUrl = function(log, url, target, targetDate, cache, useYTDL, download, callback) {
     var result = {
         oldUrl: url,
         newUrl: url,
@@ -133,7 +151,7 @@ Storage.S3.downloadUrl = function(url, target, targetDate, cache, useYTDL, downl
 };
 
 // Given a directory, return all the files.
-Storage.S3.cacheFiles = function(dir, callback) {
+Storage.S3.cacheFiles = function(log, dir, callback) {
     log.debug('Caching ' + dir);
     var objects = [];
     var lastCount = 0;
@@ -193,7 +211,7 @@ Storage.S3.cacheFiles = function(dir, callback) {
 };
 
 // Delete files with a last-modified before a given date.
-Storage.S3.deleteBefore = function(cache, date, callback) {
+Storage.S3.deleteBefore = function(log, cache, date, callback) {
     if (!cache.length) {
         callback();
         return;

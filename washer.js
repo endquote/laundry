@@ -78,6 +78,7 @@ Washer.prototype.stringify = function() {
             delete(c[i]);
         }
     }
+
     return c;
 };
 

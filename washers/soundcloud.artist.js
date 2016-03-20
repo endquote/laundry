@@ -48,6 +48,7 @@ Washers.SoundCloud.Artist.prototype.doInput = function(callback) {
             // Get the userid
             function(callback) {
                 Helpers.jsonRequest(
+                    that.job.log,
                     extend({
                         uri: '/users',
                         qs: {
@@ -70,6 +71,7 @@ Washers.SoundCloud.Artist.prototype.doInput = function(callback) {
             function(userId, callback) {
                 var tracks = [];
                 Helpers.jsonRequest(
+                    that.job.log,
                     extend({
                         uri: util.format('/users/%d/tracks', userId),
                         qs: {

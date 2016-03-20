@@ -8,8 +8,26 @@ var walk = require('walk'); // https://github.com/coolaj86/node-walk
 ns('Storage', global);
 Storage.Local = function() {};
 
+Storage.Local.configLog = function(job) {
+    // https://github.com/winstonjs/winston/blob/master/docs/transports.md#file-transport
+    var logPath = path.join(commander.local, 'logs');
+    if (job) {
+        logPath = path.join(commander.local, 'jobs', job.name, 'logs');
+    }
+    fs.ensureDirSync(logPath);
+
+    var opts = {
+        level: global.log.level,
+        filename: path.join(logPath, moment().format('YYYY-MM-DD-HH-mm') + '.log'),
+        tailable: true
+    };
+
+    return opts;
+};
+
 // Given a URL and a target, copy the URL to the target.
 //
+// log: the logger to write to
 // url: the url to download
 // target: the path to download to
 // targetDate: a date object to use as the last modified time of the file
@@ -17,7 +35,7 @@ Storage.Local = function() {};
 // useYTDL: use youtube-download to transform the url to a media url
 // download: false to not actually download, only construct the result object (weird, but allows for optional downloads without tons of pain)
 // callback: (err, {oldUrl, newUrl, error, ytdl, bytes}) - the ytdl info will be passed only if ytdl was used, and if the target wasn't already cached.
-Storage.Local.downloadUrl = function(url, target, targetDate, cache, useYTDL, download, callback) {
+Storage.Local.downloadUrl = function(log, url, target, targetDate, cache, useYTDL, download, callback) {
     var result = {
         oldUrl: url,
         newUrl: url,
@@ -110,7 +128,7 @@ Storage.Local.downloadUrl = function(url, target, targetDate, cache, useYTDL, do
 };
 
 // Given a directory, return all the files and their last-modified times.
-Storage.Local.cacheFiles = function(dir, callback) {
+Storage.Local.cacheFiles = function(log, dir, callback) {
     var p = path.join(commander.local, dir);
     var files = [];
     var directories = [];
@@ -146,7 +164,7 @@ Storage.Local.cacheFiles = function(dir, callback) {
 };
 
 // Delete files with a last-modified before a given date.
-Storage.Local.deleteBefore = function(cache, date, callback) {
+Storage.Local.deleteBefore = function(log, cache, date, callback) {
     if (!cache.length) {
         callback();
         return;

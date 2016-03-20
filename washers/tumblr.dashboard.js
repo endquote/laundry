@@ -30,6 +30,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
     async.doWhilst(function(callback) {
         // https://www.tumblr.com/docs/en/api/v2
         Helpers.jsonRequest(
+            that.job.log,
             extend({
                 uri: '/user/dashboard',
                 qs: {
@@ -40,7 +41,7 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
             function(response) {
                 response = response.response;
                 posts = posts.concat(response.posts);
-                log.debug(util.format('Got %d/%d posts', posts.length, quantity));
+                that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
                 lastResponse = response;
                 callback();
             },

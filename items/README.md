@@ -43,11 +43,11 @@ Items.Sample.downloadLogic = function(prefix, obj, washer, cache, download) {
     return {
         image: function(callback) {
             var target = prefix + '/' + obj.id + '.jpg';
-            Storage.downloadUrl(obj.image_url, target, new Date(), cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.image_url, target, new Date(), cache, false, download, callback);
         },
         video: function(callback) {
             var target = prefix + '/' + obj.id + '.mp4';
-            Storage.downloadUrl(obj.video_url, target, new Date(), cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.video_url, target, new Date(), cache, false, download, callback);
         }
     };
 };

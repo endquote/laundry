@@ -584,11 +584,11 @@ Laundry.destroy = function(jobName, callback) {
                             // Get any media files in this job.
                             function(callback) {
                                 var prefix = Item.buildPrefix(job.name);
-                                Storage.cacheFiles(prefix, callback);
+                                Storage.cacheFiles(log, prefix, callback);
                             },
                             // Delete media files.
                             function(cache, callback) {
-                                Storage.deleteBefore(cache, new Date(), callback);
+                                Storage.deleteBefore(log, cache, new Date(), callback);
                             },
                             // Delete the job from the config.
                             function(callback) {

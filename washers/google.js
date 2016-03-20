@@ -76,7 +76,8 @@ Washers.Google = function(config, job) {
                     return;
                 }
                 var that = this;
-                Helpers.jsonRequest({
+                Helpers.jsonRequest(
+                    that.job.log, {
                         url: 'https://accounts.google.com/o/oauth2/token',
                         method: 'POST',
                         form: {
@@ -102,7 +103,8 @@ Washers.Google.className = Helpers.buildClassName(__filename);
 
 Washers.Google.prototype.refreshAccessToken = function(callback) {
     var that = this;
-    Helpers.jsonRequest({
+    Helpers.jsonRequest(
+        that.job.log, {
             url: 'https://accounts.google.com/o/oauth2/token',
             method: 'POST',
             form: {
@@ -113,7 +115,7 @@ Washers.Google.prototype.refreshAccessToken = function(callback) {
             }
         },
         function(response) {
-            log.debug('Refreshed access token');
+            that.job.log.debug('Refreshed access token');
             that.token.access_token = response.access_token;
             that._requestOptions.headers.Authorization = 'Bearer ' + response.access_token;
             callback();

@@ -83,7 +83,7 @@ Washers.SoundCloud = function(config, job) {
                 }
 
                 var that = this;
-                Helpers.jsonRequest({
+                Helpers.jsonRequest(log, {
                     uri: 'https://api.soundcloud.com/oauth2/token',
                     method: 'POST',
                     qs: {

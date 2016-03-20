@@ -44,7 +44,7 @@ Item.download = function(itemClass, washer, objects, callback) {
         // Cache existing newKeys so they're not uploaded again.
         function(callback) {
             if (washer.downloadMedia) {
-                Storage.cacheFiles(prefix, function(err, c) {
+                Storage.cacheFiles(washer.job.log, prefix, function(err, c) {
                     cache = c;
                     callback(err);
                 });
@@ -74,7 +74,7 @@ Item.download = function(itemClass, washer, objects, callback) {
 
         // Delete any old stuff in the cache.
         function(callback) {
-            Storage.deleteBefore(cache, moment().subtract(commander.mediaAge, 'days').toDate(), callback);
+            Storage.deleteBefore(washer.job.log, cache, moment().subtract(commander.mediaAge, 'days').toDate(), callback);
         }
     ], function(err) {
         // Return all the constructed items.

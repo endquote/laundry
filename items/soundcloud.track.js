@@ -20,14 +20,14 @@ Items.SoundCloud.Track.downloadLogic = function(prefix, obj, washer, cache, down
     return {
         artwork: function(callback) {
             var target = prefix + '/' + obj.id + '.jpg';
-            Storage.downloadUrl(obj.artwork_url, target, targetDate, cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.artwork_url, target, targetDate, cache, false, download, callback);
         },
         audio: function(callback) {
             var target = prefix + '/' + obj.id + '.mp3';
             var audioSource = util.format('%s?client_id=%s', obj.stream_url, washer.clientId);
 
             // Using ydtl here does get you the original download, but it can often be FLAC or other formats that podcast apps don't like.
-            Storage.downloadUrl(audioSource, target, targetDate, cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, audioSource, target, targetDate, cache, false, download, callback);
         }
     };
 };

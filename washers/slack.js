@@ -93,6 +93,7 @@ Washers.Slack.className = Helpers.buildClassName(__filename);
 Washers.Slack.prototype.refreshToken = function(code, callback) {
     var that = this;
     Helpers.jsonRequest(
+        log,
         extend({
             url: 'https://slack.com/api/oauth.access',
             method: 'POST',

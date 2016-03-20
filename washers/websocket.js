@@ -30,7 +30,7 @@ Washers.Websocket = function(config, job) {
             name: 'port',
             prompt: 'What port is the socket.io server listening on?',
             beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, 80);
+                callback(true, prompt, 8080);
             },
             afterEntry: function(rl, job, oldValue, newValue, callback) {
                 callback(!validator.isInt(newValue));
@@ -43,15 +43,16 @@ Washers.Websocket.prototype = Object.create(Washer.prototype);
 Washers.Websocket.className = Helpers.buildClassName(__filename);
 
 Washers.Websocket.prototype.doOutput = function(items, callback) {
+    var that = this;
     var server = util.format('http://%s:%d', this.hostname, this.port);
-    log.debug('Connecting to ' + server);
+    that.job.log.debug('Connecting to ' + server);
     var socket = io(server);
     socket.on('connect', function() {
-        log.debug('Connected to ' + server);
+        that.job.log.debug('Connected to ' + server);
         async.eachSeries(
             items,
             function(item, callback) {
-                log.debug('Emitting ' + item.url);
+                that.job.log.debug('Emitting ' + item.url);
                 socket.emit('item', item, callback);
             },
             function(err) {

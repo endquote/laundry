@@ -54,7 +54,7 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
                 // Download the image.
                 var source = entity.media_url_https + ':' + size;
                 target = prefix + '/' + obj.id + mediaIndex + '.' + entity.media_url_https.split('.').pop();
-                Storage.downloadUrl(source, target, targetDate, cache, false, download, function(err, res) {
+                Storage.downloadUrl(washer.job.log, source, target, targetDate, cache, false, download, function(err, res) {
                     results.push(res);
 
                     // If there's a video, download the video... the image was the poster frame.
@@ -63,7 +63,7 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
                             return variant.content_type === 'video/mp4';
                         })[0];
                         target = prefix + '/' + obj.id + mediaIndex + '.' + variant.url.split('.').pop();
-                        Storage.downloadUrl(variant.url, target, targetDate, cache, false, download, function(err, video) {
+                        Storage.downloadUrl(washer.job.log, variant.url, target, targetDate, cache, false, download, function(err, video) {
                             res.video = video;
                             callback();
                         });

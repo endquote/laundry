@@ -37,7 +37,7 @@ Helpers.shortenUrl = function(url, callback) {
         return;
     }
 
-    Helpers.jsonRequest({
+    Helpers.jsonRequest(log, {
             url: 'https://www.googleapis.com/urlshortener/v1/url',
             method: 'POST',
             contentType: 'application/json',
@@ -76,23 +76,19 @@ Helpers.buildClassName = function(file) {
     return parts.join('.');
 };
 
-Helpers.jsonRequestNewLog = function(job, options, callback, errorCallback) {
-    job.log.debug(JSON.stringify(options));
-    Helpers.jsonRequest(options, callback, errorCallback);
-};
-
 // Make an HTTP request that expects JSON back, and handle the errors well.
-Helpers.jsonRequest = function(options, callback, errorCallback) {
+Helpers.jsonRequest = function(log, options, callback, errorCallback) {
     var validStatusCodes = [200, 201, undefined];
     if (!options) {
         options = {};
     }
-    log.debug(JSON.stringify(options));
+    // log.debug(JSON.stringify(options));
     options.json = true;
     if (commander.proxy) {
         options.proxy = commander.proxy;
         options.rejectUnauthorized = false;
     }
+    log.debug(JSON.stringify(options));
     request(options, function(err, response, body) {
         if (!err && (body && !body.errors && !body.error) && validStatusCodes.indexOf(response.statusCode) !== -1) {
             callback(body);

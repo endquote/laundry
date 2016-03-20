@@ -41,8 +41,9 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
         // Get the playlist id for the channel
         function(callback) {
             // https://developers.google.com/youtube/v3/docs/channels/list
-            log.debug('Getting playlist for channel name ' + that.channelName);
+            that.job.log.debug('Getting playlist for channel name ' + that.channelName);
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: '/channels',
                     qs: {
@@ -71,8 +72,9 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
 
             // Get the playlist id from a channel id.
             // https://developers.google.com/youtube/v3/docs/channels/list
-            log.debug('Getting playlist for channel ID ' + that.channelName);
+            that.job.log.debug('Getting playlist for channel ID ' + that.channelName);
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: '/channels',
                     qs: {
@@ -94,8 +96,9 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
         // Get the playlist
         function(playlistId, callback) {
             // https://developers.google.com/youtube/v3/docs/playlistItems/list
-            log.debug('Getting videos for playlist ' + playlistId);
+            that.job.log.debug('Getting videos for playlist ' + playlistId);
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: '/playlistItems',
                     qs: {
@@ -116,8 +119,9 @@ Washers.Google.YouTube.Channel.prototype.doInput = function(callback) {
             });
 
             // https://developers.google.com/youtube/v3/docs/videos/list
-            log.debug('Getting video durations.');
+            that.job.log.debug('Getting video durations.');
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: '/videos',
                     qs: {

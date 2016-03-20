@@ -97,6 +97,7 @@ Washers.MySQL.prototype.doOutput = function(items, callback) {
         //debug: commander.verbose
     });
 
+    var that = this;
     async.waterfall([
 
         function(callback) {
@@ -128,7 +129,7 @@ Washers.MySQL.prototype.doOutput = function(items, callback) {
 
             query += ')';
 
-            log.debug(query);
+            that.job.log.debug(query);
             connection.query(query, function(err, results) {
                 callback(err);
             });
@@ -148,7 +149,7 @@ Washers.MySQL.prototype.doOutput = function(items, callback) {
                     return connection.escape(val);
                 }).join(', ');
                 query += ')';
-                log.debug(query);
+                that.job.log.debug(query);
 
                 // Handle errors, if it's a duplicate that's fine, continue on.
                 connection.query(query, function(err, result) {

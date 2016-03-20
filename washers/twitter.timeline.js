@@ -70,6 +70,7 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
         }
 
         Helpers.jsonRequest(
+            that.job.log,
             extend({
                 uri: method,
                 qs: options
@@ -85,7 +86,7 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
                 if (tweets && tweets.length) {
                     retrievedLast = tweets.length;
                     retrievedTotal += tweets.length;
-                    log.debug(util.format('Got %d, total %d/%d', retrievedLast, retrievedTotal, that._quantity));
+                    that.job.log.debug(util.format('Got %d, total %d/%d', retrievedLast, retrievedTotal, that._quantity));
                     tweets.forEach(function(tweet) {
                         maxId = tweet.id_str;
                         var include = true;

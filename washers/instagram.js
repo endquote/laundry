@@ -85,6 +85,7 @@ Washers.Instagram.className = Helpers.buildClassName(__filename);
 Washers.Instagram.prototype.refreshToken = function(code, callback) {
     var that = this;
     Helpers.jsonRequest(
+        log,
         extend({
             url: 'https://api.instagram.com/oauth/access_token',
             method: 'POST',

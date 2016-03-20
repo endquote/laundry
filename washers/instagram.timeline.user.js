@@ -38,7 +38,8 @@ Washers.Instagram.Timeline.User.className = Helpers.buildClassName(__filename);
 
 Washers.Instagram.Timeline.User.prototype.getUserId = function(username, callback) {
     var that = this;
-    Helpers.jsonRequest({
+    Helpers.jsonRequest(
+        log, {
             url: 'https://api.instagram.com/v1/users/search',
             qs: {
                 count: 1,

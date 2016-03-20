@@ -30,7 +30,7 @@ Washers.Slack.Channel = function(config, job) {
             name: 'channel',
             prompt: 'What is the name of the channel to send to?',
             afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+                callback(validator.isWhitespace(newValue), newValue.replace('#', ''));
             }
         }]
     }, this.output);
@@ -51,6 +51,7 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
         // https://api.slack.com/methods/team.info
         function(callback) {
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: 'team.info'
                 }, that._requestOptions),
@@ -65,6 +66,7 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
         // https://api.slack.com/methods/channels.list
         function(callback) {
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: 'channels.list'
                 }, that._requestOptions),
@@ -82,6 +84,7 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
         // https://api.slack.com/methods/channels.history
         function(callback) {
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: 'channels.history',
                     qs: {
@@ -105,6 +108,12 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
                 message.channelInfo = channelInfo;
                 message.channelsInfo = channelsInfo;
 
+                if (!message.user) {
+                    // bots
+                    callback();
+                    return;
+                }
+
                 // If there was already a message by this user, don't request their info again.
                 var sameUser = messages.filter(function(m) {
                     return m.userInfo && m.userInfo.id === message.user;
@@ -112,6 +121,7 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
 
                 if (!sameUser) {
                     Helpers.jsonRequest(
+                        that.job.log,
                         extend({
                             url: 'users.info',
                             qs: {
@@ -152,6 +162,7 @@ Washers.Slack.Channel.prototype.doOutput = function(items, callback) {
         // https://api.slack.com/methods/channels.list
         function(callback) {
             Helpers.jsonRequest(
+                that.job.log,
                 extend({
                     url: 'channels.list'
                 }, that._requestOptions),
@@ -176,13 +187,16 @@ Washers.Slack.Channel.prototype.doOutput = function(items, callback) {
                     });
                 } else {
                     Helpers.jsonRequest(
+                        that.job.log,
                         extend({
                             url: 'chat.postMessage',
                             qs: {
                                 channel: channelInfo.id,
-                                text: S(item.description).stripTags().s,
+                                text: item.url, // S(item.description).stripTags().s,
+                                unfurl_links: true,
+                                unfurl_media: true,
                                 parse: 'full',
-                                as_user: true
+                                as_user: false
                             }
                         }, that._requestOptions),
                         function(response) {
