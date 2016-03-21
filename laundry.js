@@ -464,7 +464,6 @@ Laundry.run = function(jobName, callback) {
         // Run all the jobs
         function(jobs, callback) {
 
-            // TODO: Run jobs in parallel
             async.eachSeries(jobs, function(job, callback) {
                 async.waterfall([
 
@@ -522,7 +521,7 @@ Laundry.run = function(jobName, callback) {
         });
 
         if (runJobs.length) {
-            Laundry.run(runJobs);
+            Laundry.run(runJobs, callback);
         } else if (callback) {
             callback(err);
         }
