@@ -496,7 +496,7 @@ Laundry.run = function(jobName, callback) {
 
                     // Do the job's input task.
                     function(callback) {
-                        job.log.info(job.name + "/" + job.input.name + " - input");
+                        log.info(job.name + "/" + job.input.name + " - input");
                         job.input.doInput(function(err, items) {
                             callback(err, job, items);
                         });
@@ -504,7 +504,7 @@ Laundry.run = function(jobName, callback) {
 
                     // Do the job's output task.
                     function(job, items, callback) {
-                        job.log.info(job.name + "/" + job.output.name + " - output");
+                        log.info(job.name + "/" + job.output.name + " - output");
                         if (!items || !items.length) {
                             callback(null, job);
                         } else {
@@ -519,9 +519,9 @@ Laundry.run = function(jobName, callback) {
                         Storage.saveConfig(function() {
                             callback(null, job);
                         });
-                        job.log.info(job.name + " - complete");
+                        log.info(job.name + " - complete");
                     } else {
-                        job.log.error(job.name + " - error: " + util.inspect(err, {
+                        log.error(job.name + " - error: " + util.inspect(err, {
                             depth: 99
                         }));
                         callback(null, job);
