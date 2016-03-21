@@ -425,15 +425,27 @@ Laundry.run = function(jobName, callback) {
         return;
     }
 
-    jobName = jobName.toLowerCase();
-
     async.waterfall([
 
         // Find the requested job.
         function(callback) {
-            // Skip if it's all jobs.
+
+            // run() is calling itself with chained jobs.
+            if (_.isArray(jobName)) {
+                callback(null, jobName);
+                return;
+            }
+
+            jobName = jobName.toLowerCase();
+
+            // If all jobs, select everything that isn't scheduled to run after something else.
             if (jobName === 'all') {
-                callback(null, null);
+                var runJobs = laundryConfig.jobs.filter(function(job1) {
+                    return laundryConfig.jobs.filter(function(job2) {
+                        return job1.schedule.toString().toLowerCase() === job2.name.toLowerCase();
+                    }).length === 0;
+                });
+                callback(null, runJobs);
                 return;
             }
 
@@ -445,46 +457,14 @@ Laundry.run = function(jobName, callback) {
                 Laundry.list();
                 callback(jobName);
             } else {
-                callback(null, job);
+                callback(null, [job]);
             }
-        },
-
-        // Add any jobs which are scheduled to run after others.
-        function(job, callback) {
-            var runJobs = [job];
-
-            // If all jobs, select everything that isn't scheduled to run after something else.
-            if (jobName === 'all') {
-                runJobs = laundryConfig.jobs.filter(function(job1) {
-                    return laundryConfig.jobs.filter(function(job2) {
-                        return job1.schedule.toString().toLowerCase() === job2.name.toLowerCase();
-                    }).length === 0;
-                });
-            }
-
-            var foundJobs = false;
-            do {
-                foundJobs = false;
-                var runJobNames = runJobs.map(function(job, index, a) {
-                    return job.name.toLowerCase();
-                }); // jshint ignore:line
-                laundryConfig.jobs.forEach(function(job) {
-                    if (runJobs.indexOf(job) === -1) {
-                        var name = job.schedule ? job.schedule.toString() : '';
-                        name = name.toLowerCase();
-                        var index = runJobNames.indexOf(name);
-                        if (index !== -1) {
-                            runJobs.splice(index + 1, 0, job);
-                            foundJobs = true;
-                        }
-                    }
-                }); // jshint ignore:line
-            } while (foundJobs);
-            callback(null, runJobs);
         },
 
         // Run all the jobs
         function(jobs, callback) {
+
+            // TODO: Run jobs in parallel
             async.eachSeries(jobs, function(job, callback) {
                 async.waterfall([
 
@@ -528,11 +508,22 @@ Laundry.run = function(jobName, callback) {
                     }
                 });
             }, function(err) {
-                callback(err);
+                callback(err, jobs);
             });
         }
-    ], function(err) {
-        if (callback) {
+    ], function(err, jobs) {
+
+        // Find any jobs that are scheduled to run after jobs which just ran.
+        var runJobs = [];
+        jobs.forEach(function(ranJob) {
+            runJobs = runJobs.concat(laundryConfig.jobs.filter(function(job) {
+                return job.schedule === ranJob.name;
+            }));
+        });
+
+        if (runJobs.length) {
+            Laundry.run(runJobs);
+        } else if (callback) {
             callback(err);
         }
     });
