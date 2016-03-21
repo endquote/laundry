@@ -464,7 +464,8 @@ Laundry.run = function(jobName, callback) {
         // Run all the jobs
         function(jobs, callback) {
 
-            async.eachLimit(jobs, 3, function(job, callback) {
+            // TODO: Run jobs in parallel
+            async.eachSeries(jobs, function(job, callback) {
                 async.waterfall([
 
                     // Set up the logger for the job.
