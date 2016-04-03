@@ -516,11 +516,13 @@ Laundry.run = function(jobName, callback) {
 
         // Find any jobs that are scheduled to run after jobs which just ran.
         var runJobs = [];
-        jobs.forEach(function(ranJob) {
-            runJobs = runJobs.concat(laundryConfig.jobs.filter(function(job) {
-                return job.schedule === ranJob.name;
-            }));
-        });
+        if (jobs) {
+            jobs.forEach(function(ranJob) {
+                runJobs = runJobs.concat(laundryConfig.jobs.filter(function(job) {
+                    return job.schedule === ranJob.name;
+                }));
+            });
+        }
 
         if (runJobs.length) {
             Laundry.run(runJobs, callback);
