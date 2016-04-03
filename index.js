@@ -94,13 +94,13 @@ function runCommand() {
 
     // Reduce confusion.
     if (commander.local && (commander.s3key || commander.s3secret || commander.s3bucket)) {
-        log.error('Ambiguous: Provide only local or S3 arguments.');
+        console.error('Ambiguous: Provide only local or S3 arguments.');
         process.exit(1);
     }
 
     // Need all of the S3s.
     if (!commander.local && !(commander.s3key && commander.s3secret && commander.s3bucket)) {
-        log.error('A local path or S3 key, secret, and bucket must be provided.');
+        console.error('A local path or S3 key, secret, and bucket must be provided.');
         process.exit(1);
     }
 
