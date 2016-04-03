@@ -114,7 +114,7 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
         feedSettings.custom_elements = [{
             'itunes:image': {
                 _attr: {
-                    href: 'https://cdn.rawgit.com/endquote/laundry/master/icons/apple-touch-icon.png'
+                    href: 'https://endquote.github.io/laundry/icons/apple-touch-icon.png'
                 }
             }
         }];
