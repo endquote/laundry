@@ -94,6 +94,7 @@ Storage.initLog = function(job) {
             colorize: true,
             level: global.log.level
         });
+        log.stream = opts.stream;
     } else {
         var category = 'job-' + job.name;
         log.loggers.add(category, {
@@ -104,6 +105,7 @@ Storage.initLog = function(job) {
             }
         });
         job.log = log.loggers.get(category);
+        job.log.stream = opts.stream;
     }
 };
 

@@ -82,6 +82,10 @@ function runCommand() {
     // Configure logging.
     global.log = require('winston'); // https://github.com/winstonjs/winston
     log.level = 'info';
+
+    // Number of log files to retain for jobs, and for the global log. Could make this a setting.
+    log.retainLogs = 30;
+
     if (commander.verbose) {
         log.level = 'debug';
     }
@@ -181,8 +185,10 @@ function onComplete(err) {
     if (err) {
         log.error(err);
     }
-    if (log.s3stream) {
-        log.s3stream.flushFile();
-    }
-    log.debug(Date.now() - processStart + 'ms');
+
+    Storage.flushLogs(function() {
+        Storage.clearLog(null, log.retainLogs, function(err) {
+            log.debug(Date.now() - processStart + 'ms');
+        });
+    });
 }

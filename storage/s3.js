@@ -34,8 +34,66 @@ Storage.S3.configLog = function(job) {
         stream: stream,
         level: global.log.level
     };
-    log.s3stream = stream;
     return opts;
+};
+
+// Delete old log files. 
+Storage.S3.clearLog = function(job, retainRuns, callback) {
+
+    // Subtract one, because a new one will get added after this.
+    retainRuns = Math.max(0, retainRuns - 1);
+
+    var prefix = (job ? 'jobs/' + job.name + '/' : '') + 'logs';
+    Storage.cacheFiles(job ? job.log : log, prefix, function(err, cache) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        var expired = cache.sort(function(a, b) {
+                if (a.fileName < b.fileName) {
+                    return -1;
+                }
+                if (a.fileName > b.fileName) {
+                    return 1;
+                }
+                return 0;
+            })
+            .reverse()
+            .slice(retainRuns)
+            .map(function(file) {
+                return {
+                    Key: file.fileName
+                };
+            });
+
+        Storage.S3._client.deleteObjects({
+            Bucket: commander.s3bucket,
+            Delete: {
+                Objects: expired
+            }
+        }, function(err, data) {
+            if (callback) {
+                callback(err);
+            }
+        });
+    });
+};
+
+// Do any log cleanup that this storage method needs.
+Storage.S3.flushLogs = function(callback) {
+    var streams = laundryConfig.jobs
+        .filter(function(job) {
+            return job.log && job.log.stream;
+        }).map(function(job) {
+            return job.log.stream;
+        });
+    streams.push(log.stream);
+
+    async.each(streams, function(stream, callback) {
+        stream.flushFile(); // flushFile should really take a callback...
+        callback();
+    }, callback);
 };
 
 // Given a URL and a target, copy the URL to the target.

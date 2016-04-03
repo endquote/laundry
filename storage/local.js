@@ -25,6 +25,43 @@ Storage.Local.configLog = function(job) {
     return opts;
 };
 
+// Delete old log files. 
+Storage.Local.clearLog = function(job, retainRuns, callback) {
+    var logPath = path.join(commander.local, 'logs');
+    if (job) {
+        logPath = path.join(commander.local, 'jobs', job.name, 'logs');
+    }
+
+    if (!fs.existsSync(logPath)) {
+        if (callback) {
+            callback();
+        }
+        return;
+    }
+
+    var err = null;
+    try {
+        fs.readdirSync(logPath)
+            .sort()
+            .reverse()
+            .slice(retainRuns)
+            .forEach(function(file, index) {
+                fs.unlinkSync(path.join(logPath, file));
+            });
+    } catch (e) {
+        err = e;
+    }
+
+    if (callback) {
+        callback(err);
+    }
+};
+
+// Do any log cleanup that this storage method needs.
+Storage.Local.flushLogs = function(callback) {
+    callback();
+};
+
 // Given a URL and a target, copy the URL to the target.
 //
 // log: the logger to write to

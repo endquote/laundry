@@ -495,10 +495,12 @@ Laundry.run = function(jobName, callback) {
                 ], function(err, job) {
                     if (!err) {
                         job.lastRun = new Date();
-                        Storage.saveConfig(function() {
-                            callback(null, job);
+                        Storage.clearLog(job, log.retainLogs, function() {
+                            Storage.saveConfig(function() {
+                                log.info(job.name + " - complete");
+                                callback(null, job);
+                            });
                         });
-                        log.info(job.name + " - complete");
                     } else {
                         log.error(job.name + " - error: " + util.inspect(err, {
                             depth: 99
