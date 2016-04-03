@@ -175,36 +175,40 @@ Storage.S3.downloadUrl = function(log, url, target, targetDate, cache, useYTDL, 
         log.debug('Downloading ' + params.Key);
         var protocol = require('url').parse(url).protocol;
         var req = protocol === 'http:' ? http.request : https.request;
-        req(url, function(response) {
-            if (response.statusCode !== 200 && response.statusCode !== 302) {
-                callback(response.error, result);
-                return;
-            }
+        try {
+            req(url, function(response) {
+                if (response.statusCode !== 200 && response.statusCode !== 302) {
+                    callback(response.error, result);
+                    return;
+                }
 
-            params.Body = response;
-            params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
-            params.ContentType = response.headers['content-type'];
+                params.Body = response;
+                params.ContentLength = response.headers['content-length'] ? parseInt(response.headers['content-length']) : null;
+                params.ContentType = response.headers['content-type'];
 
-            // You can't set the last modfied date, but you can add custom metadata which represents it.
-            if (targetDate && targetDate.getTime) {
-                params.Metadata = {
-                    'last-modified': targetDate.getTime().toString()
-                };
-            }
+                // You can't set the last modfied date, but you can add custom metadata which represents it.
+                if (targetDate && targetDate.getTime) {
+                    params.Metadata = {
+                        'last-modified': targetDate.getTime().toString()
+                    };
+                }
 
-            Storage.S3._client.upload(params)
-                .on('httpUploadProgress', function(progress) {
-                    // console.log(progress);
-                })
-                .send(function(err, data) {
-                    result.error = err;
-                    if (!err) {
-                        result.bytes = response.headers['content-length'];
-                        result.newUrl = resultUrl;
-                    }
-                    callback(err, result);
-                });
-        }).end();
+                Storage.S3._client.upload(params)
+                    .on('httpUploadProgress', function(progress) {
+                        // console.log(progress);
+                    })
+                    .send(function(err, data) {
+                        result.error = err;
+                        if (!err) {
+                            result.bytes = response.headers['content-length'];
+                            result.newUrl = resultUrl;
+                        }
+                        callback(err, result);
+                    });
+            }).end();
+        } catch (err) {
+            callback(err, result);
+        }
     }
 };
 

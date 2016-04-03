@@ -133,34 +133,38 @@ Storage.Local.downloadUrl = function(log, url, target, targetDate, cache, useYTD
         log.debug('Downloading ' + target);
         var protocol = require('url').parse(url).protocol;
         var req = protocol === 'http:' ? http.request : https.request;
-        req(url, function(response) {
-            if (response.statusCode !== 200 && response.statusCode !== 302) {
-                callback(response.error, result);
-                return;
-            }
-
-            result.newUrl = resultUrl;
-            response.on('end', function() {
-                result.bytes = response.headers['content-length'];
-                if (response.error || !targetDate) {
+        try {
+            req(url, function(response) {
+                if (response.statusCode !== 200 && response.statusCode !== 302) {
                     callback(response.error, result);
                     return;
                 }
 
-                fs.utimes(target, Date.now(), targetDate, function() {
-                    callback(response.error, result);
+                result.newUrl = resultUrl;
+                response.on('end', function() {
+                    result.bytes = response.headers['content-length'];
+                    if (response.error || !targetDate) {
+                        callback(response.error, result);
+                        return;
+                    }
+
+                    fs.utimes(target, Date.now(), targetDate, function() {
+                        callback(response.error, result);
+                    });
                 });
-            });
 
-            fs.mkdirp(path.parse(target).dir, function(err) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
+                fs.mkdirp(path.parse(target).dir, function(err) {
+                    if (err) {
+                        callback(err, result);
+                        return;
+                    }
 
-                response.pipe(fs.createWriteStream(target));
-            });
-        }).end();
+                    response.pipe(fs.createWriteStream(target));
+                });
+            }).end();
+        } catch (err) {
+            callback(err, result);
+        }
     }
 };
 
