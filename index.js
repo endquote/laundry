@@ -158,7 +158,7 @@ function runCommand() {
         }
 
         // Update youtube-dl every day.
-        if (moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
+        if (cmd === 'run' && moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
             log.info('Updating youtube-dl');
             var downloader = require('youtube-dl/lib/downloader');
             downloader(function error(err, done) {
