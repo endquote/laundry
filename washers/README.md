@@ -9,23 +9,29 @@ this.input = _.merge({
 	// Shown in the list of washers
     description: 'Loads data from an RSS feed.',
 
-    // An array of settings to ask about
-    settings: [{
+    // An array of settings to ask about, in the format of Inquirer.js prompt objects
+    // https://github.com/SBoudrias/Inquirer.js
+    prompts: [{
+        // The type of question to ask, usually "input"
+        type: 'input',
 
-    	// The property name to save this setting as. 
+        // The property name to save this setting as. 
         name: 'url',
 
         // The prompt to give the user.
-        prompt: 'What RSS feed URL do you want to launder?',
+        message: 'What RSS feed URL do you want to launder?',
 
-        // Called before asking the user for a value, callback indicating whether a
-        // response is required, what the prompt should be, and a suggested default.
-        beforeEntry: function(rl, job, prompt, callback(required, prompt, suggest)),
+        // Called after a value is entered, return true if it's valid, false or an error message if not.
+        validate: function(answer)
 
-        // Called after the user has entered a value, so it can be validated, modified
-        // or acted upon in some way. Callback indicating whether the value is valid,
-        // and what the new value is.
-        afterEntry: function(rl, job, oldValue, newValue, callback(err, newValue))
+        // Called after a valid value is entered, return it modified if needed.
+        filter: function(value),
+
+        // Return a default value for this setting, or set to a string
+        default: function(),
+
+        // An addition to the inquirer functionality -- if you need to set a default or other property based on the job.
+        setup: function(job)
     }]
 }, this.input);
 ```
