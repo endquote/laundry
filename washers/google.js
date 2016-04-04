@@ -19,80 +19,78 @@ Washers.Google = function(config, job) {
     };
 
     this.input = _.merge({
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'clientId',
-            prompt: 'Go to https://console.developers.google.com/ and create a new project. Open the API Manager and activate YouTube and Gmail. Under "Credentials", click "Create Credentials", then "OAuth Client ID". Choose "Other" and give it a name. The client ID and secret will appear.\nWhat is the client ID?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
+            message: 'Client ID',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
-                callback(validator.isWhitespace(newValue));
+                console.log(wrap('Go to https://console.developers.google.com/ and create a new project. Open the API Manager and activate YouTube and Gmail. Under "Credentials", click "Create Credentials", then "OAuth Client ID". Choose "Other" and give it a name. The client ID and secret will appear.'));
+                return true;
+            },
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }, {
+            type: 'input',
             name: 'clientSecret',
-            prompt: 'What is the client secret?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
+            message: 'Client secret',
+            when: function(answers) {
+                return job && job.input.token ? false : true;
             },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
-                }
-                callback(validator.isWhitespace(newValue));
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }, {
+            type: 'input',
             name: 'authCode',
-            prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, job, prompt, callback) {
-                if (this.token) {
-                    callback(false, prompt);
-                    return;
+            message: 'Auth code',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
 
+                var done = this.async();
+
                 var url = 'https://accounts.google.com/o/oauth2/auth?' + qs.stringify({
-                    client_id: this.clientId,
+                    client_id: answers.clientId,
                     response_type: 'code',
                     redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
                     access_type: 'offline',
                     scope: 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/gmail.readonly'
                 });
 
-                var that = this;
                 Helpers.shortenUrl(url, function(url) {
-                    prompt = util.format(prompt, url);
-                    callback(true, prompt);
+                    console.log(wrap(util.format('Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s', url)));
+                    done(true);
                 });
             },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (this.token) {
-                    callback(false);
-                    return;
+            validate: function(value, answers) {
+                if (validator.isWhitespace(value)) {
+                    return false;
                 }
-                if (validator.isWhitespace(newValue)) {
-                    callback(true);
-                    return;
-                }
-                var that = this;
+
+                var done = this.async();
+
                 Helpers.jsonRequest(
-                    that.job.log, {
+                    null, {
                         url: 'https://accounts.google.com/o/oauth2/token',
                         method: 'POST',
                         form: {
-                            code: newValue,
-                            client_id: that.clientId,
-                            client_secret: that.clientSecret,
+                            code: value,
+                            client_id: answers.clientId,
+                            client_secret: answers.clientSecret,
                             redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
                             grant_type: 'authorization_code'
                         }
                     },
                     function(response) {
-                        that.token = response;
-                        callback();
+                        answers.token = response;
+                        done(true);
                     },
-                    callback);
+                    done);
             }
         }]
     }, this.input);

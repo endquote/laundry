@@ -82,13 +82,14 @@ Helpers.jsonRequest = function(log, options, callback, errorCallback) {
     if (!options) {
         options = {};
     }
-    // log.debug(JSON.stringify(options));
     options.json = true;
     if (commander.proxy) {
         options.proxy = commander.proxy;
         options.rejectUnauthorized = false;
     }
-    log.debug(JSON.stringify(options));
+    if (log) {
+        log.debug(JSON.stringify(options));
+    }
     request(options, function(err, response, body) {
         if (!err && (body && !body.errors && !body.error) && validStatusCodes.indexOf(response.statusCode) !== -1) {
             callback(body);

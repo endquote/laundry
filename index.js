@@ -16,6 +16,7 @@ global.qs = require('qs'); // https://www.npmjs.com/package/qs
 global.extend = require('deep-extend'); // https://www.npmjs.com/package/deep-extend
 global.request = require('request'); // https://github.com/request/request
 global.commander = require('commander'); // https://www.npmjs.com/package/commander
+global.wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 
 // Set up arguments.
 commander

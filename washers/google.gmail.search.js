@@ -14,11 +14,12 @@ Washers.Google.Gmail.Search = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads mails from a Gmail search query.',
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'query',
-            prompt: 'What is the Gmail search query?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+            message: 'What is the Gmail search query?',
+            validate: function(value) {
+                return !validator.isWhitespace(value);
             }
         }]
     });

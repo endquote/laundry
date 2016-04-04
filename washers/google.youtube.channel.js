@@ -14,11 +14,12 @@ Washers.Google.YouTube.Channel = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent videos from a YouTube channel.',
-        settings: [{
+        prompts: [{
+                type: 'input',
                 name: 'channelName',
-                prompt: 'What is the name or ID of the channel to watch?',
-                afterEntry: function(rl, job, oldValue, newValue, callback) {
-                    callback(validator.isWhitespace(newValue));
+                message: 'What is the name or ID of the channel to watch?',
+                validate: function(value) {
+                    return !validator.isWhitespace(value);
                 }
             },
             Washer.downloadMediaOption

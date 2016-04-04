@@ -1,17 +1,19 @@
 'use strict';
 
-var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 var child_process = require('child_process'); // https://nodejs.org/api/child_process.html
 var inquirer = require('inquirer'); // https://github.com/sboudrias/Inquirer.js
 
+// Handy global word wrap method.
+var oldWrap = global.wrap;
+global.wrap = function(s) {
+    return oldWrap(s, {
+        width: 70
+    });
+};
+
 // Singleton Laundry class, generally the entry point to the whole thing.
 function Laundry() {}
-
-// Options to pass to the word wrap method.
-Laundry._wrapOpts = {
-    width: 70
-};
 
 // Create a new job.
 Laundry.create = function(jobName, callback) {
@@ -40,10 +42,10 @@ Laundry.create = function(jobName, callback) {
                 return job && job.name.toLowerCase() === jobName.toLowerCase();
             })[0];
             if (job) {
-                console.log(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.", jobName), Laundry._wrapOpts));
+                console.log(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.", jobName)));
                 callback();
             } else {
-                console.log(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".", jobName), Laundry._wrapOpts));
+                console.log(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".", jobName)));
                 job = new Job({
                     name: jobName
                 });
@@ -53,7 +55,7 @@ Laundry.create = function(jobName, callback) {
 
         // Ask for the input washer.
         function(callback) {
-            console.log(wrap("Now to decide where to launder data from. The sources we have are:", Laundry._wrapOpts));
+            console.log(wrap("Now to decide where to launder data from. The sources we have are:"));
             inquirer.prompt(
                 [Laundry._washerPrompt(job, 'input')],
                 function(answers) {
@@ -72,7 +74,7 @@ Laundry.create = function(jobName, callback) {
 
         // Request the output washer.
         function(callback) {
-            console.log(wrap("Now to decide where to send data to. The options we have are:", Laundry._wrapOpts));
+            console.log(wrap("Now to decide where to send data to. The options we have are:"));
             inquirer.prompt(
                 [Laundry._washerPrompt(job, 'output')],
                 function(answers) {
@@ -108,7 +110,7 @@ Laundry.create = function(jobName, callback) {
                     callback(err);
                     return;
                 }
-                console.log(chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), Laundry._wrapOpts)));
+                console.log(chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name))));
                 callback();
             });
         }
@@ -149,7 +151,7 @@ Laundry._washerPrompt = function(job, mode) {
     var prompt = {
         type: 'list',
         name: 'washer',
-        message: mode.substr(0, 1).toUpperCase() + mode.substr(1),
+        message: ' ',
         pageSize: 10,
         choices: choices,
     };
@@ -223,6 +225,9 @@ Laundry._configureWasher = function(job, mode, callback) {
         if (washer[prompt.name]) {
             prompt.default = washer[prompt.name];
         }
+        if (prompt.message.length > 1) {
+            prompt.message += ':';
+        }
         if (prompt.setup) {
             prompt.setup(job);
         }
@@ -265,7 +270,7 @@ Laundry._scheduleJob = function(job, callback) {
     prompt += "- Enter a number to run after so many minutes. Entering 60 will run the job every hour.\n";
     prompt += "- Enter a time to run at a certain time every day, like '9:30' or '13:00'.\n";
     prompt += "- Enter the name of another job to run after that job runs.";
-    console.log("\n" + wrap(prompt, Laundry._wrapOpts));
+    console.log("\n" + wrap(prompt));
 
     inquirer.prompt([{
         type: 'input',
@@ -324,13 +329,13 @@ Laundry._scheduleJob = function(job, callback) {
         job.schedule = answers.schedule;
         var type = Laundry._scheduleType(job.schedule);
         if (type === 'manual') {
-            console.log(wrap(util.format("This job will only be run manually."), Laundry._wrapOpts));
+            console.log(wrap(util.format("This job will only be run manually.")));
         } else if (type === 'timed') {
-            console.log(wrap(util.format("This job will run every day at %s.", job.schedule), Laundry._wrapOpts));
+            console.log(wrap(util.format("This job will run every day at %s.", job.schedule)));
         } else if (type === 'interval') {
-            console.log(wrap(util.format("This job will run every %d minutes.", job.schedule), Laundry._wrapOpts));
+            console.log(wrap(util.format("This job will run every %d minutes.", job.schedule)));
         } else if (type === 'after') {
-            console.log(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".", job.schedule), Laundry._wrapOpts));
+            console.log(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".", job.schedule)));
         }
         callback();
     });
@@ -508,7 +513,7 @@ Laundry.destroy = function(jobName, callback) {
                 },
                 // Tell the user about it.
                 function(url, callback) {
-                    console.log(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyed."), job.name), Laundry._wrapOpts) + "\n");
+                    console.log(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyed."), job.name)) + "\n");
                     callback();
                 }
             ], function(err) {
@@ -516,7 +521,7 @@ Laundry.destroy = function(jobName, callback) {
             });
 
         } else {
-            console.log(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name), Laundry._wrapOpts) + "\n");
+            console.log(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name)) + "\n");
             callback();
         }
     });

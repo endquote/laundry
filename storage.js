@@ -53,7 +53,7 @@ Storage.loadConfig = function(callback) {
             loaded = true;
         } catch (e) {
             loaded = false;
-            log.warn('Config not found, using default.');
+            // log.warn('Config not found, using default.');
         }
 
         // Set defaults for settings.

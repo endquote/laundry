@@ -26,7 +26,8 @@
         "S": true,
         "qs": true,
         "extend": true,
-        "request": true
+        "request": true,
+        "wrap": true
     },
     "curly": true,
     "eqeqeq": true,
