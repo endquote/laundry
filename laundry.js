@@ -1,9 +1,9 @@
 'use strict';
 
-var readline = require('readline'); // https://nodejs.org/api/readline.html
 var wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 var chalk = require('chalk'); // https://github.com/sindresorhus/chalk
 var child_process = require('child_process'); // https://nodejs.org/api/child_process.html
+var inquirer = require('inquirer'); // https://github.com/sboudrias/Inquirer.js
 
 // Singleton Laundry class, generally the entry point to the whole thing.
 function Laundry() {}
@@ -16,95 +16,87 @@ Laundry._wrapOpts = {
 // Create a new job.
 Laundry.create = function(jobName, callback) {
     jobName = jobName || '';
+
     // Convert name to confirm to S3 bucket naming best practices
     jobName = jobName.toLowerCase(); // No capital letters (A-Z)
     jobName = jobName.replace('.', '-'); // No periods (.)
     jobName = jobName.replace('_', '-'); // No underscores (_)
     jobName = jobName.replace(/(^-|-$)/g, ''); // - cannot appear at the beginning nor end of the bucket name
     jobName = jobName.substr(0, 32); // The bucket name must be less than or equal to 32 characters long
+
     if (!jobName || jobName === 'all') {
         console.log("Specify a name for the job with " + chalk.bold("laundry create [job]") + ".\n");
         Laundry.list(callback);
         return;
     }
 
-    // input, output, or null -- used to control the completion behavior
-    var mode = null;
+    var job;
 
     async.waterfall([
 
-        // Set up the console.
-        function(callback) {
-            var rl = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout,
-                completer: function(line) {
-                    return Laundry._tabComplete(mode, line);
-                }
-            });
-            callback(null, rl);
-        },
-
         // Get the job
-        function(rl, callback) {
-            var job = laundryConfig.jobs.filter(function(job) {
+        function(callback) {
+            job = laundryConfig.jobs.filter(function(job) {
                 return job && job.name.toLowerCase() === jobName.toLowerCase();
             })[0];
             if (job) {
-                rl.write(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.\n", jobName), Laundry._wrapOpts));
-                callback(null, rl, job);
+                console.log(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.", jobName), Laundry._wrapOpts));
+                callback();
             } else {
-                rl.write(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".\n", jobName), Laundry._wrapOpts));
+                console.log(wrap(util.format("Great, let's create a new job called " + chalk.green.bold("%s") + ".", jobName), Laundry._wrapOpts));
                 job = new Job({
                     name: jobName
                 });
-                callback(null, rl, job);
+                callback();
             }
         },
 
         // Ask for the input washer.
-        function(rl, job, callback) {
-            mode = 'input';
-            Laundry._askForWasher(rl, job, mode, function(err) {
-                callback(err, rl, job);
-            });
+        function(callback) {
+            console.log(wrap("Now to decide where to launder data from. The sources we have are:", Laundry._wrapOpts));
+            inquirer.prompt(
+                [Laundry._washerPrompt(job, 'input')],
+                function(answers) {
+                    job.input = answers.washer;
+                    callback();
+                });
         },
 
         // Configure the input washer.
-        function(rl, job, callback) {
-            mode = null;
+        function(callback) {
             Laundry._inheritSettings(job.input, 'input');
-            Laundry._configureWasher(rl, job, 'input', function(err) {
-                callback(err, rl, job);
+            Laundry._configureWasher(job, 'input', function() {
+                callback();
             });
         },
 
         // Request the output washer.
-        function(rl, job, callback) {
-            mode = 'output';
-            Laundry._askForWasher(rl, job, mode, function(err) {
-                callback(err, rl, job);
-            });
+        function(callback) {
+            console.log(wrap("Now to decide where to send data to. The options we have are:", Laundry._wrapOpts));
+            inquirer.prompt(
+                [Laundry._washerPrompt(job, 'output')],
+                function(answers) {
+                    job.output = answers.washer;
+                    callback();
+                });
         },
 
         // Configure the output washer.
-        function(rl, job, callback) {
-            mode = null;
+        function(callback) {
             Laundry._inheritSettings(job.output, 'output');
-            Laundry._configureWasher(rl, job, 'output', function(err) {
-                callback(err, rl, job);
+            Laundry._configureWasher(job, 'output', function() {
+                callback();
             });
         },
 
         // Configure scheduling.
-        function(rl, job, callback) {
-            mode = null;
-            Laundry._scheduleJob(rl, job, function(err) {
-                callback(err, rl, job);
+        function(callback) {
+            Laundry._scheduleJob(job, function(err) {
+                callback();
             });
         }
 
-    ], function(err, rl, job) {
+    ], function(err) {
         if (err) {
             callback(err);
         } else if (job) {
@@ -116,102 +108,58 @@ Laundry.create = function(jobName, callback) {
                     callback(err);
                     return;
                 }
-                rl.write("\n" + chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), Laundry._wrapOpts)));
-                rl.close();
+                console.log(chalk.green(wrap(util.format("Cool, the job " + chalk.bold("%s") + " is all set up!\n", job.name), Laundry._wrapOpts)));
                 callback();
             });
         }
     });
 };
 
-// Tab completion function to complete washer names in the console. Weird.
-// https://nodejs.org/api/readline.html#readline_readline_createinterface_options
-Laundry._tabComplete = function(mode, line) {
-    line = line.toLowerCase();
-    if (!line) {
-        return [
-            [], line
-        ];
-    }
+// Build the prompt object for asking which washer to use.
+Laundry._washerPrompt = function(job, mode) {
 
-    var validWashers = [];
-    if (mode) {
-        for (var i in allWashers) {
-            var w = new allWashers[i]();
-            if (w[mode] && w.name) {
-                validWashers.push(w);
-            }
-        }
-    }
-
-    var completions = validWashers.map(function(washer) {
-        return washer.name;
-    });
-
-    completions.sort();
-    completions = completions.filter(function(completion) {
-        return completion.toLowerCase().indexOf(line) === 0;
-    });
-    return [completions, line];
-};
-
-// Prompt the user for an input or output washer.
-Laundry._askForWasher = function(rl, job, mode, callback) {
+    // Get all of the washers with input or output, as requested.
     var validWashers = [];
     for (var i in allWashers) {
         var w = new allWashers[i]();
         if (w[mode] && w.name) {
+
+            // Use the existing washer if there is one.
+            if (job[mode] && job[mode].className === w.className) {
+                w = job[mode];
+            }
+
             validWashers.push(w);
         }
     }
 
+    // Sort by name.
     validWashers.sort(function(a, b) {
         return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
     });
 
-    var washersList = '';
-    validWashers.forEach(function(washer) {
-        washersList += util.format(chalk.bold("%s") + " - %s\n", washer.name, washer[mode].description);
+    // Make choice labels.
+    var choices = validWashers.map(function(washer) {
+        return {
+            value: washer,
+            name: washer.name + ' - ' + washer[mode].description
+        };
     });
 
-    var prompt = "Now to decide where to launder data from. The sources we have are:\n%s\n";
-    var confirm = "Cool, we'll start with " + chalk.green.bold("%s") + ".";
-    var question = "Which source do you want to use? ";
-    if (mode === 'output') {
-        prompt = "Now to decide where to send data to. The options we have are:\n%s\n\n";
-        confirm = "Cool, we'll send it to " + chalk.green.bold("%s") + ".\n";
-        question = "Which target do you want to use? ";
-    }
+    var prompt = {
+        type: 'list',
+        name: 'washer',
+        message: mode.substr(0, 1).toUpperCase() + mode.substr(1),
+        pageSize: 10,
+        choices: choices,
+    };
 
-    var list = util.format(prompt, washersList);
-    rl.write("\n" + wrap(list, Laundry._wrapOpts));
+    // Default to the current washer.
+    prompt.default = choices.indexOf(choices.filter(function(choice) {
+        return choice.value === job[mode];
+    })[0]);
 
-    var washer = null;
-    async.whilst(function() {
-            return washer === null || washer === undefined;
-        }, function(callback) {
-            rl.question(wrap(question, Laundry._wrapOpts), function(answer) {
-                answer = chalk.stripColor(answer).trim();
-                washer = validWashers.filter(function(washer) {
-                    return washer.name.toLowerCase() === answer.toLowerCase();
-                })[0];
-                if (washer) {
-                    rl.write(wrap(util.format(confirm, washer.name), Laundry._wrapOpts) + '\n\n');
-                    if (!job[mode] || job[mode].name !== washer.name) {
-                        job[mode] = washer;
-                    }
-                } else {
-                    rl.write(wrap(chalk.red("Hm, couldn't find that one. Try again?\n"), Laundry._wrapOpts));
-                }
-                callback();
-            });
-            if (job[mode]) {
-                rl.write(job[mode].name);
-            }
-        },
-        function(err) {
-            callback(err);
-        });
+    return prompt;
 };
 
 // Given an input or output washer, find other jobs using a similar one and inherit settings from it.
@@ -237,8 +185,8 @@ Laundry._inheritSettings = function(washer, mode) {
             return;
         }
         var w = new allWashers[baseClass]();
-        if (w[mode]) {
-            w[mode].settings.forEach(function(setting) {
+        if (w[mode] && w[mode].prompts) {
+            w[mode].prompts.forEach(function(setting) {
                 if (settings.indexOf(setting.name) === -1) {
                     settings.push(setting.name);
                 }
@@ -263,147 +211,129 @@ Laundry._inheritSettings = function(washer, mode) {
 };
 
 // Given a washer and an input/output mode, configure settings on the washer.
-Laundry._configureWasher = function(rl, job, mode, callback) {
+Laundry._configureWasher = function(job, mode, callback) {
     var washer = job[mode];
-    async.eachSeries(washer[mode].settings, function(item, callback) {
-        var valid = false;
+    var prompts = washer[mode].prompts;
+    if (!prompts || !prompts.length) {
+        callback();
+        return;
+    }
 
-        if (!item.beforeEntry) {
-            item.beforeEntry = function(rl, job, prompt, callback) {
-                callback(true, prompt, '');
-            };
+    prompts.forEach(function(prompt) {
+        if (washer[prompt.name]) {
+            prompt.default = washer[prompt.name];
         }
-
-        if (!item.afterEntry) {
-            item.afterEntry = function(rl, job, lastValue, newValue, callback) {
-                callback();
-            };
+        if (prompt.setup) {
+            prompt.setup(job);
         }
-
-        async.whilst(function() {
-                return !valid;
-            },
-            function(callback) {
-                // Call the beforeEntry method...
-                item.beforeEntry.apply(washer, [
-                    rl,
-                    job,
-                    item.prompt,
-                    function(required, prompt, suggest) {
-                        if (!required) {
-                            valid = true;
-                            callback();
-                            return;
-                        }
-                        if (!suggest) {
-                            suggest = '';
-                        }
-
-                        // Show the prompt...
-                        rl.question(wrap(prompt + ' ', Laundry._wrapOpts), function(answer) {
-                            answer = Helpers.cleanString(answer);
-                            // Call the after entry method
-                            item.afterEntry.apply(washer, [rl, job, washer[item.name], answer,
-                                function(err, newAnswer) {
-                                    if (newAnswer !== undefined) {
-                                        answer = newAnswer;
-                                    }
-
-                                    if (err) {
-                                        // Reject the answer
-                                        rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), Laundry._wrapOpts));
-                                    } else {
-                                        // Save the answer
-                                        valid = true;
-                                        washer[item.name] = answer;
-                                    }
-                                    callback();
-                                }
-                            ]);
-                        });
-
-                        // Default to the suggestion returned by beforeEntry, or the existing value for the property.
-                        var def = '';
-                        if (suggest) {
-                            def = suggest;
-                        } else if (washer[item.name]) {
-                            def = washer[item.name];
-                        }
-
-                        rl.write(def.toString());
-                    }
-                ]);
-            },
-            function(err) {
-                callback(err);
-            });
-    }, function(err) {
-        callback(err);
     });
+
+    inquirer.prompt(
+        prompts,
+        function(answers) {
+            for (var i in answers) {
+                washer[i] = answers[i];
+            }
+            callback();
+        });
 };
 
-Laundry._scheduleJob = function(rl, job, callback) {
+Laundry._scheduleType = function(schedule) {
+    if (schedule) {
+        schedule = schedule.toString();
+    }
+
+    if (!schedule) {
+        // Run manually.
+        return 'manual';
+    } else if (schedule.indexOf(':') !== -1) {
+        // Run at a time of day.
+        return 'timed';
+    } else if (!isNaN(parseInt(schedule))) {
+        // Run on an interval.
+        return 'interval';
+    } else {
+        // Run after another job.
+        return 'after';
+    }
+};
+
+Laundry._scheduleJob = function(job, callback) {
     var prompt = '';
     prompt += "Now to set when this job will run.\n";
     prompt += "- Leave blank to run only when 'laundry run [job]' is called.\n";
     prompt += "- Enter a number to run after so many minutes. Entering 60 will run the job every hour.\n";
     prompt += "- Enter a time to run at a certain time every day, like '9:30' or '13:00'.\n";
-    prompt += "- Enter the name of another job to run after that job runs.\n\n";
-    rl.write("\n" + wrap(prompt, Laundry._wrapOpts));
+    prompt += "- Enter the name of another job to run after that job runs.";
+    console.log("\n" + wrap(prompt, Laundry._wrapOpts));
 
-    var valid = false;
-    async.whilst(function() {
-            return !valid;
-        },
-        function(callback) {
-            rl.question(wrap("How do you want the job to be scheduled? ", Laundry._wrapOpts), function(answer) {
-                answer = chalk.stripColor(answer).trim().toLowerCase();
-
-                if (!answer) {
-                    valid = true;
-                    rl.write(wrap(util.format("This job will only be run manually.\n"), Laundry._wrapOpts));
-                } else if (answer.indexOf(':') !== -1) {
-                    var time = moment({
-                        hour: answer.split(':')[0],
-                        minute: answer.split(':')[1]
+    inquirer.prompt([{
+        type: 'input',
+        name: 'schedule',
+        prompt: 'Schedule',
+        default: job.schedule,
+        message: 'How do you want the job to be scheduled?',
+        validate: function(value) {
+            var valid = false;
+            var type = Laundry._scheduleType(value);
+            if (type === 'manual') {
+                valid = true;
+            } else if (type === 'timed') {
+                var time = moment({
+                    hour: value.split(':')[0],
+                    minute: value.split(':')[1]
+                });
+                valid = time.isValid();
+            } else if (type === 'interval') {
+                valid = parseInt(value) > 0;
+            } else if (type === 'after') {
+                if (value !== job.name.toLowerCase()) {
+                    laundryConfig.jobs.forEach(function(job) {
+                        if (job.name.toLowerCase() === value) {
+                            valid = true;
+                        }
                     });
-                    valid = time.isValid();
-                    if (valid) {
-                        answer = time.format('HH:mm');
-                        rl.write(wrap(util.format("This job will run every day at %s.\n", answer), Laundry._wrapOpts));
-                    }
-                } else if (!isNaN(parseInt(answer))) {
-                    answer = parseInt(answer);
-                    valid = answer > 0;
-                    if (valid) {
-                        rl.write(wrap(util.format("This job will run every %d minutes.\n", answer), Laundry._wrapOpts));
-                    }
-                } else {
-                    if (answer !== job.name.toLowerCase()) {
-                        laundryConfig.jobs.forEach(function(job) {
-                            if (job.name.toLowerCase() === answer) {
-                                valid = true;
-                                answer = job.name;
-                                rl.write(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".\n", answer), Laundry._wrapOpts));
-                            }
-                        });
-                    }
                 }
-
-                if (valid) {
-                    job.schedule = answer;
-                } else {
-                    rl.write(wrap(chalk.red("That's not a valid answer. Try again?\n"), Laundry._wrapOpts));
-                }
-                callback();
-            });
-            if (job.schedule) {
-                rl.write(job.schedule.toString());
             }
+            return valid;
         },
-        function(err) {
-            callback(err, rl, job);
-        });
+        filter: function(value) {
+            var type = Laundry._scheduleType(value);
+            if (type === 'manual') {
+                value = value;
+            } else if (type === 'timed') {
+                var time = moment({
+                    hour: value.split(':')[0],
+                    minute: value.split(':')[1]
+                });
+                value = time.format('HH:mm');
+            } else if (type === 'interval') {
+                value = parseInt(value);
+            } else if (type === 'after') {
+                if (value !== job.name.toLowerCase()) {
+                    laundryConfig.jobs.forEach(function(job) {
+                        if (job.name.toLowerCase() === value) {
+                            value = job.name;
+                        }
+                    });
+                }
+            }
+            return value;
+        }
+    }], function(answers) {
+        job.schedule = answers.schedule;
+        var type = Laundry._scheduleType(job.schedule);
+        if (type === 'manual') {
+            console.log(wrap(util.format("This job will only be run manually."), Laundry._wrapOpts));
+        } else if (type === 'timed') {
+            console.log(wrap(util.format("This job will run every day at %s.", job.schedule), Laundry._wrapOpts));
+        } else if (type === 'interval') {
+            console.log(wrap(util.format("This job will run every %d minutes.", job.schedule), Laundry._wrapOpts));
+        } else if (type === 'after') {
+            console.log(wrap(util.format("This job will run after the job " + chalk.bold("%s") + ".", job.schedule), Laundry._wrapOpts));
+        }
+        callback();
+    });
 };
 
 // Edit an existing job.
@@ -540,80 +470,56 @@ Laundry.destroy = function(jobName, callback) {
         return;
     }
 
-    var job = null;
+    // Find the requested job.
+    var job = laundryConfig.jobs.filter(function(j) {
+        return j.name.toLowerCase() === jobName.toLowerCase();
+    })[0];
 
-    async.waterfall([
+    if (!job) {
+        console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
+        Laundry.list();
+        callback();
+        return;
+    }
 
-            // Find the requested job.
-            function(callback) {
-                var job = laundryConfig.jobs.filter(function(j) {
-                    return j.name.toLowerCase() === jobName.toLowerCase();
-                })[0];
-                if (!job) {
-                    console.log("Job " + chalk.red.bold(jobName) + " was not found.\n");
-                    Laundry.list();
-                    callback(jobName);
-                } else {
-                    callback(null, job);
+    // Confirm and destroy.
+    inquirer.prompt([{
+        type: 'input',
+        name: 'job',
+        message: util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name)
+    }], function(answers) {
+        var answer = answers.job;
+        if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
+
+            async.waterfall([
+                // Get any media files in this job.
+                function(callback) {
+                    var prefix = Item.buildPrefix(job.name);
+                    Storage.cacheFiles(log, prefix, callback);
+                },
+                // Delete media files.
+                function(cache, callback) {
+                    Storage.deleteBefore(log, cache, new Date(), callback);
+                },
+                // Delete the job from the config.
+                function(callback) {
+                    laundryConfig.jobs.splice(laundryConfig.jobs.indexOf(job), 1);
+                    Storage.saveConfig(callback);
+                },
+                // Tell the user about it.
+                function(url, callback) {
+                    console.log(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyed."), job.name), Laundry._wrapOpts) + "\n");
+                    callback();
                 }
-            },
+            ], function(err) {
+                callback(err);
+            });
 
-            // Set up the console.
-            function(job, callback) {
-                var rl = readline.createInterface({
-                    input: process.stdin,
-                    output: process.stdout
-                });
-
-                callback(null, rl, job);
-            },
-
-            // Confirm and destroy.
-            function(rl, job, callback) {
-                rl.question(wrap(util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name), Laundry._wrapOpts) + "\n", function(answer) {
-                    answer = chalk.stripColor(answer).trim().toLowerCase();
-                    if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
-
-                        async.waterfall([
-                            // Get any media files in this job.
-                            function(callback) {
-                                var prefix = Item.buildPrefix(job.name);
-                                Storage.cacheFiles(log, prefix, callback);
-                            },
-                            // Delete media files.
-                            function(cache, callback) {
-                                Storage.deleteBefore(log, cache, new Date(), callback);
-                            },
-                            // Delete the job from the config.
-                            function(callback) {
-                                laundryConfig.jobs.splice(laundryConfig.jobs.indexOf(job), 1);
-                                Storage.saveConfig(callback);
-                            },
-                            // Tell the user about it.
-                            function(url, callback) {
-                                rl.write(wrap(util.format(chalk.red("Job " + chalk.bold("%s") + " destroyed."), job.name), Laundry._wrapOpts) + "\n");
-                                callback(null, rl);
-                            }
-                        ], function(err, rl) {
-                            callback(err, rl);
-                        });
-
-                    } else {
-                        rl.write(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name), Laundry._wrapOpts) + "\n");
-                        callback(null, rl);
-                    }
-                });
-            }
-        ],
-        function(err, rl) {
-            if (rl) {
-                rl.write("\n");
-                rl.close();
-            }
-            if (callback) {
-                callback();
-            }
-        });
+        } else {
+            console.log(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name), Laundry._wrapOpts) + "\n");
+            callback();
+        }
+    });
 };
 
 // List current jobs.

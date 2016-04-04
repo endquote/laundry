@@ -18,25 +18,27 @@ Washers.RSS = function(config, job) {
 
     this.input = _.merge({
         description: 'Loads data from an RSS feed.',
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'url',
-            prompt: 'What RSS feed URL do you want to launder?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(!validator.isURL(newValue));
+            message: 'What RSS feed URL do you want to launder?',
+            validate: function(value) {
+                return validator.isURL(value);
             }
         }]
     }, this.input);
 
     this.output = _.merge({
         description: 'Writes data to an RSS feed on disk.',
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'feedname',
-            prompt: 'What do you want the title of the output feed to be?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, job.name);
+            message: 'What do you want the title of the output feed to be?',
+            validate: function(value) {
+                return !validator.isWhitespace(value);
             },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+            setup: function(job) {
+                this.default = job.name;
             }
         }]
     }, this.output);
