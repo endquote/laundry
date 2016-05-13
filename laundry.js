@@ -233,6 +233,9 @@ Laundry._configureWasher = function(job, mode, callback) {
         if (prompt.message.length > 1) {
             prompt.message += ':';
         }
+        if (prompt.setup) {
+            prompt.setup(job);
+        }
     });
 
     inquirer.prompt(prompts)
