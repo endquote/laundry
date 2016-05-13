@@ -122,7 +122,7 @@ Laundry._washerPrompt = function(job, mode) {
     // Get all of the washers with input or output, as requested.
     var validWashers = [];
     for (var i in allWashers) {
-        var w = new allWashers[i]();
+        var w = new allWashers[i](null, job);
         if (w[mode] && w.name) {
 
             // Use the existing washer if there is one.
