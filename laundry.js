@@ -33,6 +33,7 @@ Laundry.create = function(jobName, callback) {
     }
 
     var job;
+    var editing = false;
 
     async.waterfall([
 
@@ -42,6 +43,7 @@ Laundry.create = function(jobName, callback) {
                 return job && job.name.toLowerCase() === jobName.toLowerCase();
             })[0];
             if (job) {
+                editing = true;
                 console.log(wrap(util.format("There's already a job called " + chalk.green.bold("%s") + ", so we'll edit it.", jobName)));
                 callback();
             } else {
@@ -66,7 +68,9 @@ Laundry.create = function(jobName, callback) {
 
         // Configure the input washer.
         function(callback) {
-            Laundry._inheritSettings(job.input, 'input');
+            if (!editing) {
+                Laundry._inheritSettings(job.input, 'input');
+            }
             Laundry._configureWasher(job, 'input', function() {
                 callback();
             });
@@ -84,7 +88,9 @@ Laundry.create = function(jobName, callback) {
 
         // Configure the output washer.
         function(callback) {
-            Laundry._inheritSettings(job.output, 'output');
+            if (!editing) {
+                Laundry._inheritSettings(job.output, 'output');
+            }
             Laundry._configureWasher(job, 'output', function() {
                 callback();
             });
