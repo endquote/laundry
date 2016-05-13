@@ -57,8 +57,8 @@ Laundry.create = function(jobName, callback) {
         function(callback) {
             console.log(wrap("Now to decide where to launder data from. The sources we have are:"));
             inquirer.prompt(
-                [Laundry._washerPrompt(job, 'input')],
-                function(answers) {
+                [Laundry._washerPrompt(job, 'input')])
+                .then(function(answers) {
                     job.input = answers.washer;
                     callback();
                 });
@@ -75,9 +75,8 @@ Laundry.create = function(jobName, callback) {
         // Request the output washer.
         function(callback) {
             console.log(wrap("Now to decide where to send data to. The options we have are:"));
-            inquirer.prompt(
-                [Laundry._washerPrompt(job, 'output')],
-                function(answers) {
+            inquirer.prompt([Laundry._washerPrompt(job, 'output')])
+                .then(function(answers) {
                     job.output = answers.washer;
                     callback();
                 });
@@ -233,9 +232,8 @@ Laundry._configureWasher = function(job, mode, callback) {
         }
     });
 
-    inquirer.prompt(
-        prompts,
-        function(answers) {
+    inquirer.prompt(prompts)
+        .then(function(answers) {
             for (var i in answers) {
                 washer[i] = answers[i];
             }
@@ -325,7 +323,7 @@ Laundry._scheduleJob = function(job, callback) {
             }
             return value;
         }
-    }], function(answers) {
+    }]).then(function(answers) {
         job.schedule = answers.schedule;
         var type = Laundry._scheduleType(job.schedule);
         if (type === 'manual') {
@@ -492,7 +490,7 @@ Laundry.destroy = function(jobName, callback) {
         type: 'input',
         name: 'job',
         message: util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name)
-    }], function(answers) {
+    }].then(function(answers) {
         var answer = answers.job;
         if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
 
@@ -524,7 +522,7 @@ Laundry.destroy = function(jobName, callback) {
             console.log(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name)) + "\n");
             callback();
         }
-    });
+    }));
 };
 
 // List current jobs.
