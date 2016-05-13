@@ -14,7 +14,7 @@ Washers.Instagram.Timeline = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent images from your Instagram timeline.',
-        settings: [Washer.downloadMediaOption]
+        prompts: [Washer.downloadMediaOption]
     });
 };
 

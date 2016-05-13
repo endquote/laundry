@@ -21,59 +21,71 @@ Washers.Instagram = function(config, job) {
     };
 
     this.input = _.merge({
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'clientId',
-            prompt: util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri),
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
+            message: 'Client ID',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
-                callback(validator.isWhitespace(newValue));
+                console.log(wrap(util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri)));
+                return true;
+            },
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }, {
+            type: 'input',
             name: 'clientSecret',
-            prompt: 'What is the client secret?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
+            message: 'Client secret',
+            when: function(answers) {
+                return job && job.input.token ? false : true;
             },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
-                }
-                callback(validator.isWhitespace(newValue));
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }, {
+            type: 'input',
             name: 'authCode',
-            prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, job, prompt, callback) {
-                if (this.token) {
-                    callback(false, prompt);
-                    return;
+            message: 'Auth code',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
 
-                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships&client_id=%s&redirect_uri=%s&response_type=code', this.clientId, this._callbackUri);
-                var that = this;
+                var done = this.async();
+                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships&client_id=%s&redirect_uri=%s&response_type=code', answers.clientId, job.input._callbackUri);
                 Helpers.shortenUrl(url, function(url) {
-                    prompt = util.format(prompt, url);
-                    callback(true, prompt);
+                    console.log(wrap(util.format('Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s', url)));
+                    done(null, true);
                 });
             },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (this.token) {
-                    callback(false);
-                    return;
-                }
-                if (validator.isWhitespace(newValue)) {
-                    callback(true);
-                    return;
+            validate: function(value, answers) {
+                if (validator.isWhitespace(value)) {
+                    return false;
                 }
 
-                this.refreshToken(newValue, function(err) {
-                    callback(err);
-                });
+                var done = this.async();
+                Helpers.jsonRequest(
+                    null, {
+                        url: 'https://api.instagram.com/oauth/access_token',
+                        method: 'POST',
+                        form: {
+                            client_id: answers.clientId,
+                            client_secret: answers.clientSecret,
+                            grant_type: 'authorization_code',
+                            redirect_uri: job.input._callbackUri,
+                            code: value
+                        }
+                    },
+                    function(response) {
+                        answers.token = response.access_token;
+                        done(null, true);
+                    },
+                    function(err) {
+                        done(null, false);
+                    });
             }
         }]
     }, this.input);
@@ -81,27 +93,5 @@ Washers.Instagram = function(config, job) {
 
 Washers.Instagram.prototype = Object.create(Washer.prototype);
 Washers.Instagram.className = Helpers.buildClassName(__filename);
-
-Washers.Instagram.prototype.refreshToken = function(code, callback) {
-    var that = this;
-    Helpers.jsonRequest(
-        log,
-        extend({
-            url: 'https://api.instagram.com/oauth/access_token',
-            method: 'POST',
-            form: {
-                client_id: this.clientId,
-                client_secret: this.clientSecret,
-                grant_type: 'authorization_code',
-                redirect_uri: this._callbackUri,
-                code: code ? code : this.authCode
-            }
-        }),
-        function(response) {
-            that.token = response.access_token;
-            callback();
-        },
-        callback);
-};
 
 module.exports = Washers.Instagram;

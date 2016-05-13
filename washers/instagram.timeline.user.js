@@ -16,18 +16,40 @@ Washers.Instagram.Timeline.User = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent images from an Instagram account.',
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'username',
-            prompt: 'What account do you want to watch?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (validator.isWhitespace(newValue)) {
-                    callback(true);
-                    return;
+            message: 'What account do you want to watch?',
+            filter: function(value) {
+                return value.replace('@', '');
+            },
+            validate: function(value, answers) {
+                if (validator.isWhitespace(value)) {
+                    return false;
                 }
 
-                this.getUserId(newValue, function(err) {
-                    callback(err);
-                });
+                // Get the userid for the username.
+                var done = this.async();
+                Helpers.jsonRequest(
+                    null, {
+                        url: 'https://api.instagram.com/v1/users/search',
+                        qs: {
+                            count: 1,
+                            q: value,
+                            access_token: job.input.token
+                        }
+                    },
+                    function(response) {
+                        if (response.data.length) {
+                            answers.userId = response.data[0].id;
+                            done(null, true);
+                        } else {
+                            done(null, false);
+                        }
+                    },
+                    function(err) {
+                        done(null, false);
+                    });
             }
         }]
     });
@@ -35,28 +57,6 @@ Washers.Instagram.Timeline.User = function(config, job) {
 
 Washers.Instagram.Timeline.User.prototype = Object.create(Washers.Instagram.Timeline.prototype);
 Washers.Instagram.Timeline.User.className = Helpers.buildClassName(__filename);
-
-Washers.Instagram.Timeline.User.prototype.getUserId = function(username, callback) {
-    var that = this;
-    Helpers.jsonRequest(
-        log, {
-            url: 'https://api.instagram.com/v1/users/search',
-            qs: {
-                count: 1,
-                q: username,
-                access_token: that.token
-            }
-        },
-        function(response) {
-            if (response.data.length) {
-                that.userId = response.data[0].id;
-                callback();
-            } else {
-                callback('User not found.');
-            }
-        },
-        callback);
-};
 
 Washers.Instagram.Timeline.User.prototype.doInput = function(callback) {
     this.requestMedia('/users/' + this.userId + '/media/recent', callback);

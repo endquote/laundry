@@ -52,8 +52,8 @@ Washers.Google = function(config, job) {
                     return false;
                 }
 
+                // Shorten the oauth URL.
                 var done = this.async();
-
                 var url = 'https://accounts.google.com/o/oauth2/auth?' + qs.stringify({
                     client_id: answers.clientId,
                     response_type: 'code',
@@ -64,7 +64,7 @@ Washers.Google = function(config, job) {
 
                 Helpers.shortenUrl(url, function(url) {
                     console.log(wrap(util.format('Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s', url)));
-                    done(true);
+                    done(null, true);
                 });
             },
             validate: function(value, answers) {
@@ -72,8 +72,8 @@ Washers.Google = function(config, job) {
                     return false;
                 }
 
+                // Get the auth token.
                 var done = this.async();
-
                 Helpers.jsonRequest(
                     null, {
                         url: 'https://accounts.google.com/o/oauth2/token',
@@ -88,9 +88,11 @@ Washers.Google = function(config, job) {
                     },
                     function(response) {
                         answers.token = response;
-                        done(true);
+                        done(null, true);
                     },
-                    done);
+                    function(err) {
+                        done(null, false);
+                    });
             }
         }]
     }, this.input);

@@ -13,12 +13,15 @@ Washers.Instagram.Timeline.Hashtag = function(config, job) {
     this.className = Helpers.buildClassName(__filename);
     this.input = _.merge(this.input, {
         description: 'Loads recent images from Instagram with a given hashtag.',
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'tag',
-            prompt: 'What tag do you want to watch?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                newValue = newValue.replace('#', '');
-                callback(validator.isWhitespace(newValue));
+            message: 'What tag do you want to watch?',
+            filter: function(value) {
+                return value.replace('#', '');
+            },
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }]
     });
