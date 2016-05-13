@@ -64,10 +64,7 @@ Washer.downloadMediaOption = {
     type: 'confirm',
     name: 'downloadMedia',
     message: 'Download media?',
-    default: false,
-    setup: function(job) {
-        this.default = job.input.downloadMedia;
-    }
+    default: false
 };
 
 // Remove stuff from the washer that's saved to disk.
