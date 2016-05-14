@@ -17,10 +17,7 @@ Washers.Google.Gmail.Search = function(config, job) {
         prompts: [{
             type: 'input',
             name: 'query',
-            message: 'What is the Gmail search query?',
-            validate: function(value) {
-                return !validator.isWhitespace(value);
-            }
+            message: 'What is the Gmail search query?'
         }]
     });
 };

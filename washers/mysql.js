@@ -21,10 +21,7 @@ Washers.MySQL = function(config, job) {
             type: 'input',
             name: 'hostname',
             message: 'What\'s the hostname of the MySQL server?',
-            default: 'localhost',
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
-            }
+            default: 'localhost'
         }, {
             type: 'input',
             name: 'port',
@@ -36,21 +33,18 @@ Washers.MySQL = function(config, job) {
         }, {
             type: 'input',
             name: 'username',
-            message: 'What username should we log in with?',
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
-            }
+            message: 'What username should we log in with?'
         }, {
             type: 'input',
             name: 'password',
-            message: 'What password should we use?'
+            message: 'What password should we use?',
+            validate: function(value, answers) {
+                return true;
+            }
         }, {
             type: 'input',
             name: 'database',
-            message: 'What\'s the name of the database to use?',
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
-            }
+            message: 'What\'s the name of the database to use?'
         }]
     }, this.output);
 };

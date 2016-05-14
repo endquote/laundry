@@ -19,9 +19,6 @@ Washers.Instagram.Timeline.Hashtag = function(config, job) {
             message: 'What tag do you want to watch?',
             filter: function(value) {
                 return value.replace('#', '');
-            },
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
             }
         }]
     });

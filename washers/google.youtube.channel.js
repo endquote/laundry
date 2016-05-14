@@ -17,10 +17,7 @@ Washers.Google.YouTube.Channel = function(config, job) {
         prompts: [{
                 type: 'input',
                 name: 'channelName',
-                message: 'What is the name or ID of the channel to watch?',
-                validate: function(value) {
-                    return !validator.isWhitespace(value);
-                }
+                message: 'What is the name or ID of the channel to watch?'
             },
             Washer.downloadMediaOption
         ]

@@ -29,9 +29,6 @@ Washers.Google = function(config, job) {
                 }
                 console.log(wrap('Go to https://console.developers.google.com/ and create a new project. Open the API Manager and activate YouTube and Gmail. Under "Credentials", click "Create Credentials", then "OAuth Client ID". Choose "Other" and give it a name. The client ID and secret will appear.'));
                 return true;
-            },
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
             }
         }, {
             type: 'input',
@@ -39,9 +36,6 @@ Washers.Google = function(config, job) {
             message: 'Client secret',
             when: function(answers) {
                 return job && job.input.token ? false : true;
-            },
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
             }
         }, {
             type: 'input',

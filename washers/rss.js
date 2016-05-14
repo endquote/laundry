@@ -34,9 +34,6 @@ Washers.RSS = function(config, job) {
             type: 'input',
             name: 'feedname',
             message: 'What do you want the title of the output feed to be?',
-            validate: function(value) {
-                return !validator.isWhitespace(value);
-            },
             setup: function(job) {
                 this.default = job.name;
             }

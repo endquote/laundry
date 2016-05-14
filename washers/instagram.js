@@ -31,9 +31,6 @@ Washers.Instagram = function(config, job) {
                 }
                 console.log(wrap(util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri)));
                 return true;
-            },
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
             }
         }, {
             type: 'input',
@@ -41,9 +38,6 @@ Washers.Instagram = function(config, job) {
             message: 'Client secret',
             when: function(answers) {
                 return job && job.input.token ? false : true;
-            },
-            validate: function(value, answers) {
-                return !validator.isWhitespace(value);
             }
         }, {
             type: 'input',
