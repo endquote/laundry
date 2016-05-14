@@ -17,50 +17,39 @@ Washers.MySQL = function(config, job) {
 
     this.output = _.merge({
         description: 'Writes an array of Items to a MySQL table',
-        settings: [{
+        prompts: [{
+            type: 'input',
             name: 'hostname',
-            prompt: 'What\'s the hostname of the MySQL server?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, this.hostname || 'localhost');
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+            message: 'What\'s the hostname of the MySQL server?',
+            default: 'localhost',
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }, {
+            type: 'input',
             name: 'port',
-            prompt: 'What port is the MySQL server listening on?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, this.port || 3306);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(!validator.isInt(newValue));
+            message: 'What port is the MySQL server listening on?',
+            default: 3306,
+            validate: function(value, answers) {
+                return value && validator.isInt(value.toString());
             }
         }, {
+            type: 'input',
             name: 'username',
-            prompt: 'What username should we log in with?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+            message: 'What username should we log in with?',
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }, {
+            type: 'input',
             name: 'password',
-            prompt: 'What password should we use?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
-            }
+            message: 'What password should we use?'
         }, {
+            type: 'input',
             name: 'database',
-            prompt: 'What\'s the name of the database to use?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+            message: 'What\'s the name of the database to use?',
+            validate: function(value, answers) {
+                return !validator.isWhitespace(value);
             }
         }]
     }, this.output);
@@ -94,7 +83,7 @@ Washers.MySQL.prototype.doOutput = function(items, callback) {
         user: this.username,
         password: this.password,
         database: this.database,
-        //debug: commander.verbose
+        // debug: commander.verbose
     });
 
     var that = this;
