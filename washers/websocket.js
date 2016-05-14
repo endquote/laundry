@@ -17,23 +17,16 @@ Washers.Websocket = function(config, job) {
 
     this.output = _.merge({
         description: 'Writes an array of Items to a websocket connection',
-        settings: [{
+        prompts: [{
             name: 'hostname',
-            prompt: 'What\'s the hostname of the socket.io server?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, 'localhost');
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
-            }
+            message: 'What\'s the hostname of the socket.io server?',
+            default: 'localhost'
         }, {
             name: 'port',
-            prompt: 'What port is the socket.io server listening on?',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(true, prompt, 8080);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(!validator.isInt(newValue));
+            message: 'What port is the socket.io server listening on?',
+            default: 8080,
+            validate: function(value, answers) {
+                return value && validator.isInt(value.toString());
             }
         }]
     }, this.output);
