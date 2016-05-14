@@ -29,7 +29,7 @@ Washers.Instagram = function(config, job) {
                 if (job && job.input.token) {
                     return false;
                 }
-                console.log(wrap(util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri)));
+                console.log(wrap(util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.', job.input._callbackUri)));
                 return true;
             }
         }, {

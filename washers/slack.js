@@ -22,68 +22,78 @@ Washers.Slack = function(config, job) {
         }
     };
 
-    var authSettings = [{
-        name: 'clientId',
-        prompt: util.format('Go to https://api.slack.com/applications/new. For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Create Application". The client ID and secret will appear.\nWhat is the client ID?', this._callbackUri),
-        beforeEntry: function(rl, job, prompt, callback) {
-            callback(this.token ? false : true, prompt);
-        },
-        afterEntry: function(rl, job, oldValue, newValue, callback) {
-            if (oldValue !== newValue) {
-                this.token = null;
+    function authSettings(mode) {
+        return [{
+            type: 'input',
+            name: 'clientId',
+            message: 'Client ID',
+            when: function(answers) {
+                if (job && job[mode].token) {
+                    return false;
+                }
+                console.log(wrap(util.format('Go to https://api.slack.com/applications/new. For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Create Application". The client ID and secret will appear.', job[mode]._callbackUri)));
+                return true;
             }
-            callback(validator.isWhitespace(newValue));
-        }
-    }, {
-        name: 'clientSecret',
-        prompt: 'What is the client secret?',
-        beforeEntry: function(rl, job, prompt, callback) {
-            callback(this.token ? false : true, prompt);
-        },
-        afterEntry: function(rl, job, oldValue, newValue, callback) {
-            if (oldValue !== newValue) {
-                this.token = null;
+        }, {
+            type: 'input',
+            name: 'clientSecret',
+            message: 'Client secret',
+            when: function(answers) {
+                return job && job[mode].token ? false : true;
             }
-            callback(validator.isWhitespace(newValue));
-        }
-    }, {
-        name: 'authCode',
-        prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-        beforeEntry: function(rl, job, prompt, callback) {
-            if (this.token) {
-                callback(false, prompt);
-                return;
-            }
+        }, {
+            type: 'input',
+            name: 'authCode',
+            message: 'Auth code',
+            when: function(answers) {
+                if (job && job[mode].token) {
+                    return false;
+                }
 
-            var url = util.format('https://slack.com/oauth/authorize?client_id=%s&redirect_uri=%s&scope=channels:history%20channels:read%20chat:write:bot%20team:read%20users:read%20identify', this.clientId, this._callbackUri);
-            var that = this;
-            Helpers.shortenUrl(url, function(url) {
-                prompt = util.format(prompt, url);
-                callback(true, prompt);
-            });
-        },
-        afterEntry: function(rl, job, oldValue, newValue, callback) {
-            if (this.token) {
-                callback(false);
-                return;
-            }
-            if (validator.isWhitespace(newValue)) {
-                callback(true);
-                return;
-            }
+                var done = this.async();
+                var prompt = 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s';
+                var url = util.format('https://slack.com/oauth/authorize?client_id=%s&redirect_uri=%s&scope=channels:history%20channels:read%20chat:write:bot%20team:read%20users:read%20identify', answers.clientId, job[mode]._callbackUri);
+                Helpers.shortenUrl(url, function(url) {
+                    prompt = util.format(prompt, url);
+                    console.log(prompt);
+                    done(null, true);
+                });
+            },
+            validate: function(value, answers) {
+                if (validator.isWhitespace(value)) {
+                    return false;
+                }
 
-            this.refreshToken(newValue, function(err) {
-                callback(err);
-            });
-        }
-    }];
+                var done = this.async();
+                Helpers.jsonRequest(
+                    log,
+                    extend({
+                        url: 'https://slack.com/api/oauth.access',
+                        method: 'POST',
+                        form: {
+                            client_id: answers.clientId,
+                            client_secret: answers.clientSecret,
+                            redirect_uri: job[mode]._callbackUri,
+                            code: value
+                        }
+                    }),
+                    function(response) {
+                        answers.token = response.access_token;
+                        done(null, true);
+                    },
+                    function(err) {
+                        done(null, false);
+                    });
+            }
+        }];
+    }
 
     this.input = _.merge({
-        settings: authSettings
+        prompts: authSettings('input')
     }, this.input);
 
     this.output = _.merge({
-        settings: authSettings
+        prompts: authSettings('output')
     }, this.output);
 };
 
