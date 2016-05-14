@@ -66,7 +66,7 @@ Helpers.cleanString = function(s) {
 };
 
 Helpers.buildClassName = function(file) {
-    console.log(file);
+    console.log('hi', file);
     file = path.parse(file.toLowerCase());
     var parts = file.dir.split(/[\/\\]/);
     parts = parts.slice(parts.lastIndexOf('laundry') + 1);
