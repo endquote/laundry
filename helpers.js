@@ -209,4 +209,22 @@ _.merge = function(object, sources, customizer, thisArg) {
     }, thisArg);
 };
 
+// Given a string property path, retrieve the value from an object.
+// http://stackoverflow.com/a/16190716/468472
+Object.byString = function(obj, path, def) {
+    path = path.split('.');
+    var len = path.length;
+    for (var i = 0; i < len; i++) {
+        if (!obj || typeof obj !== 'object') {
+            return def;
+        }
+        obj = obj[path[i]];
+    }
+
+    if (obj === undefined) {
+        return def;
+    }
+    return obj;
+};
+
 module.exports = Helpers;

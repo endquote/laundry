@@ -130,11 +130,16 @@ Washers.MySQL.prototype.doOutput = function(items, callback) {
                 var query = 'INSERT INTO ' + table + '(' + Object.keys(schema).join(', ') + ') VALUES (';
                 query += Object.keys(schema).map(function(key) {
                     var val = item[key];
-                    if (schema[key] === 'date') {
-                        val = item[key].format();
-                    } else if (schema[key] === 'array' || schema[key] === 'object') {
-                        val = JSON.stringify(item[key]);
+                    if (key.indexOf('_') !== -1) {
+                        val = Object.byString(item, key.replace('_', '.'));
                     }
+
+                    if (schema[key] === 'date') {
+                        val = val.format();
+                    } else if (schema[key] === 'array' || schema[key] === 'object') {
+                        val = JSON.stringify(val);
+                    }
+
                     return connection.escape(val);
                 }).join(', ');
                 query += ')';
