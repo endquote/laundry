@@ -14,12 +14,11 @@ Washers.Twitter.Timeline.Hashtag = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Load recent tweets with a given hashtag.',
-        settings: [{
+        prompts: [{
             name: 'hashtag',
-            prompt: 'What hashtag do you want to follow?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                newValue = newValue.replace('#', '');
-                callback(validator.isWhitespace(newValue));
+            message: 'What hashtag do you want to follow?',
+            filter: function(value) {
+                return value.replace('#', '');
             }
         }]
     });

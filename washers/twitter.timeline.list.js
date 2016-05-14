@@ -14,19 +14,15 @@ Washers.Twitter.Timeline.List = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent tweets Twitter list.',
-        settings: [{
+        prompts: [{
             name: 'listOwner',
-            prompt: 'Who owns the list?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                newValue = newValue.replace('@', '');
-                callback(validator.isWhitespace(newValue));
+            message: 'Who owns the list?',
+            filter: function(value) {
+                return value.replace('@', '');
             }
         }, {
             name: 'listName',
-            prompt: 'What list do you want to follow?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
-            }
+            message: 'What list do you want to follow?'
         }]
     });
 };

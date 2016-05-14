@@ -14,11 +14,11 @@ Washers.Twitter.Timeline.User = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from a Twitter user.',
-        settings: [{
+        prompts: [{
             name: 'username',
-            prompt: 'What user do you want to follow?',
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                callback(validator.isWhitespace(newValue));
+            message: 'What user do you want to follow?',
+            filter: function(value) {
+                return value.replace('@', '');
             }
         }]
     });
