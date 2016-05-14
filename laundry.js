@@ -230,9 +230,9 @@ Laundry._configureWasher = function(job, mode, callback) {
         if (washer[prompt.name]) {
             prompt.default = washer[prompt.name];
         }
-        if (prompt.message.length > 1) {
-            prompt.message += ':';
-        }
+
+        prompt.message = prompt.message || ':';
+        prompt.message += ':';
 
         prompt.validate = prompt.validate || function(value, answers) {
             return !validator.isWhitespace(value);
