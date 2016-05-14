@@ -20,7 +20,6 @@ Washers.Google = function(config, job) {
 
     this.input = _.merge({
         prompts: [{
-            type: 'input',
             name: 'clientId',
             message: 'Client ID',
             when: function(answers) {
@@ -31,14 +30,12 @@ Washers.Google = function(config, job) {
                 return true;
             }
         }, {
-            type: 'input',
             name: 'clientSecret',
             message: 'Client secret',
             when: function(answers) {
                 return job && job.input.token ? false : true;
             }
         }, {
-            type: 'input',
             name: 'authCode',
             message: 'Auth code',
             when: function(answers) {

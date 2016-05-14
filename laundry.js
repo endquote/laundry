@@ -233,11 +233,13 @@ Laundry._configureWasher = function(job, mode, callback) {
         if (prompt.message.length > 1) {
             prompt.message += ':';
         }
-        if (!prompt.validate) {
-            prompt.validate = function(value, answers) {
-                return !validator.isWhitespace(value);
-            };
-        }
+
+        prompt.validate = prompt.validate || function(value, answers) {
+            return !validator.isWhitespace(value);
+        };
+
+        prompt.type = prompt.type || 'input';
+
         if (prompt.setup) {
             prompt.setup(job);
         }

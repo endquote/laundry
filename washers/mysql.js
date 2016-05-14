@@ -18,12 +18,10 @@ Washers.MySQL = function(config, job) {
     this.output = _.merge({
         description: 'Writes an array of Items to a MySQL table',
         prompts: [{
-            type: 'input',
             name: 'hostname',
             message: 'What\'s the hostname of the MySQL server?',
             default: 'localhost'
         }, {
-            type: 'input',
             name: 'port',
             message: 'What port is the MySQL server listening on?',
             default: 3306,
@@ -31,18 +29,15 @@ Washers.MySQL = function(config, job) {
                 return value && validator.isInt(value.toString());
             }
         }, {
-            type: 'input',
             name: 'username',
             message: 'What username should we log in with?'
         }, {
-            type: 'input',
             name: 'password',
             message: 'What password should we use?',
             validate: function(value, answers) {
                 return true;
             }
         }, {
-            type: 'input',
             name: 'database',
             message: 'What\'s the name of the database to use?'
         }]

@@ -6,13 +6,13 @@ In addition to the input/output methods, there are `input` and `output` properti
 
 ```javascript
 this.input = _.merge({
-	// Shown in the list of washers
+    // Shown in the list of washers
     description: 'Loads data from an RSS feed.',
 
     // An array of settings to ask about, in the format of Inquirer.js prompt objects
     // https://github.com/SBoudrias/Inquirer.js
     prompts: [{
-        // The type of question to ask, usually "input"
+        // The type of question to ask, default is "input"
         type: 'input',
 
         // The property name to save this setting as. 
@@ -22,6 +22,7 @@ this.input = _.merge({
         message: 'What RSS feed URL do you want to launder?',
 
         // Called after a value is entered, return true if it's valid, false or an error message if not.
+        // The default validation function ensures the value is not an empty string.
         validate: function(answer)
 
         // Called after a valid value is entered, return it modified if needed.

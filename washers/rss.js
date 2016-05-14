@@ -19,7 +19,6 @@ Washers.RSS = function(config, job) {
     this.input = _.merge({
         description: 'Loads data from an RSS feed.',
         prompts: [{
-            type: 'input',
             name: 'url',
             message: 'What RSS feed URL do you want to launder?',
             validate: function(value) {
@@ -31,7 +30,6 @@ Washers.RSS = function(config, job) {
     this.output = _.merge({
         description: 'Writes data to an RSS feed on disk.',
         prompts: [{
-            type: 'input',
             name: 'feedname',
             message: 'What do you want the title of the output feed to be?',
             setup: function(job) {

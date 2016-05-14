@@ -22,7 +22,6 @@ Washers.Instagram = function(config, job) {
 
     this.input = _.merge({
         prompts: [{
-            type: 'input',
             name: 'clientId',
             message: 'Client ID',
             when: function(answers) {
@@ -33,14 +32,12 @@ Washers.Instagram = function(config, job) {
                 return true;
             }
         }, {
-            type: 'input',
             name: 'clientSecret',
             message: 'Client secret',
             when: function(answers) {
                 return job && job.input.token ? false : true;
             }
         }, {
-            type: 'input',
             name: 'authCode',
             message: 'Auth code',
             when: function(answers) {
@@ -48,6 +45,7 @@ Washers.Instagram = function(config, job) {
                     return false;
                 }
 
+                // Shorten the auth URL.
                 var done = this.async();
                 var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships&client_id=%s&redirect_uri=%s&response_type=code', answers.clientId, job.input._callbackUri);
                 Helpers.shortenUrl(url, function(url) {
@@ -60,6 +58,7 @@ Washers.Instagram = function(config, job) {
                     return false;
                 }
 
+                // Get the auth token.
                 var done = this.async();
                 Helpers.jsonRequest(
                     null, {

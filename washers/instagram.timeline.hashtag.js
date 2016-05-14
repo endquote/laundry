@@ -14,7 +14,6 @@ Washers.Instagram.Timeline.Hashtag = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent images from Instagram with a given hashtag.',
         prompts: [{
-            type: 'input',
             name: 'tag',
             message: 'What tag do you want to watch?',
             filter: function(value) {

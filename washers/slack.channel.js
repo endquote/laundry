@@ -16,7 +16,6 @@ Washers.Slack.Channel = function(config, job) {
     this.input = _.merge({
         description: 'Loads items from a Slack channel.',
         prompts: [{
-            type: 'input',
             name: 'channel',
             message: 'What is the name of the channel to follow?',
             filter: function(value) {
@@ -28,7 +27,6 @@ Washers.Slack.Channel = function(config, job) {
     this.output = _.merge({
         description: 'Sends data to a Slack channel.',
         prompts: [{
-            type: 'input',
             name: 'channel',
             message: 'What is the name of the channel to send to?',
             filter: function(value) {

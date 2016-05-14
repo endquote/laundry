@@ -15,7 +15,6 @@ Washers.Google.Gmail.Search = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads mails from a Gmail search query.',
         prompts: [{
-            type: 'input',
             name: 'query',
             message: 'What is the Gmail search query?'
         }]

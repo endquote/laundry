@@ -17,7 +17,6 @@ Washers.Instagram.Timeline.User = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent images from an Instagram account.',
         prompts: [{
-            type: 'input',
             name: 'username',
             message: 'What account do you want to watch?',
             filter: function(value) {
