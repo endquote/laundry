@@ -1,1 +1,1 @@
-worker: node index.js tick
+clock: node index.js tick
