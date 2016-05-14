@@ -25,78 +25,69 @@ Washers.SoundCloud = function(config, job) {
     };
 
     this.input = _.merge({
-        settings: [{
+        prompts: [{
             name: 'clientId',
-            prompt: util.format('Go to http://soundcloud.com/you/apps/. For the callback URL enter %s. Fill in whatever for the other fields. Click "Save App".\nWhat is the "Client ID"?\n', this._callbackUri),
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
+            message: 'Client ID',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
-                callback(validator.isWhitespace(newValue));
+                console.log(wrap(util.format('Go to http://soundcloud.com/you/apps/. For the callback URL enter %s. Fill in whatever for the other fields. Click "Save App".\nWhat is the "Client ID"?', job.input._callbackUri)));
+                return true;
             }
         }, {
             name: 'clientSecret',
-            prompt: 'What is the "Client Secret"?\n',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
-                }
-                callback(validator.isWhitespace(newValue));
+            message: 'Client secret',
+            when: function(answers) {
+                return job && job.input.token ? false : true;
             }
         }, {
-            name: 'authVerifier',
-            prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, job, prompt, callback) {
-                if (this.token) {
-                    callback(false, prompt);
-                    return;
+            name: 'authCode',
+            message: 'Auth code',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
 
                 var url = 'https://soundcloud.com/connect?' + qs.stringify({
-                    client_id: this.clientId,
-                    client_secret: this.clientSecret,
-                    redirect_uri: this._callbackUri,
+                    client_id: answers.clientId,
+                    client_secret: answers.clientSecret,
+                    redirect_uri: job.input._callbackUri,
                     response_type: 'code',
                     scope: 'non-expiring'
                 });
 
+                // Shorten the oauth URL.
+                var done = this.async();
+                var prompt = 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s';
                 Helpers.shortenUrl(url, function(url) {
-                    prompt = util.format(prompt, url);
-                    callback(true, prompt);
+                    console.log(util.format(prompt, url));
+                    done(null, true);
                 });
             },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (this.token) {
-                    callback(false);
-                    return;
+            validate: function(value, answers) {
+                if (validator.isWhitespace(value)) {
+                    return false;
                 }
 
-                if (validator.isWhitespace(newValue)) {
-                    callback(true);
-                    return;
-                }
-
-                var that = this;
-                Helpers.jsonRequest(log, {
+                // Get the auth token.
+                var done = this.async();
+                Helpers.jsonRequest(null, {
                     uri: 'https://api.soundcloud.com/oauth2/token',
                     method: 'POST',
                     qs: {
-                        client_id: this.clientId,
-                        client_secret: this.clientSecret,
+                        client_id: answers.clientId,
+                        client_secret: answers.clientSecret,
                         grant_type: 'authorization_code',
-                        redirect_uri: this._callbackUri,
-                        code: newValue
+                        redirect_uri: job.input._callbackUri,
+                        code: value
                     }
                 }, function(response) {
-                    that.token = response.access_token;
-                    callback();
-                }, callback);
+                    answers.token = response.access_token;
+                    done(null, true);
+                }, function(err) {
+                    done(null, false);
+                });
             }
         }]
     }, this.input);
