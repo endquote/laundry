@@ -33,81 +33,69 @@ Washers.Tumblr = function(config, job) {
 
     // Helpful for auth flow: http://t1mg.com/tumblr-api-oauth-in-node/
     this.input = _.merge({
-        settings: [{
+        prompts: [{
             name: 'consumerKey',
-            prompt: util.format('Go to https://www.tumblr.com/oauth/register. For the callback URL enter %s. Fill in whatever for the other fields. Click "Register".\nWhat is the "OAuth Consumer Key"?\n', this._callbackUri),
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
+            message: 'Consumer key',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
-                callback(validator.isWhitespace(newValue));
+                console.log(wrap(util.format('Go to https://www.tumblr.com/oauth/register. For the callback URL enter %s. Fill in whatever for the other fields. Click "Register".\nWhat is the "OAuth Consumer Key"?', job.input._callbackUri)));
+                return true;
             }
         }, {
             name: 'consumerSecret',
-            prompt: 'Click "Show secret key". Scary, right? What is the secret key?\n',
-            beforeEntry: function(rl, job, prompt, callback) {
-                callback(this.token ? false : true, prompt);
-            },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (oldValue !== newValue) {
-                    this.token = null;
-                }
-                callback(validator.isWhitespace(newValue));
+            message: 'Secret key',
+            when: function(answers) {
+                return job && job.input.token ? false : true;
             }
         }, {
             name: 'authVerifier',
-            prompt: 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s\n\n',
-            beforeEntry: function(rl, job, prompt, callback) {
-                if (this.token) {
-                    callback(false, prompt);
-                    return;
+            message: 'Auth code',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
                 }
 
-                var that = this;
-                this._oauth = new OAuth.OAuth(
+                var done = this.async();
+
+                job.input._oauth = new OAuth.OAuth(
                     'http://www.tumblr.com/oauth/request_token',
                     'http://www.tumblr.com/oauth/access_token',
-                    this.consumerKey,
-                    this.consumerSecret,
+                    answers.consumerKey,
+                    answers.consumerSecret,
                     '1.0A',
                     null,
                     'HMAC-SHA1'
                 );
-                this._oauth.getOAuthRequestToken(function(err, oauth_token, oauth_token_secret, results) {
-                    that.oauthToken = oauth_token;
-                    that.oauthTokenSecret = oauth_token_secret;
+                job.input._oauth.getOAuthRequestToken(function(err, oauth_token, oauth_token_secret, results) {
+                    answers.oauthToken = oauth_token;
+                    answers.oauthTokenSecret = oauth_token_secret;
                     var url = util.format('http://www.tumblr.com/oauth/authorize?oauth_token=%s', oauth_token);
                     Helpers.shortenUrl(url, function(url) {
-                        prompt = util.format(prompt, url);
-                        callback(true, prompt);
+                        var prompt = 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s';
+                        console.log(util.format(prompt, url));
+                        done(null, true);
                     });
                 });
             },
-            afterEntry: function(rl, job, oldValue, newValue, callback) {
-                if (this.token) {
-                    callback(false);
-                    return;
+            validate: function(value, answers) {
+                if (validator.isWhitespace(value)) {
+                    return false;
                 }
 
-                if (validator.isWhitespace(newValue)) {
-                    callback(true);
-                    return;
-                }
+                var done = this.async();
 
-                var that = this;
-                this._oauth.getOAuthAccessToken(this.oauthToken, this.oauthTokenSecret, newValue, function(err, oauth_access_token, oauth_access_token_secret, results) {
+                job.input._oauth.getOAuthAccessToken(answers.oauthToken, answers.oauthTokenSecret, value, function(err, oauth_access_token, oauth_access_token_secret, results) {
                     if (err) {
-                        callback(true);
+                        done(null, false);
                         return;
                     }
-                    that.token = {
+                    answers.token = {
                         accessToken: oauth_access_token,
                         accessTokenSecret: oauth_access_token_secret
                     };
-                    callback(false);
+                    done(null, true);
                 });
             }
         }]

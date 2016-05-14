@@ -14,12 +14,9 @@ Washers.Tumblr.Blog = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from a Tumblr blog.',
-        settings: [{
+        prompts: [{
                 name: 'blogHost',
-                prompt: 'Which Tumblr blog do you want to follow? Enter something like "beeple.tumblr.com" or a custom domain like "stayclassicblog.com".\n',
-                afterEntry: function(rl, job, oldValue, newValue, callback) {
-                    callback(validator.isWhitespace(newValue));
-                }
+                message: 'Which Tumblr blog do you want to follow? Enter something like "beeple.tumblr.com".'
             },
             Washer.downloadMediaOption
         ]
