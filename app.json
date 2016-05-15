@@ -1,0 +1,30 @@
+{
+    "name": "Laundry",
+    "description": "Data laundering tools.",
+    "website": "https://github.com/endquote/laundry",
+    "repository": "https://github.com/endquote/laundry",
+    "logo": "https://raw.githubusercontent.com/endquote/laundry/gh-pages/icons/favicon-194x194.png",
+    "env": {
+        "LAUNDRY_S3_BUCKET": {
+            "description": "The name of the S3 bucket to store things in.",
+            "value": "MY_S3_BUCKET"
+        },
+        "LAUNDRY_S3_KEY": {
+            "description": "The S3 access key to use.",
+            "value": "MY_S3_KEY"
+        },
+        "LAUNDRY_S3_SECRET": {
+            "description": "The S3 secret to use.",
+            "value": "MY_S3_SECRET"
+        }
+    },
+    "formation": {
+        "web": {
+            "quantity": 0
+        },
+        "clock": {
+            "quantity": 1
+        }
+    },
+    "image": "heroku/nodejs"
+}

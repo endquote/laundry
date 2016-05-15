@@ -88,3 +88,13 @@ You'll then need to run `laundry tick` every so often to trigger jobs.
 On Mac/Linux, you'll probably want to use a [wrapper script](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/laundry-tick.sh) which you [run via cron](https://github.com/endquote/laundry/blob/master/samples/setup/mac-linux/cron-howto.txt).
 
 On Windows, you can use a [batch file](https://github.com/endquote/laundry/blob/master/samples/setup/windows/laundry-tick.bat) that runs on an interval via the [task scheduler](http://windows.microsoft.com/en-US/windows/schedule-task). Try importing [this task](https://github.com/endquote/laundry/blob/master/samples/setup/windows/laundry-task.xml) and modifying as needed.
+
+## Running on Heroku
+
+You can magically deploy to Heroku using the deploy button below. Give it a sensible "app name" which you'll use for the configuration steps.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+Heroku doesn't have a persistent filesystem, so you'll want to store things on S3. Go to the application settings at https://dashboard.heroku.com/apps/[app-name]/settings. Under "Config Variables", set the S3 bucket name and access keys.
+
+Then you'll need to configure jobs. Install the [Heroku toolbelt](https://toolbelt.heroku.com), then get a shell with `heroku run bash --app [app-name]`. From there you can run the laundry commands such as `node index.js list` to list jobs, `node index.js create foo` to create a job called "foo", etc.
