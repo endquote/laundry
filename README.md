@@ -91,10 +91,8 @@ On Windows, you can use a [batch file](https://github.com/endquote/laundry/blob/
 
 ## Running on Heroku
 
-You can magically deploy to Heroku using the deploy button below. Give it a sensible "app name" which you'll use for the configuration steps.
+You can magically deploy to Heroku using the deploy button below. Since Heroku doesn't have a persistent filesystem, you'll want to store things on S3. The install process will ask you for a sensible app name and S3 settings.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
-Heroku doesn't have a persistent filesystem, so you'll want to store things on S3. Go to the application settings at https://dashboard.heroku.com/apps/[app-name]/settings. Under "Config Variables", set the S3 bucket name and access keys.
 
 Then you'll need to configure jobs. Install the [Heroku toolbelt](https://toolbelt.heroku.com), then get a shell with `heroku run bash --app [app-name]`. From there you can run the laundry commands such as `node index.js list` to list jobs, `node index.js create foo` to create a job called "foo", etc.
