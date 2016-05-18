@@ -18,6 +18,12 @@ global.request = require('request'); // https://github.com/request/request
 global.commander = require('commander'); // https://www.npmjs.com/package/commander
 global.wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 
+var processStart = Date.now();
+
+var daemon = false;
+var daemonInterval = 60;
+var daemonTimeout = null;
+
 // Set up arguments.
 commander
     .version(JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'))).version)
@@ -34,37 +40,43 @@ commander
 commander.command('create [job]')
     .description('configure a new job')
     .action(function(job) {
-        runCommand('create', job);
+        prepareCommand('create', job);
     });
 
 commander.command('edit [job]')
     .description('edit an existing job')
     .action(function(job) {
-        runCommand('edit', job);
+        prepareCommand('edit', job);
     });
 
 commander.command('run [job]')
     .description('run an existing job (or "all" to run all jobs)')
     .action(function(job) {
-        runCommand('run', job);
+        prepareCommand('run', job);
     });
 
 commander.command('destroy [job]')
     .description('destroy an existing job')
     .action(function(job) {
-        runCommand('destroy', job);
+        prepareCommand('destroy', job);
     });
 
 commander.command('list')
     .description('list configured jobs')
     .action(function() {
-        runCommand('list');
+        prepareCommand('list');
     });
 
 commander.command('tick')
     .description('run on an interval or cron to trigger scheduled jobs')
     .action(function() {
-        runCommand('tick');
+        prepareCommand('tick');
+    });
+
+commander.command('daemon [seconds]')
+    .description('run contiuously, calling tick on an interval')
+    .action(function(seconds) {
+        prepareCommand('daemon', seconds);
     });
 
 commander.parse(process.argv);
@@ -76,9 +88,7 @@ if (commander.args.filter(function(arg) {
     commander.help();
 }
 
-var processStart = Date.now();
-
-function runCommand() {
+function prepareCommand() {
 
     // Configure logging.
     global.log = require('winston'); // https://github.com/winstonjs/winston
@@ -148,10 +158,24 @@ function runCommand() {
     global.Storage = require('./storage');
     Storage.init();
 
-    // Load the configuration, then run the command, then call the complete handler.
+    // Determine the command.
     var args = Array.prototype.slice.call(arguments);
     var cmd = args.shift();
+
+    if (cmd === 'daemon') {
+        daemon = true;
+        daemonInterval = args.shift() || daemonInterval;
+        cmd = 'tick';
+    }
+
     args.push(onComplete);
+
+    runCommand(cmd, args);
+}
+
+
+// Load the configuration, then run the command.
+function runCommand(cmd, args) {
     Storage.loadConfig(function(err) {
         if (err) {
             onComplete(err);
@@ -181,7 +205,7 @@ function runCommand() {
     });
 }
 
-// Output execution time.
+// Perform actions after the command is complete.
 function onComplete(err) {
     if (err) {
         log.error(err);
@@ -190,6 +214,13 @@ function onComplete(err) {
     Storage.flushLogs(function() {
         Storage.clearLog(null, log.retainLogs, function(err) {
             log.debug(Date.now() - processStart + 'ms');
+
+            // In deamon mode, run again in a while.
+            if (daemon) {
+                setTimeout(function() {
+                    runCommand('tick', [onComplete]);
+                }, daemonInterval * 1000);
+            }
         });
     });
 }
