@@ -96,3 +96,5 @@ You can magically deploy to Heroku using the deploy button below. Since Heroku d
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 Then you'll need to configure jobs. Install the [Heroku toolbelt](https://toolbelt.heroku.com), then get a shell with `heroku run bash --app [app-name]`. From there you can run the laundry commands such as `node index.js list` to list jobs, `node index.js create foo` to create a job called "foo", etc.
+
+Laundry runs in daemon mode on Heroku, which means its dyno needs to be consistently running, which isn't possible on the free plan. The "hobby" plan should work fine, though.
