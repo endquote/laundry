@@ -22,14 +22,10 @@ Items.Vogue.downloadLogic = function(prefix, obj, washer, cache, download) {
                 var target = util.format('%s/%s/%d.jpg', prefix, obj.id, index + 1);
                 var targetDate = obj.date;
                 Storage.downloadUrl(washer.job.log, slide, target, targetDate, cache, false, download, function(err, res) {
-                    res.id = index;
-                    results.push(res);
+                    results[index] = res;
                     callback();
                 });
             }, function(err) {
-                results.sort(function(a, b) {
-                    return a.id - b.id;
-                });
                 callback(err, results);
             });
         }
