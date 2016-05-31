@@ -35,7 +35,11 @@ Items.Vogue.downloadLogic = function(prefix, obj, washer, cache, download) {
 Items.Vogue.factory = function(item, downloads) {
     var url = util.format('http://www.vogue.com/fashion-shows/%s', item.urlFragment);
 
-    var description = item.review + '\n';
+    var description = '';
+    if (item.review) {
+        description += item.review + '\n';
+    }
+
     downloads.slides.forEach(function(slide, index) {
         description += util.format('<p><a href="%s/slideshow/collection#%d"><img src="%s"/></a></p>\n', url, index + 1, slide.newUrl);
     });
