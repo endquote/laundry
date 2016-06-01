@@ -83,7 +83,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
             encodeURIComponent(item.location.name), item.location.latitude, item.location.longitude, item.location.name);
     }
 
-    if (item.likes.data.length) {
+    if (item.likes.data && item.likes.data.length) {
         item.description += util.format('<p>%d likes: ', item.likes.count);
         item.likes.data.forEach(function(like, index, list) {
             item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username, like.username);
@@ -94,7 +94,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
         item.description += '</p>';
     }
 
-    if (item.comments.data.length) {
+    if (item.comments.data && item.comments.data.length) {
         item.description += util.format('<p>%d comments:</p>', item.comments.count);
         item.comments.data.forEach(function(comment) {
             item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>',
