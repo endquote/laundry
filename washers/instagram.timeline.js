@@ -43,6 +43,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
             that.job.log,
             opts,
             function(response) {
+                console.log(response);
                 following = following.concat(response.data);
                 that.job.log.debug(util.format('Got %d users', following.length));
                 nextUrl = response.pagination.next_url;

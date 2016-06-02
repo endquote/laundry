@@ -47,7 +47,7 @@ Washers.Instagram = function(config, job) {
 
                 // Shorten the auth URL.
                 var done = this.async();
-                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships&client_id=%s&redirect_uri=%s&response_type=code', answers.clientId, job.input._callbackUri);
+                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships+follower_list&client_id=%s&redirect_uri=%s&response_type=code', answers.clientId, job.input._callbackUri);
                 Helpers.shortenUrl(url, function(url) {
                     console.log(wrap(util.format('Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s', url)));
                     done(null, true);

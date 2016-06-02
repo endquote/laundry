@@ -503,7 +503,7 @@ Laundry.destroy = function(jobName, callback) {
         type: 'input',
         name: 'job',
         message: util.format("Are you sure you want to destroy the job " + chalk.bold("%s") + "? Enter the job name again to confirm.", job.name)
-    }].then(function(answers) {
+    }]).then(function(answers) {
         var answer = answers.job;
         if (answer === job.name.toLowerCase() && answer === jobName.toLowerCase()) {
 
@@ -535,7 +535,7 @@ Laundry.destroy = function(jobName, callback) {
             console.log(wrap(util.format(chalk.green("Job " + chalk.bold("%s") + " saved."), job.name)) + "\n");
             callback();
         }
-    }));
+    });
 };
 
 // List current jobs.
