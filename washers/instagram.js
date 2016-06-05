@@ -24,7 +24,10 @@ Washers.Instagram = function(config, job) {
         prompts: [{
             name: 'clientId',
             message: 'Client ID',
+            default: '2a0cb3ae206a43bb8d5e7308fd7919a2',
             when: function(answers) {
+                answers.clientId = '2a0cb3ae206a43bb8d5e7308fd7919a2';
+                return false;
                 if (job && job.input.token) {
                     return false;
                 }
@@ -34,7 +37,10 @@ Washers.Instagram = function(config, job) {
         }, {
             name: 'clientSecret',
             message: 'Client secret',
+            default: 'da6a3016880e44ecabcba252165c3d28',
             when: function(answers) {
+                answers.clientSecret = 'da6a3016880e44ecabcba252165c3d28';
+                return false;
                 return job && job.input.token ? false : true;
             }
         }, {
@@ -47,7 +53,8 @@ Washers.Instagram = function(config, job) {
 
                 // Shorten the auth URL.
                 var done = this.async();
-                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=basic+likes+comments+relationships+follower_list&client_id=%s&redirect_uri=%s&response_type=code', answers.clientId, job.input._callbackUri);
+                var scopes = ['basic', 'public_content', 'follower_list', 'relationships'];
+                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=%s&client_id=%s&redirect_uri=%s&response_type=code', scopes.join('+'), answers.clientId, job.input._callbackUri);
                 Helpers.shortenUrl(url, function(url) {
                     console.log(wrap(util.format('Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s', url)));
                     done(null, true);
