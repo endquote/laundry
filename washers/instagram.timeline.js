@@ -92,9 +92,7 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
     var quantity = 150;
     var posts = [];
     var nextMax = null;
-    async.whilst(function() {
-            return !posts.length || (posts.length < quantity && nextMax);
-        }, function(callback) {
+    async.doWhilst(function(callback) {
             Helpers.jsonRequest(
                 that.job.log,
                 extend({
@@ -113,6 +111,9 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
                     callback();
                 },
                 callback);
+        },
+        function() {
+            return posts.length < quantity && nextMax;
         },
         function(err) {
             if (err) {
