@@ -95,7 +95,7 @@ Helpers.jsonRequest = function(log, options, callback, errorCallback) {
     }
     request(options, function(err, response, body) {
         if (!err && (body && !body.errors && !body.error) && validStatusCodes.indexOf(response.statusCode) !== -1) {
-            callback(body);
+            callback(body, response);
         } else {
             errorCallback(err || body);
         }
