@@ -80,21 +80,25 @@ Helpers.buildClassName = function(file) {
 };
 
 // Make an HTTP request that expects JSON back, and handle the errors well.
+var JSONbig = require('json-bigint');
 Helpers.jsonRequest = function(log, options, callback, errorCallback) {
     var validStatusCodes = [200, 201, undefined];
-    if (!options) {
-        options = {};
-    }
-    options.json = true;
+    options = options || {};
     options.gzip = true;
+
     if (commander.proxy) {
         options.proxy = commander.proxy;
         options.rejectUnauthorized = false;
     }
+
     if (log) {
-        log.debug(JSON.stringify(options));
+        var o = _.clone(options);
+        delete(o.jar);
+        log.debug(JSON.stringify(o));
     }
+
     request(options, function(err, response, body) {
+        body = JSONbig.parse(body);
         if (!err && (body && !body.errors && !body.error) && validStatusCodes.indexOf(response.statusCode) !== -1) {
             callback(body, response);
         } else {
