@@ -1,9 +1,16 @@
 'use strict';
 
+var crypto = require('crypto');
+
 /*
 Base class for Instagram washers containing common methods.
 input: none
 output: none
+
+On June 1 2016 Instagram changed their API and terms to prevent things like Laundry from working.
+Switched to the private API by porting this PHP implementation.
+https://github.com/mgp25/Instagram-API
+
 */
 ns('Washers', global);
 Washers.Instagram = function(config, job) {
@@ -11,87 +18,115 @@ Washers.Instagram = function(config, job) {
 
     this.name = '';
     this.className = Helpers.buildClassName(__filename);
-    this._callbackUri = 'https://endquote.github.io/laundry/callbacks/instagram.html';
+
+    var that = this;
+
+    this._igApi = 'https://i.instagram.com/api/v1/';
+    this._igUserAgent = 'Instagram 8.0.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
+    this._igKey = '9b3b9e55988c954e51477da115c58ae82dcae7ac01c735b4443a3c5923cb593a';
+    this._igKeyVersion = '4';
+    this._jar = request.jar();
 
     this._requestOptions = {
-        baseUrl: 'https://api.instagram.com/v1/',
-        qs: {
-            access_token: this.token
+        baseUrl: this._igApi,
+        headers: {
+            'User-Agent': this._igUserAgent
         }
     };
 
     this.input = _.merge({
         prompts: [{
-            name: 'clientId',
-            message: 'Client ID',
-            default: '2a0cb3ae206a43bb8d5e7308fd7919a2',
-            when: function(answers) {
-                answers.clientId = '2a0cb3ae206a43bb8d5e7308fd7919a2';
-                return false;
-                if (job && job.input.token) {
-                    return false;
-                }
-                console.log(wrap(util.format('Go to https://instagram.com/developer/clients/manage/, click "Register a New Client". For the Redirect URI, enter %s. Fill in whatever for the other fields. Click "Register". The client ID and secret will appear.', job.input._callbackUri)));
-                return true;
-            }
+            name: 'username',
+            message: 'Username'
         }, {
-            name: 'clientSecret',
-            message: 'Client secret',
-            default: 'da6a3016880e44ecabcba252165c3d28',
-            when: function(answers) {
-                answers.clientSecret = 'da6a3016880e44ecabcba252165c3d28';
-                return false;
-                return job && job.input.token ? false : true;
-            }
-        }, {
-            name: 'authCode',
-            message: 'Auth code',
-            when: function(answers) {
-                if (job && job.input.token) {
-                    return false;
-                }
-
-                // Shorten the auth URL.
-                var done = this.async();
-                var scopes = ['basic', 'public_content', 'follower_list', 'relationships'];
-                var url = util.format('https://api.instagram.com/oauth/authorize/?scope=%s&client_id=%s&redirect_uri=%s&response_type=code', scopes.join('+'), answers.clientId, job.input._callbackUri);
-                Helpers.shortenUrl(url, function(url) {
-                    console.log(wrap(util.format('Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s', url)));
-                    done(null, true);
-                });
-            },
-            validate: function(value, answers) {
-                if (validator.isWhitespace(value)) {
-                    return false;
-                }
-
-                // Get the auth token.
-                var done = this.async();
-                Helpers.jsonRequest(
-                    null, {
-                        url: 'https://api.instagram.com/oauth/access_token',
-                        method: 'POST',
-                        form: {
-                            client_id: answers.clientId,
-                            client_secret: answers.clientSecret,
-                            grant_type: 'authorization_code',
-                            redirect_uri: job.input._callbackUri,
-                            code: value
-                        }
-                    },
-                    function(response) {
-                        answers.token = response.access_token;
-                        done(null, true);
-                    },
-                    function(err) {
-                        done(null, false);
-                    });
-            }
+            name: 'password',
+            message: 'Password',
+            type: 'password'
         }]
     }, this.input);
 };
 
 Washers.Instagram.prototype = Object.create(Washer.prototype);
 Washers.Instagram.className = Helpers.buildClassName(__filename);
+
+Washers.Instagram.prototype.login = function(callback) {
+    var that = this;
+
+    this.uuid = this.uuid || this.generateUUID(true);
+    this.deviceId = this.deviceId || this.generateDeviceID(this.username, this.password);
+
+    Helpers.jsonRequest(
+        that.job.log,
+        extend({
+            method: 'POST',
+            url: 'si/fetch_headers/?challenge_type=signup&guid=' + this.generateUUID(false),
+            jar: that._jar,
+        }, that._requestOptions),
+        function(result, response) {
+            var rx = /csrftoken=([^;]+)/;
+            var csrftoken = rx.exec(response.headers['set-cookie'][0])[1];
+
+            var data = {
+                'phone_id': that.generateUUID(true),
+                '_csrftoken': 'Set-Cookie: csrftoken=' + csrftoken,
+                'username': that.username,
+                'guid': that.uuid,
+                'device_id': that.deviceId,
+                'password': that.password,
+                'login_attempt_count': '0'
+            };
+
+            Helpers.jsonRequest(that.job.log,
+                extend({
+                    method: 'POST',
+                    url: 'accounts/login/',
+                    jar: that._jar,
+                    form: that.generateSignature(JSON.stringify(data))
+                }, that._requestOptions),
+                function(result, response) {
+                    that.job.log.info(util.format('Logged in as %s', result.logged_in_user.username));
+                    callback();
+                },
+                callback);
+        },
+        callback);
+    return;
+};
+
+Washers.Instagram.prototype.generateUUID = function(dashes) {
+    return util.format(dashes ? '%s%s-%s-%s-%s-%s%s%s' : '%s%s%s%s%s%s%s%s',
+        Math.round(Math.random() * 65535).toString(16),
+        Math.round(Math.random() * 65535).toString(16),
+        Math.round(Math.random() * 65535).toString(16), (Math.round(Math.random() * 4095) | 0x4000).toString(16), (Math.round(Math.random() * 16383) | 0x8000).toString(16),
+        Math.round(Math.random() * 65535).toString(16),
+        Math.round(Math.random() * 65535).toString(16),
+        Math.round(Math.random() * 65535).toString(16)
+    );
+};
+
+Washers.Instagram.prototype.generateDeviceID = function(username, password) {
+    var shasum = crypto.createHash('md5');
+    shasum.update(username + password, 'utf8');
+    var seed = shasum.digest('hex');
+
+    var volatile_seed = fs.statSync(__dirname).mtime.getTime();
+    shasum = crypto.createHash('md5');
+    shasum.update(seed + volatile_seed, 'utf8');
+
+    var id = shasum.digest('hex');
+    id = 'android-' + id.substr(0, 16);
+
+    return id;
+};
+
+Washers.Instagram.prototype.generateSignature = function(data) {
+    var hash = crypto.createHmac('sha256', this._igKey);
+    hash.update(data);
+    var signature = hash.digest('hex');
+    return {
+        ig_sig_key_version: this._igKeyVersion,
+        signed_body: signature + '.' + (data)
+    };
+};
 
 module.exports = Washers.Instagram;

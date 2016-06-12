@@ -22,6 +22,13 @@ Washers.Instagram.Timeline.prototype = Object.create(Washers.Instagram.prototype
 Washers.Instagram.Timeline.className = Helpers.buildClassName(__filename);
 
 Washers.Instagram.Timeline.prototype.doInput = function(callback) {
+    var that = this;
+    this.login(function(e) {
+        // ready to do stuff with that._jar
+        callback(e);
+    });
+
+    return;
     // Used to use /users/self/feed, but it got deprectated.
     // http://developers.instagram.com/post/133424514006/instagram-platform-update
 
