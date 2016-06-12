@@ -23,72 +23,66 @@ Washers.Instagram.Timeline.className = Helpers.buildClassName(__filename);
 
 Washers.Instagram.Timeline.prototype.doInput = function(callback) {
     var that = this;
-    this.login(function(e) {
-        // ready to do stuff with that._jar
-        callback(e);
-    });
-
-    return;
-    // Used to use /users/self/feed, but it got deprectated.
-    // http://developers.instagram.com/post/133424514006/instagram-platform-update
-
-    var that = this;
     var following = [];
     var posts = [];
-    var nextUrl;
 
-    // Get all the users you follow.
-    async.doWhilst(function(callback) {
-        var opts = extend({
-            url: nextUrl ? nextUrl : '/users/self/follows'
-        }, that._requestOptions);
-        if (nextUrl) {
-            delete opts.baseUrl;
-        }
-
-        Helpers.jsonRequest(
-            that.job.log,
-            opts,
-            function(response) {
-                console.log(response);
-                following = following.concat(response.data);
-                that.job.log.debug(util.format('Got %d users', following.length));
-                nextUrl = response.pagination.next_url;
-                callback();
-            },
-            callback);
-
-    }, function() {
-        return nextUrl;
-    }, function(err) {
-        if (err) {
-            callback(err);
-            return;
-        }
-
-        // Get the last page of photos from each user.
-        async.eachLimit(following, 5, function(user, callback) {
+    // Log in.
+    this.login(function(e) {
+        // Get the list of user's we're following, it's a paged list.
+        var next_max_id;
+        async.doWhilst(function(callback) {
             Helpers.jsonRequest(
                 that.job.log,
                 extend({
-                    url: '/users/' + user.id + '/media/recent'
+                    jar: that._jar,
+                    url: 'friendships/following',
+                    qs: {
+                        ig_sig_key_version: that._igKeyVersion,
+                        rank_token: that._igRankToken,
+                        max_id: next_max_id
+                    }
                 }, that._requestOptions),
                 function(response) {
-                    posts = posts.concat(response.data);
+                    next_max_id = response.next_max_id;
+                    following = following.concat(response.users);
                     callback();
-                }
+                },
+                callback
             );
+        }, function() {
+            return next_max_id;
         }, function(err) {
-            that.job.log.debug('Got %d posts', posts.length);
+            if (err) {
+                callback(err);
+                return;
+            }
 
-            // Throw out all but the latest posts.
-            posts.sort(function(a, b) {
-                return b.created_time - a.created_time;
+            // Get the last page of photos from each user.
+            // It seems to consistently return 18 posts, could make requests for additional pages.
+            async.eachLimit(following, 5, function(user, callback) {
+                Helpers.jsonRequest(
+                    that.job.log,
+                    extend({
+                        jar: that._jar,
+                        url: 'feed/user/' + user.pk + '/'
+                    }, that._requestOptions),
+                    function(response) {
+                        posts = posts.concat(response.items);
+                        callback();
+                    }
+                );
+            }, function(err) {
+                that.job.log.debug('Got %d posts', posts.length);
+
+                // Throw out all but the latest posts.
+                posts.sort(function(a, b) {
+                    return b.taken_at - a.taken_at;
+                });
+                posts = posts.slice(0, 150);
+
+                // Trigger item creation, download, and processing.
+                Item.download(Items.Instagram.Media, that, posts, callback);
             });
-            posts = posts.slice(0, 150);
-
-            // Trigger item creation, download, and processing.
-            Item.download(Items.Instagram.Media, that, posts, callback);
         });
     });
 };

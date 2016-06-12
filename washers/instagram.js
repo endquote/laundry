@@ -21,10 +21,12 @@ Washers.Instagram = function(config, job) {
 
     var that = this;
 
+    // https://github.com/mgp25/Instagram-API/blob/master/src/Constants.php
     this._igApi = 'https://i.instagram.com/api/v1/';
     this._igUserAgent = 'Instagram 8.0.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
     this._igKey = '9b3b9e55988c954e51477da115c58ae82dcae7ac01c735b4443a3c5923cb593a';
     this._igKeyVersion = '4';
+
     this._jar = request.jar();
 
     this._requestOptions = {
@@ -49,11 +51,12 @@ Washers.Instagram = function(config, job) {
 Washers.Instagram.prototype = Object.create(Washer.prototype);
 Washers.Instagram.className = Helpers.buildClassName(__filename);
 
+// https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L80
 Washers.Instagram.prototype.login = function(callback) {
     var that = this;
 
-    this.uuid = this.uuid || this.generateUUID(true);
-    this.deviceId = this.deviceId || this.generateDeviceID(this.username, this.password);
+    this._igUuid = this._igUuid || this.generateUUID(true);
+    this._igDeviceId = this._igDeviceId || this.generateDeviceID(this.username, this.password);
 
     Helpers.jsonRequest(
         that.job.log,
@@ -70,8 +73,8 @@ Washers.Instagram.prototype.login = function(callback) {
                 'phone_id': that.generateUUID(true),
                 '_csrftoken': 'Set-Cookie: csrftoken=' + csrftoken,
                 'username': that.username,
-                'guid': that.uuid,
-                'device_id': that.deviceId,
+                'guid': that._igUuid,
+                'device_id': that._igDeviceId,
                 'password': that.password,
                 'login_attempt_count': '0'
             };
@@ -84,6 +87,8 @@ Washers.Instagram.prototype.login = function(callback) {
                     form: that.generateSignature(JSON.stringify(data))
                 }, that._requestOptions),
                 function(result, response) {
+                    that._igUsernameId = result.logged_in_user.pk;
+                    that._igRankToken = that._igUsernameId + '_' + that._igUuid;
                     that.job.log.info(util.format('Logged in as %s', result.logged_in_user.username));
                     callback();
                 },
@@ -93,6 +98,7 @@ Washers.Instagram.prototype.login = function(callback) {
     return;
 };
 
+// https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L1607
 Washers.Instagram.prototype.generateUUID = function(dashes) {
     return util.format(dashes ? '%s%s-%s-%s-%s-%s%s%s' : '%s%s%s%s%s%s%s%s',
         Math.round(Math.random() * 65535).toString(16),
@@ -104,6 +110,7 @@ Washers.Instagram.prototype.generateUUID = function(dashes) {
     );
 };
 
+// https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L1599
 Washers.Instagram.prototype.generateDeviceID = function(username, password) {
     var shasum = crypto.createHash('md5');
     shasum.update(username + password, 'utf8');
@@ -119,6 +126,7 @@ Washers.Instagram.prototype.generateDeviceID = function(username, password) {
     return id;
 };
 
+// https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L1592
 Washers.Instagram.prototype.generateSignature = function(data) {
     var hash = crypto.createHmac('sha256', this._igKey);
     hash.update(data);

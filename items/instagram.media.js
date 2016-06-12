@@ -18,10 +18,11 @@ Items.Instagram.Media = function(config) {
         data: []
     };
     this.location = {
-        latitude: 0,
+        city: '',
         name: '',
-        longitude: 0,
-        id: 0
+        address: '',
+        lat: 0,
+        lng: 0
     };
 
     Item.call(this, config);
@@ -35,11 +36,11 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
     return {
         image: function(callback) {
             var target = prefix + '/' + obj.id + '.jpg';
-            Storage.downloadUrl(washer.job.log, obj.images.standard_resolution.url, target, moment.unix(obj.created_time).toDate(), cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, callback);
         },
         video: function(callback) {
             var target = prefix + '/' + obj.id + '.mp4';
-            Storage.downloadUrl(washer.job.log, obj.videos ? obj.videos.standard_resolution.url : null, target, moment.unix(obj.created_time).toDate(), cache, false, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.video_versions ? obj.video_versions[0].url : null, target, moment.unix(obj.taken_at).toDate(), cache, false, download, callback);
         }
     };
 };
@@ -47,17 +48,20 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
 // Construct an Item given an API response and any upload info.
 Items.Instagram.Media.factory = function(post, downloads) {
     var item = new Items.Instagram.Media({
-        tags: post.tags,
-        type: post.type,
+        //tags: post.tags,
+        type: post.video_versions ? 'video' : 'still',
         comments: post.comments,
-        date: moment.unix(post.created_time),
-        url: post.link,
-        likes: post.likes,
+        date: moment.unix(post.taken_at),
+        url: util.format('https://www.instagram.com/p/%s/', post.code),
+        likes: {
+            count: post.like_count,
+            data: post.likers
+        },
         image: downloads.image.newUrl,
         video: downloads.video.newUrl,
         caption: post.caption ? post.caption.text : null,
         author: post.user.username,
-        authorpic: post.user.profile_picture,
+        authorpic: post.user.profile_pic_url,
         location: post.location,
         mediaUrl: downloads.video.newUrl,
         mediaBytes: downloads.video.bytes
@@ -69,7 +73,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (!item.video) {
-        item.description = util.format('<p><a href="%s"><img src="%s" width="640" height="640"/></a></p>', item.url, item.image);
+        item.description = util.format('<p><a href="%s"><img src="%s"/></a></p>', item.url, item.image);
     } else {
         item.description = Item.buildVideo(item.video, item.image, 600, 600);
     }
@@ -79,8 +83,8 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (item.location) {
-        item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s</a></p>',
-            encodeURIComponent(item.location.name), item.location.latitude, item.location.longitude, item.location.name);
+        item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s, %s</a></p>',
+            encodeURIComponent(item.location.name), item.location.lat, item.location.lng, item.location.name, item.location.city);
     }
 
     if (item.likes.data && item.likes.data.length) {
@@ -98,7 +102,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
         item.description += util.format('<p>%d comments:</p>', item.comments.count);
         item.comments.data.forEach(function(comment) {
             item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>',
-                comment.from.username, comment.from.username, Items.Instagram.Media.linkify(comment.text));
+                comment.user.username, comment.user.username, Items.Instagram.Media.linkify(comment.text));
         });
     }
 
