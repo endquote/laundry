@@ -86,6 +86,7 @@ Helpers.jsonRequest = function(log, options, callback, errorCallback) {
         options = {};
     }
     options.json = true;
+    options.gzip = true;
     if (commander.proxy) {
         options.proxy = commander.proxy;
         options.rejectUnauthorized = false;
