@@ -27,7 +27,12 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
     var posts = [];
 
     // Log in.
-    this.login(function(e) {
+    this.login(function(err) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
         // Get the list of user's we're following, it's a paged list.
         var next_max_id;
         async.doWhilst(function(callback) {
@@ -57,21 +62,16 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
                 return;
             }
 
-            // Get the last page of photos from each user.
-            // It seems to consistently return 18 posts, could make requests for additional pages.
+            // Get the last page of photos from each user. More than 18 requires a second page.
             async.eachLimit(following, 5, function(user, callback) {
-                Helpers.jsonRequest(
-                    that.job.log,
-                    extend({
-                        jar: that._jar,
-                        url: 'feed/user/' + user.pk + '/'
-                    }, that._requestOptions),
-                    function(response) {
-                        posts = posts.concat(response.items);
-                        callback();
+                that.requestMedia('feed/user/' + user.pk + '/', 18,
+                    function(err, items) {
+                        posts = posts.concat(items);
+                        callback(err);
                     }
                 );
             }, function(err) {
+
                 that.job.log.debug('Got %d posts', posts.length);
 
                 // Throw out all but the latest posts.
@@ -87,28 +87,25 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
     });
 };
 
-Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
+// Helper method for API endpoints which return a list of posts.
+Washers.Instagram.Timeline.prototype.requestMedia = function(method, quantity, callback) {
     var that = this;
-
-    var quantity = 150;
     var posts = [];
     var nextMax = null;
     async.doWhilst(function(callback) {
             Helpers.jsonRequest(
                 that.job.log,
                 extend({
+                    jar: that._jar,
                     url: method,
                     qs: {
-                        count: quantity - posts.length,
                         max_id: nextMax ? nextMax : ''
                     }
                 }, that._requestOptions),
                 function(response) {
-                    response.data.forEach(function(media) {
-                        posts.push(media);
-                    });
+                    posts = posts.concat(response.items);
                     that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
-                    nextMax = response.pagination.next_max_id;
+                    nextMax = response.next_max_id ? response.next_max_id.toString() : null;
                     callback();
                 },
                 callback);
@@ -117,12 +114,7 @@ Washers.Instagram.Timeline.prototype.requestMedia = function(method, callback) {
             return posts.length < quantity && nextMax;
         },
         function(err) {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            Item.download(Items.Instagram.Media, that, posts, callback);
+            callback(err, posts);
         });
 };
 

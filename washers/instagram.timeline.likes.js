@@ -19,8 +19,22 @@ Washers.Instagram.Timeline.Likes = function(config, job) {
 
 Washers.Instagram.Timeline.Likes.prototype = Object.create(Washers.Instagram.Timeline.prototype);
 Washers.Instagram.Timeline.Likes.className = Helpers.buildClassName(__filename);
+
 Washers.Instagram.Timeline.Likes.prototype.doInput = function(callback) {
-    this.requestMedia('/users/self/media/liked', callback);
+    var that = this;
+    this.login(function(err) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        that.requestMedia('/feed/liked/', 50, function(err, posts) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            Item.download(Items.Instagram.Media, that, posts, callback);
+        });
+    });
 };
 
 module.exports = Washers.Instagram.Timeline.Likes;

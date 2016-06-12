@@ -17,38 +17,10 @@ Washers.Instagram.Timeline.User = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent images from an Instagram account.',
         prompts: [{
-            name: 'username',
+            name: 'targetUser',
             message: 'What account do you want to watch?',
             filter: function(value) {
                 return value.replace('@', '');
-            },
-            validate: function(value, answers) {
-                if (validator.isWhitespace(value)) {
-                    return false;
-                }
-
-                // Get the userid for the username.
-                var done = this.async();
-                Helpers.jsonRequest(
-                    null, {
-                        url: 'https://api.instagram.com/v1/users/search',
-                        qs: {
-                            count: 1,
-                            q: value,
-                            access_token: job.input.token
-                        }
-                    },
-                    function(response) {
-                        if (response.data.length) {
-                            answers.userId = response.data[0].id;
-                            done(null, true);
-                        } else {
-                            done(null, false);
-                        }
-                    },
-                    function(err) {
-                        done(null, false);
-                    });
             }
         }]
     });
@@ -58,7 +30,35 @@ Washers.Instagram.Timeline.User.prototype = Object.create(Washers.Instagram.Time
 Washers.Instagram.Timeline.User.className = Helpers.buildClassName(__filename);
 
 Washers.Instagram.Timeline.User.prototype.doInput = function(callback) {
-    this.requestMedia('/users/' + this.userId + '/media/recent', callback);
+    var that = this;
+
+    // Log in.
+    this.login(function(err) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        // Get the userid for the username.
+        Helpers.jsonRequest(
+            that.job.log,
+            extend({
+                jar: that._jar,
+                url: util.format('users/%s/usernameinfo/', that.targetUser),
+            }, that._requestOptions),
+
+            function(response) {
+                // Get the user's feed.
+                that.requestMedia('/feed/user/' + response.user.pk + '/', 50, function(err, posts) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+                    Item.download(Items.Instagram.Media, that, posts, callback);
+                });
+            },
+            callback);
+    });
 };
 
 module.exports = Washers.Instagram.Timeline.User;

@@ -27,7 +27,20 @@ Washers.Instagram.Timeline.Hashtag.prototype = Object.create(Washers.Instagram.T
 Washers.Instagram.Timeline.Hashtag.className = Helpers.buildClassName(__filename);
 
 Washers.Instagram.Timeline.Hashtag.prototype.doInput = function(callback) {
-    this.requestMedia('/tags/' + encodeURIComponent(this.tag) + '/media/recent', callback);
+    var that = this;
+    this.login(function(err) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        that.requestMedia('/feed/tag/' + encodeURIComponent(that.tag) + '/', 50, function(err, posts) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            Item.download(Items.Instagram.Media, that, posts, callback);
+        });
+    });
 };
 
 module.exports = Washers.Instagram.Timeline.Hashtag;
