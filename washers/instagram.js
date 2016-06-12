@@ -39,10 +39,10 @@ Washers.Instagram = function(config, job) {
     this.input = _.merge({
         prompts: [{
             name: 'username',
-            message: 'Username'
+            message: 'Your username'
         }, {
             name: 'password',
-            message: 'Password',
+            message: 'Your password',
             type: 'password'
         }]
     }, this.input);

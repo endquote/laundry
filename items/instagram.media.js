@@ -50,12 +50,15 @@ Items.Instagram.Media.factory = function(post, downloads) {
     var item = new Items.Instagram.Media({
         //tags: post.tags,
         type: post.video_versions ? 'video' : 'still',
-        comments: post.comments,
         date: moment.unix(post.taken_at),
         url: util.format('https://www.instagram.com/p/%s/', post.code),
         likes: {
             count: post.like_count,
             data: post.likers
+        },
+        commands: {
+            count: post.comment_count,
+            data: post.comments
         },
         image: downloads.image.newUrl,
         video: downloads.video.newUrl,
@@ -83,12 +86,21 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (item.location) {
-        item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s, %s</a></p>',
-            encodeURIComponent(item.location.name), item.location.lat, item.location.lng, item.location.name, item.location.city);
+        var label = '';
+        if (item.location.name && item.location.city) {
+            label = item.location.name + ', ' + item.location.city;
+        } else if (item.location.name || item.location.city) {
+            label = item.location.name || item.location.city;
+        }
+        item.description += util.format('<p><a href="http://maps.apple.com/?q=%s&ll=%s,%s">%s</a></p>',
+            encodeURIComponent(item.location.name), item.location.lat, item.location.lng, label);
+    }
+
+    if (item.likes.count) {
+        item.description += util.format('<p>%d likes: ', item.likes.count);
     }
 
     if (item.likes.data && item.likes.data.length) {
-        item.description += util.format('<p>%d likes: ', item.likes.count);
         item.likes.data.forEach(function(like, index, list) {
             item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username, like.username);
             if (index < list.length - 1) {
@@ -98,8 +110,11 @@ Items.Instagram.Media.factory = function(post, downloads) {
         item.description += '</p>';
     }
 
-    if (item.comments.data && item.comments.data.length) {
+    if (item.comments.count) {
         item.description += util.format('<p>%d comments:</p>', item.comments.count);
+    }
+
+    if (item.comments.data && item.comments.data.length) {
         item.comments.data.forEach(function(comment) {
             item.description += util.format('<p><strong><a href="http://instagram.com/%s">%s</a>:</strong> %s</p>',
                 comment.user.username, comment.user.username, Items.Instagram.Media.linkify(comment.text));
