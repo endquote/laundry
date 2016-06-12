@@ -97,10 +97,11 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (item.likes.count) {
-        item.description += util.format('<p>%d likes: ', item.likes.count);
+        item.description += util.format('<p>%d likes', item.likes.count);
     }
 
     if (item.likes.data && item.likes.data.length) {
+        item.description += ': ';
         item.likes.data.forEach(function(like, index, list) {
             item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username, like.username);
             if (index < list.length - 1) {
@@ -111,7 +112,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (item.comments.count) {
-        item.description += util.format('<p>%d comments:</p>', item.comments.count);
+        item.description += util.format('<p>%d comments</p>', item.comments.count);
     }
 
     if (item.comments.data && item.comments.data.length) {
