@@ -56,7 +56,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
             count: post.like_count,
             data: post.likers
         },
-        commands: {
+        comments: {
             count: post.comment_count,
             data: post.comments
         },
