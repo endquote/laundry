@@ -1,16 +1,16 @@
 'use strict';
 
 /*
-Raw washer
+JSON washer
 input: TODO
 output: Writes an array of Items to disk as JSON files
 */
 
 ns('Washers', global);
-Washers.Raw = function(config, job) {
+Washers.JSON = function(config, job) {
     Washer.call(this, config, job);
 
-    this.name = 'Raw';
+    this.name = 'JSON';
     this.className = Helpers.buildClassName(__filename);
 
     this.output = _.merge({
@@ -18,26 +18,25 @@ Washers.Raw = function(config, job) {
     }, this.output);
 };
 
-Washers.Raw.prototype = Object.create(Washer.prototype);
-Washers.Raw.className = Helpers.buildClassName(__filename);
+Washers.JSON.prototype = Object.create(Washer.prototype);
+Washers.JSON.className = Helpers.buildClassName(__filename);
 
-Washers.Raw.prototype.doOutput = function(items, callback) {
+Washers.JSON.prototype.doOutput = function(items, callback) {
     if (!items) {
         callback();
     }
 
     var that = this;
-    items.forEach(function(item) {
+    async.eachSeries(items, function(item, callback) {
         var target = Item.buildPrefix(that.job.name, that.className) + '/' + item.date.unix() + '.json';
         var json = JSONbig.stringify(item, null, 2);
         Storage.writeFile(target, json, function(err, destination) {
             if (destination) {
-                that.job.log.info('Wrote to ' + destination);
+                that.job.log.debug('Wrote to ' + destination);
             }
+            callback(err);
         });
-    });
-
-    callback();
+    }, callback);
 };
 
-module.exports = Washers.Raw;
+module.exports = Washers.JSON;
