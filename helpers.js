@@ -102,7 +102,11 @@ Helpers.jsonRequest = function(log, options, callback, errorCallback) {
     }
 
     request(options, function(err, response, body) {
-        body = JSONbig.parse(body);
+        if (body) {
+            try {
+                body = JSONbig.parse(body);
+            } catch (e) {}
+        }
         if (!err && (body && !body.errors && !body.error) && validStatusCodes.indexOf(response.statusCode) !== -1) {
             callback(body, response);
         } else {
