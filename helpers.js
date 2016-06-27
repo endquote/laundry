@@ -80,7 +80,6 @@ Helpers.buildClassName = function(file) {
 };
 
 // Make an HTTP request that expects JSON back, and handle the errors well.
-var JSONbig = require('json-bigint');
 Helpers.jsonRequest = function(log, options, callback, errorCallback) {
     var validStatusCodes = [200, 201, undefined];
     options = options || {};

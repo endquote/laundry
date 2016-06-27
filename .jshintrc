@@ -27,7 +27,8 @@
         "qs": true,
         "extend": true,
         "request": true,
-        "wrap": true
+        "wrap": true,
+        "JSONbig": true
     },
     "curly": true,
     "eqeqeq": true,
