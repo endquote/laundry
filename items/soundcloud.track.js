@@ -74,7 +74,8 @@ Items.SoundCloud.Track.factory = function(obj, downloads) {
         mediaUrl: downloads.audio.newUrl,
         mediaBytes: downloads.audio.bytes,
         artwork: downloads.artwork.newUrl,
-        duration: obj.duration / 1000
+        duration: obj.duration / 1000,
+        downloads: downloads
     });
 
     return item;

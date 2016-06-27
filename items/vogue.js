@@ -50,7 +50,8 @@ Items.Vogue.factory = function(item, downloads) {
         url: url,
         date: moment(item.pubDate),
         author: item.brandName,
-        slides: item.slides
+        slides: item.slides,
+        downloads: downloads
     });
 };
 

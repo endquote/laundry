@@ -100,7 +100,8 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         coordinates: tweet.coordinates ? {
             lat: tweet.coordinates.coordinates[1],
             lon: tweet.coordinates.coordinates[0]
-        } : null
+        } : null,
+        downloads: downloads
     });
 
     // Start with media, then tweet text.

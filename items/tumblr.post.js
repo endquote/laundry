@@ -80,6 +80,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
     item.sourceTitle = post.source_title;
     item.liked = post.liked;
     item.description = '';
+    item.downloads = downloads;
 
     // Use uploaded photos if any
     if (post.photos) {
