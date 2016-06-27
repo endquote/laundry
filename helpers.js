@@ -96,6 +96,11 @@ Helpers.jsonRequest = function(log, options, callback, errorCallback) {
         log.debug(JSON.stringify(o));
     }
 
+    if (!options.json && options.body) {
+        options.json = options.body;
+        delete options.body;
+    }
+
     request(options, function(err, response, body) {
         body = JSONbig.parse(body);
         if (!err && (body && !body.errors && !body.error) && validStatusCodes.indexOf(response.statusCode) !== -1) {
