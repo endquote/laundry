@@ -2,7 +2,7 @@
 
 /*
 Tumblr Dashboard washer
-input: converts media from the user's Tumblr Dashboard into items
+input: converts posts from the user's Tumblr Dashboard into Items
 output: none
 */
 ns('Washers.Tumblr', global);

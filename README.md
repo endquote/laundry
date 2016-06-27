@@ -13,16 +13,17 @@ Laundry is made up of _washers_, each with an input or an output, or both. Any i
 
 Input | Output
 ----- | ------
-gMail search | MySQL database
-Instagram hashtag | RSS (with enclosures)
-Instagram timeline | Slack channel
-Instagram likes | Web socket ([example](https://github.com/endquote/laundry/tree/master/samples/socket))
-Instagram user | 
+gMail search | JSON files
+Instagram hashtag | MySQL database
+Instagram timeline | RSS (with enclosures)
+Instagram likes | Slack channel
+Instagram user | Web socket ([example](https://github.com/endquote/laundry/tree/master/samples/socket))
 RSS | 
 Slack channel | 
 Soundcloud artist | 
 Soundcloud timeline | 
 Tumblr blog | 
+Tumblr likes | 
 Tumblr timeline | 
 Twitter hashtag | 
 Twitter timeline | 

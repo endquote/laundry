@@ -2,7 +2,7 @@
 
 /*
 Tumblr blog washer
-input: converts media from a particular Tumblr blog into items
+input: converts posts from a particular Tumblr blog into Items
 output: none
 */
 ns('Washers.Tumblr', global);
