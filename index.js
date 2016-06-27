@@ -17,6 +17,7 @@ global.extend = require('deep-extend'); // https://www.npmjs.com/package/deep-ex
 global.request = require('request'); // https://github.com/request/request
 global.commander = require('commander'); // https://www.npmjs.com/package/commander
 global.wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
+global.JSONbig = require('json-bigint'); // https://www.npmjs.com/package/json-bigint
 
 var processStart = Date.now();
 
