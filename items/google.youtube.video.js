@@ -45,7 +45,7 @@ Items.Google.YouTube.Video.downloadLogic = function(prefix, obj, washer, cache, 
 // Construct an Item given an API response and any upload info.
 Items.Google.YouTube.Video.factory = function(video, downloads) {
     var player = util.format('<img src="%s" />', downloads.thumbnail.newUrl);
-    if (downloads.video.bytes) {
+    if (downloads.video.newUrl !== downloads.video.oldUrl) {
         player = Item.buildVideo(downloads.video.newUrl, downloads.thumbnail.newUrl, 640, 480);
     }
 

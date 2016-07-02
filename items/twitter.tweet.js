@@ -106,7 +106,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
     // Start with media, then tweet text.
     downloads.media.forEach(function(media) {
-        if (media.video && media.video.bytes) {
+        if (media.video && media.video.newUrl !== media.video.oldUrl) {
             item.description += Item.buildVideo(media.video.newUrl, media.newUrl);
         } else {
             item.description += util.format('<p><img src="%s"/></p>', media.newUrl);
