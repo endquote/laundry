@@ -68,6 +68,18 @@ Washer.downloadMediaOption = {
     default: false
 };
 
+Washer.quantityOption = function(count, message) {
+    return {
+        type: 'input',
+        name: 'quantity',
+        message: message || 'How many items do you want to retrieve?',
+        default: count || 20,
+        validate: function(value, answers) {
+            return value && validator.isInt(value.toString());
+        }
+    };
+};
+
 // Remove stuff from the washer that's saved to disk.
 Washer.prototype.stringify = function() {
     var c = _.clone(this);

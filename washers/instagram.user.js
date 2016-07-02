@@ -5,11 +5,11 @@ Instagram User washer
 input: converts media from a user's Instagram feed into items
 output: none
 */
-ns('Washers.Instagram.Timeline', global);
-Washers.Instagram.Timeline.User = function(config, job) {
+ns('Washers.Instagram', global);
+Washers.Instagram.User = function(config, job) {
     this.userId = null;
 
-    Washers.Instagram.Timeline.call(this, config, job);
+    Washers.Instagram.call(this, config, job);
 
     this.name = 'Instagram/User';
     this.className = Helpers.buildClassName(__filename);
@@ -17,19 +17,22 @@ Washers.Instagram.Timeline.User = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent images from an Instagram account.',
         prompts: [{
-            name: 'targetUser',
-            message: 'What account do you want to watch?',
-            filter: function(value) {
-                return value.replace('@', '');
-            }
-        }]
+                name: 'targetUser',
+                message: 'What account do you want to watch?',
+                filter: function(value) {
+                    return value.replace('@', '');
+                }
+            },
+            Washer.downloadMediaOption,
+            Washer.quantityOption(50)
+        ]
     });
 };
 
-Washers.Instagram.Timeline.User.prototype = Object.create(Washers.Instagram.Timeline.prototype);
-Washers.Instagram.Timeline.User.className = Helpers.buildClassName(__filename);
+Washers.Instagram.User.prototype = Object.create(Washers.Instagram.prototype);
+Washers.Instagram.User.className = Helpers.buildClassName(__filename);
 
-Washers.Instagram.Timeline.User.prototype.doInput = function(callback) {
+Washers.Instagram.User.prototype.doInput = function(callback) {
     var that = this;
 
     // Log in.
@@ -49,7 +52,7 @@ Washers.Instagram.Timeline.User.prototype.doInput = function(callback) {
 
             function(response) {
                 // Get the user's feed.
-                that.requestMedia('/feed/user/' + response.user.pk + '/', 50, function(err, posts) {
+                that.requestMedia('/feed/user/' + response.user.pk + '/', that.quantity, function(err, posts) {
                     if (err) {
                         callback(err);
                         return;
@@ -61,4 +64,4 @@ Washers.Instagram.Timeline.User.prototype.doInput = function(callback) {
     });
 };
 
-module.exports = Washers.Instagram.Timeline.User;
+module.exports = Washers.Instagram.User;

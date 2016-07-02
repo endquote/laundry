@@ -14,7 +14,10 @@ Washers.Tumblr.Dashboard = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from your Tumblr Dashboard.',
-        prompts: [Washer.downloadMediaOption]
+        prompts: [
+            Washer.downloadMediaOption,
+            Washer.quantityOption(100)
+        ]
     });
 };
 
@@ -22,7 +25,6 @@ Washers.Tumblr.Dashboard.prototype = Object.create(Washers.Tumblr.prototype);
 Washers.Tumblr.Dashboard.className = Helpers.buildClassName(__filename);
 
 Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
-    var quantity = 100;
     var posts = [];
     var lastResponse = null;
     var limit = 20;
@@ -34,20 +36,20 @@ Washers.Tumblr.Dashboard.prototype.doInput = function(callback) {
             extend({
                 uri: '/user/dashboard',
                 qs: {
-                    limit: Math.min(limit, quantity - posts.length),
+                    limit: Math.min(limit, that.quantity - posts.length),
                     since_id: posts.length ? posts[posts.length - 1].id : null
                 }
             }, that._requestOptions),
             function(response) {
                 response = response.response;
                 posts = posts.concat(response.posts);
-                that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
+                that.job.log.debug(util.format('Got %d/%d posts', posts.length, that.quantity));
                 lastResponse = response;
                 callback();
             },
             callback);
     }, function() {
-        return lastResponse.posts.length === limit && posts.length < quantity;
+        return lastResponse.posts.length === limit && posts.length < that.quantity;
     }, function(err) {
         if (err) {
             callback(err);

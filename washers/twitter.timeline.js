@@ -12,9 +12,6 @@ Washers.Twitter.Timeline = function(config, job) {
     this.name = 'Twitter/Timeline';
     this.className = Helpers.buildClassName(__filename);
 
-    // how many to get per shot... maybe make configurable.
-    this._quantity = 500;
-
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from your Twitter timeline.',
         prompts: [{
@@ -28,7 +25,8 @@ Washers.Twitter.Timeline = function(config, job) {
                 default: false,
                 message: 'Do you want to exclude retweets and quotes?'
             },
-            Washer.downloadMediaOption
+            Washer.downloadMediaOption,
+            Washer.quantityOption(500)
         ]
     });
 };
@@ -74,7 +72,7 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
                 if (tweets && tweets.length) {
                     retrievedLast = tweets.length;
                     retrievedTotal += tweets.length;
-                    that.job.log.debug(util.format('Got %d, total %d/%d', retrievedLast, retrievedTotal, that._quantity));
+                    that.job.log.debug(util.format('Got %d, total %d/%d', retrievedLast, retrievedTotal, that.quantity));
                     tweets.forEach(function(tweet) {
                         maxId = tweet.id_str;
                         var include = true;
@@ -93,13 +91,14 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
             },
             callback);
     }, function() {
-        return retrievedTotal < that._quantity && retrievedLast > 1;
+        return retrievedTotal < that.quantity && retrievedLast > 1;
     }, function(err) {
         if (err) {
             callback(err);
             return;
         }
 
+        posts = posts.slice(0, that.quantity);
         Item.download(Items.Twitter.Tweet, that, posts, callback);
     });
 };

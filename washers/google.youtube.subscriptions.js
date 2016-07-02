@@ -14,7 +14,10 @@ Washers.Google.YouTube.Subscriptions = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent videos from your YouTube subscriptions.',
-        prompts: [Washer.downloadMediaOption]
+        prompts: [
+            Washer.downloadMediaOption,
+            Washer.quantityOption(50)
+        ]
     });
 };
 
@@ -47,7 +50,7 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
                             part: 'id,snippet',
                             mine: true,
                             auth: that._oauth2Client,
-                            maxResults: 50,
+                            maxResults: that.quantity,
                             pageToken: nextPageToken
                         }
                     }, that._requestOptions),

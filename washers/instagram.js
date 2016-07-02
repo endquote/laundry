@@ -137,4 +137,37 @@ Washers.Instagram.prototype.generateSignature = function(data) {
     };
 };
 
+
+// Helper method for API endpoints which return a list of posts.
+Washers.Instagram.prototype.requestMedia = function(method, quantity, callback) {
+    var that = this;
+    var posts = [];
+    var nextMax = null;
+    async.doWhilst(function(callback) {
+            Helpers.jsonRequest(
+                that.job.log,
+                extend({
+                    jar: that._jar,
+                    url: method,
+                    qs: {
+                        max_id: nextMax ? nextMax : ''
+                    }
+                }, that._requestOptions),
+                function(response) {
+                    posts = posts.concat(response.items);
+                    that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
+                    nextMax = response.next_max_id ? response.next_max_id.toString() : null;
+                    callback();
+                },
+                callback);
+        },
+        function() {
+            return posts.length < quantity && nextMax;
+        },
+        function(err) {
+            callback(err, posts);
+        });
+};
+
+
 module.exports = Washers.Instagram;

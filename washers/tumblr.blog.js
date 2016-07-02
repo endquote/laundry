@@ -18,7 +18,8 @@ Washers.Tumblr.Blog = function(config, job) {
                 name: 'blogHost',
                 message: 'Which Tumblr blog do you want to follow? Enter something like "beeple.tumblr.com".'
             },
-            Washer.downloadMediaOption
+            Washer.downloadMediaOption,
+            Washer.quantityOption(50)
         ]
     });
 };
@@ -27,7 +28,6 @@ Washers.Tumblr.Blog.prototype = Object.create(Washers.Tumblr.prototype);
 Washers.Tumblr.Blog.className = Helpers.buildClassName(__filename);
 
 Washers.Tumblr.Blog.prototype.doInput = function(callback) {
-    var quantity = 50;
     var posts = [];
     var lastResponse = null;
     var limit = 20;
@@ -39,7 +39,7 @@ Washers.Tumblr.Blog.prototype.doInput = function(callback) {
             extend({
                 uri: '/blog/' + that.blogHost + '/posts',
                 qs: {
-                    limit: Math.min(limit, quantity - posts.length),
+                    limit: Math.min(limit, that.quantity - posts.length),
                     offset: posts.length
                 }
             }, that._requestOptions),
@@ -51,7 +51,7 @@ Washers.Tumblr.Blog.prototype.doInput = function(callback) {
             },
             callback);
     }, function() {
-        return lastResponse.posts.length === limit && posts.length < quantity;
+        return lastResponse.posts.length === limit && posts.length < that.quantity;
     }, function(err) {
         if (err) {
             callback(err);

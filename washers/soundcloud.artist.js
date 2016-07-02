@@ -66,7 +66,6 @@ Washers.SoundCloud.Artist.prototype.doInput = function(callback) {
 
             // Get the tracks.
             function(userId, callback) {
-                var tracks = [];
                 Helpers.jsonRequest(
                     that.job.log,
                     extend({
@@ -76,7 +75,6 @@ Washers.SoundCloud.Artist.prototype.doInput = function(callback) {
                         }
                     }, that._requestOptions),
                     function(response) {
-                        tracks = tracks.concat(response);
                         callback(null, response);
                     },
                     callback);

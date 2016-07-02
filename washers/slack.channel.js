@@ -16,12 +16,14 @@ Washers.Slack.Channel = function(config, job) {
     this.input = _.merge({
         description: 'Loads items from a Slack channel.',
         prompts: [{
-            name: 'channel',
-            message: 'What is the name of the channel to follow?',
-            filter: function(value) {
-                return value.replace('#', '');
-            }
-        }]
+                name: 'channel',
+                message: 'What is the name of the channel to follow?',
+                filter: function(value) {
+                    return value.replace('#', '');
+                }
+            },
+            Washer.quantityOption(100)
+        ]
     }, this.input);
 
     this.output = _.merge({
@@ -89,7 +91,7 @@ Washers.Slack.Channel.prototype.doInput = function(callback) {
                     url: 'channels.history',
                     qs: {
                         channel: channelInfo.id,
-                        count: 100 // could go up to 1000
+                        count: that.quantity // could go up to 1000
                     }
                 }, that._requestOptions),
                 function(response) {

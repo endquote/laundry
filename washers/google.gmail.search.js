@@ -15,9 +15,11 @@ Washers.Google.Gmail.Search = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads mails from a Gmail search query.',
         prompts: [{
-            name: 'query',
-            message: 'What is the Gmail search query?'
-        }]
+                name: 'query',
+                message: 'What is the Gmail search query?'
+            },
+            Washer.quantityOption(10)
+        ]
     });
 };
 
@@ -39,13 +41,14 @@ Washers.Google.Gmail.Search.prototype.doInput = function(callback) {
             that.job.log.debug('Getting messages for query ' + that.query);
             var messages = [];
 
-            // Request messages matching the query -- seems to return 100 by default, fine for now.
+            // Request messages matching the query.
             Helpers.jsonRequest(
                 that.job.log,
                 extend({
                     url: '/users/me/messages',
                     qs: {
-                        q: that.query
+                        q: that.query,
+                        maxResults: that.quantity
                     }
                 }, that._requestOptions),
                 function(result) {

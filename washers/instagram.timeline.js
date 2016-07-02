@@ -14,7 +14,17 @@ Washers.Instagram.Timeline = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads recent images from your Instagram timeline.',
-        prompts: [Washer.downloadMediaOption]
+        prompts: [
+            Washer.downloadMediaOption, {
+                type: 'input',
+                name: 'quantityPerUser',
+                message: 'How many items do you want to retrieve per user?',
+                default: 18,
+                validate: function(value, answers) {
+                    return value && validator.isInt(value.toString());
+                }
+            }
+        ]
     });
 };
 
@@ -64,7 +74,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
 
             // Get the last page of photos from each user. More than 18 requires a second page.
             async.eachLimit(following, 5, function(user, callback) {
-                that.requestMedia('feed/user/' + user.pk + '/', 18,
+                that.requestMedia('feed/user/' + user.pk + '/', that.quantityPerUser,
                     function(err, items) {
                         posts = posts.concat(items);
                         callback(err);
@@ -85,37 +95,6 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
             });
         });
     });
-};
-
-// Helper method for API endpoints which return a list of posts.
-Washers.Instagram.Timeline.prototype.requestMedia = function(method, quantity, callback) {
-    var that = this;
-    var posts = [];
-    var nextMax = null;
-    async.doWhilst(function(callback) {
-            Helpers.jsonRequest(
-                that.job.log,
-                extend({
-                    jar: that._jar,
-                    url: method,
-                    qs: {
-                        max_id: nextMax ? nextMax : ''
-                    }
-                }, that._requestOptions),
-                function(response) {
-                    posts = posts.concat(response.items);
-                    that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
-                    nextMax = response.next_max_id ? response.next_max_id.toString() : null;
-                    callback();
-                },
-                callback);
-        },
-        function() {
-            return posts.length < quantity && nextMax;
-        },
-        function(err) {
-            callback(err, posts);
-        });
 };
 
 module.exports = Washers.Instagram.Timeline;

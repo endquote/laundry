@@ -14,7 +14,10 @@ Washers.Tumblr.Likes = function(config, job) {
 
     this.input = _.merge(this.input, {
         description: 'Loads posts you\'ve liked on Tumblr.',
-        prompts: [Washer.downloadMediaOption]
+        prompts: [
+            Washer.downloadMediaOption,
+            Washer.quantityOption(50)
+        ]
     });
 };
 
@@ -22,7 +25,6 @@ Washers.Tumblr.Likes.prototype = Object.create(Washers.Tumblr.prototype);
 Washers.Tumblr.Likes.className = Helpers.buildClassName(__filename);
 
 Washers.Tumblr.Likes.prototype.doInput = function(callback) {
-    var quantity = 100;
     var posts = [];
     var lastResponse = null;
     var limit = 20;
@@ -34,20 +36,20 @@ Washers.Tumblr.Likes.prototype.doInput = function(callback) {
             extend({
                 uri: '/user/likes',
                 qs: {
-                    limit: Math.min(limit, quantity - posts.length),
+                    limit: Math.min(limit, that.quantity - posts.length),
                     offset: posts.length
                 }
             }, that._requestOptions),
             function(response) {
                 response = response.response;
                 posts = posts.concat(response.liked_posts);
-                that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
+                that.job.log.debug(util.format('Got %d/%d posts', posts.length, that.quantity));
                 lastResponse = response;
                 callback();
             },
             callback);
     }, function() {
-        return lastResponse.liked_posts.length === limit && posts.length < quantity;
+        return lastResponse.liked_posts.length === limit && posts.length < that.quantity;
     }, function(err) {
         if (err) {
             callback(err);
