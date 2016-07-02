@@ -19,7 +19,7 @@ Washers.Vogue = function(config, job) {
 
     this.input = _.merge({
         description: 'Loads the latest fashion shows.',
-        prompts: [Washer.downloadMediaOption]
+        prompts: [Washer.downloadMediaOption()]
     }, this.input);
 };
 

@@ -18,7 +18,7 @@ Washers.Tumblr.Blog = function(config, job) {
                 name: 'blogHost',
                 message: 'Which Tumblr blog do you want to follow? Enter something like "beeple.tumblr.com".'
             },
-            Washer.downloadMediaOption,
+            Washer.downloadMediaOption(),
             Washer.quantityOption(50)
         ]
     });

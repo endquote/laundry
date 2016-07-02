@@ -15,7 +15,7 @@ Washers.Instagram.Likes = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads media you\'ve liked on Instagram.',
         prompts: [
-            Washer.downloadMediaOption,
+            Washer.downloadMediaOption(),
             Washer.quantityOption(50)
         ]
     });

@@ -15,7 +15,7 @@ Washers.Instagram.Timeline = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent images from your Instagram timeline.',
         prompts: [
-            Washer.downloadMediaOption, {
+            Washer.downloadMediaOption(), {
                 type: 'input',
                 name: 'quantityPerUser',
                 message: 'How many items do you want to retrieve per user?',

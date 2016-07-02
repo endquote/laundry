@@ -15,7 +15,7 @@ Washers.Tumblr.Dashboard = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent posts from your Tumblr Dashboard.',
         prompts: [
-            Washer.downloadMediaOption,
+            Washer.downloadMediaOption(),
             Washer.quantityOption(100)
         ]
     });

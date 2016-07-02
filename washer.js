@@ -61,11 +61,13 @@ var Washer = function(config, job) {
 
 Washer.className = Helpers.buildClassName(__filename);
 
-Washer.downloadMediaOption = {
-    type: 'confirm',
-    name: 'downloadMedia',
-    message: 'Download media?',
-    default: false
+Washer.downloadMediaOption = function(download) {
+    return {
+        type: 'confirm',
+        name: 'downloadMedia',
+        message: 'Download media?',
+        default: download
+    };
 };
 
 Washer.quantityOption = function(count, message) {

@@ -30,7 +30,7 @@ Washers.SoundCloud.Artist = function(config, job) {
                     return !value || validator.isDecimal(value.toString());
                 }
             },
-            Washer.downloadMediaOption
+            Washer.downloadMediaOption()
         ]
     });
 };
