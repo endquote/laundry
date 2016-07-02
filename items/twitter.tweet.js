@@ -38,7 +38,7 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
             var targetDate = new Date(obj.created_at);
             async.each(obj.extended_entities.media, function(entity, callback) {
 
-                // Add ".x" to the filename if there are multiple media items.
+                // Add ".n" to the filename if there are multiple media items.
                 var mediaIndex = obj.extended_entities.media.length > 1 ? '.' + obj.extended_entities.media.indexOf(entity) : '';
 
                 // Figure out the biggest size (probably always 'large')
@@ -106,7 +106,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
     // Start with media, then tweet text.
     downloads.media.forEach(function(media) {
-        if (media.video) {
+        if (media.video && media.video.bytes) {
             item.description += Item.buildVideo(media.video.newUrl, media.newUrl);
         } else {
             item.description += util.format('<p><img src="%s"/></p>', media.newUrl);
