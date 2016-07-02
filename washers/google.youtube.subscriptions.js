@@ -131,19 +131,18 @@ Washers.Google.YouTube.Subscriptions.prototype.doInput = function(callback) {
 
         // Parse the subscriptions list into a list of videos in order.
         function(subscriptions, callback) {
-            var maxVideos = 50;
             var videos = [];
             subscriptions.forEach(function(subscription, index, array) {
                 videos = videos.concat(subscription.videos);
             });
 
-            that.job.log.debug('Reducing ' + videos.length + ' videos to ' + maxVideos);
+            that.job.log.debug('Reducing ' + videos.length + ' videos to ' + that.quantity);
 
             videos.sort(function(a, b) {
                 return new Date(b.snippet.publishedAt).getTime() - new Date(a.snippet.publishedAt).getTime();
             });
 
-            videos = videos.slice(0, 50);
+            videos = videos.slice(0, that.quantity);
             callback(null, videos);
         },
 
