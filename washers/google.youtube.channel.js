@@ -18,8 +18,8 @@ Washers.Google.YouTube.Channel = function(config, job) {
                 name: 'channelName',
                 message: 'What is the name or ID of the channel to watch?'
             },
-            Washer.downloadMediaOption(),
-            Washer.quantityOption(10)
+            Washer.downloadMediaOption(this.downloadMedia),
+            Washer.quantityOption(this.quantity || 10)
         ]
     });
 };

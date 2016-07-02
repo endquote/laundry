@@ -20,8 +20,8 @@ Washers.Instagram.Hashtag = function(config, job) {
                     return value.replace('#', '');
                 }
             },
-            Washer.downloadMediaOption(),
-            Washer.quantityOption(50)
+            Washer.downloadMediaOption(this.downloadMedia),
+            Washer.quantityOption(this.quantity || 50)
         ]
     });
 };

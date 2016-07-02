@@ -15,8 +15,8 @@ Washers.Google.YouTube.Subscriptions = function(config, job) {
     this.input = _.merge(this.input, {
         description: 'Loads recent videos from your YouTube subscriptions.',
         prompts: [
-            Washer.downloadMediaOption(),
-            Washer.quantityOption(50)
+            Washer.downloadMediaOption(this.downloadMedia),
+            Washer.quantityOption(this.quantity || 50)
         ]
     });
 };

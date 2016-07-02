@@ -25,8 +25,8 @@ Washers.Twitter.Timeline = function(config, job) {
                 default: false,
                 message: 'Do you want to exclude retweets and quotes?'
             },
-            Washer.downloadMediaOption(),
-            Washer.quantityOption(500)
+            Washer.downloadMediaOption(this.downloadMedia),
+            Washer.quantityOption(this.quantity || 500)
         ]
     });
 };

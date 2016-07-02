@@ -22,7 +22,7 @@ Washers.Slack.Channel = function(config, job) {
                     return value.replace('#', '');
                 }
             },
-            Washer.quantityOption(100)
+            Washer.quantityOption(this.quantity || 100)
         ]
     }, this.input);
 

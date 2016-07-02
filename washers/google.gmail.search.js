@@ -18,7 +18,7 @@ Washers.Google.Gmail.Search = function(config, job) {
                 name: 'query',
                 message: 'What is the Gmail search query?'
             },
-            Washer.quantityOption(10)
+            Washer.quantityOption(this.quantity || 10)
         ]
     });
 };
