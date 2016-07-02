@@ -16,6 +16,9 @@ Washers.RSS = function(config, job) {
     this.name = 'RSS';
     this.className = Helpers.buildClassName(__filename);
 
+    // Flag to set this as the default washer choice.
+    this._isDefaultWasher = true;
+
     this.input = _.merge({
         description: 'Loads data from an RSS feed.',
         prompts: [{

@@ -149,7 +149,7 @@ Laundry._washerPrompt = function(job, mode) {
     var choices = validWashers.map(function(washer) {
         return {
             value: washer,
-            name: washer.name + ' - ' + washer[mode].description
+            name: washer.name + ' - ' + washer[mode].description,
         };
     });
 
@@ -158,13 +158,19 @@ Laundry._washerPrompt = function(job, mode) {
         name: 'washer',
         message: ' ',
         pageSize: 10,
-        choices: choices,
+        choices: choices
     };
 
     // Default to the current washer.
     prompt.default = choices.indexOf(choices.filter(function(choice) {
         return choice.value === job[mode];
     })[0]);
+
+    if (prompt.default === undefined) {
+        prompt.default = choices.indexOf(choices.filter(function(c) {
+            return c.value._isDefaultWasher;
+        })[0]);
+    }
 
     return prompt;
 };
