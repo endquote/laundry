@@ -48,7 +48,6 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
 // Construct an Item given an API response and any upload info.
 Items.Instagram.Media.factory = function(post, downloads) {
     var item = new Items.Instagram.Media({
-        //tags: post.tags,
         type: post.video_versions ? 'video' : 'still',
         date: moment.unix(post.taken_at),
         url: util.format('https://www.instagram.com/p/%s/', post.code),
@@ -70,6 +69,15 @@ Items.Instagram.Media.factory = function(post, downloads) {
         mediaBytes: downloads.video.bytes,
         downloads: downloads
     });
+
+    item.tags = [];
+    if (item.caption) {
+        var re = /#([\w]+)/g;
+        var match;
+        while (match = re.exec(post.caption.text)) { // jshint ignore:line
+            item.tags.push(match[0].substr(1));
+        }
+    }
 
     item.title = item.author;
     if (item.caption) {
