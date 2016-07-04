@@ -16,7 +16,10 @@ Washers.Tumblr.Blog = function(config, job) {
         description: 'Loads recent posts from a Tumblr blog.',
         prompts: [{
                 name: 'blogHost',
-                message: 'Which Tumblr blog do you want to follow? Enter something like "beeple.tumblr.com".'
+                message: 'Which Tumblr blog do you want to follow?',
+                setup: function(job) {
+                    this.default = job.input.blogHost || 'endquote.tumblr.com';
+                }
             },
             Washer.downloadMediaOption(this.downloadMedia),
             Washer.quantityOption(this.quantity || 50)
