@@ -7,6 +7,7 @@ Items.Tumblr.Post = function(config) {
     this.sourceUrl = '';
     this.sourceTitle = '';
     this.liked = false;
+    this.caption = '';
 
     Item.call(this, config);
     this.className = Helpers.buildClassName(__filename);
@@ -71,7 +72,8 @@ Items.Tumblr.Post.factory = function(post, downloads) {
         url: post.post_url,
         date: moment(new Date(post.date)),
         author: post.blog_name,
-        tags: post.tags
+        tags: post.tags,
+        caption: S(post.caption).stripTags().s
     });
 
     item.postType = post.type;
