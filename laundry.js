@@ -166,7 +166,7 @@ Laundry._washerPrompt = function(job, mode) {
         return choice.value === job[mode];
     })[0]);
 
-    if (prompt.default === undefined) {
+    if (prompt.default === -1) {
         prompt.default = choices.indexOf(choices.filter(function(c) {
             return c.value._isDefaultWasher;
         })[0]);
