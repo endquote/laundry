@@ -1,0 +1,102 @@
+'use strict';
+
+var OAuth = require('oauth'); // https://www.npmjs.com/package/oauth
+
+/*
+Base class for Pinterest washers containing common methods.
+input: none
+output: none
+*/
+ns('Washers', global);
+Washers.Pinterest = function(config, job) {
+
+    this.consumerKey = null;
+    this.consumerSecret = null;
+    this.authVerifier = null;
+    this.token = null;
+
+    Washer.call(this, config, job);
+
+    this.name = '';
+    this.className = Helpers.buildClassName(__filename);
+    this._callbackUri = 'https://endquote.github.io/laundry/callbacks/pinterest.html';
+
+    this._requestOptions = {
+        baseUrl: 'https://api.pinterest.com/v1/',
+        oauth: {
+            consumer_key: this.consumerKey,
+            consumer_secret: this.consumerSecret,
+            token: this.token ? this.token.accessToken : null,
+            token_secret: this.token ? this.token.accessTokenSecret : null
+        }
+    };
+
+    this.input = _.merge({
+        prompts: [{
+            name: 'consumerKey',
+            message: 'App ID',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
+                }
+                console.log(wrap(util.format('Go to https://developers.pinterest.com/apps/ and create an app. For the callback URL enter %s. Fill in whatever for the other fields.\nWhat is the "App ID"?', job.input._callbackUri)));
+                return true;
+            }
+        }, {
+            name: 'consumerSecret',
+            message: 'App secret',
+            when: function(answers) {
+                return job && job.input.token ? false : true;
+            }
+        }, {
+            name: 'authVerifier',
+            message: 'Auth code',
+            when: function(answers) {
+                if (job && job.input.token) {
+                    return false;
+                }
+
+                // Get the auth code.
+                var done = this.async();
+                var url = util.format('https://api.pinterest.com/oauth/?response_type=code&redirect_uri=%s&client_id=%s&scope=read_public,write_public', job.input._callbackUri, answers.consumerKey);
+                Helpers.shortenUrl(url, function(url) {
+                    var prompt = 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s';
+                    console.log(util.format(prompt, url));
+                    done(null, true);
+                });
+            },
+            validate: function(value, answers) {
+                if (validator.isWhitespace(value)) {
+                    return false;
+                }
+
+                // Get the auth token.
+                var done = this.async();
+                Helpers.jsonRequest(
+                    null, {
+                        url: 'https://api.pinterest.com/v1/oauth/token',
+                        method: 'POST',
+                        form: {
+                            code: value,
+                            client_id: answers.consumerKey,
+                            client_secret: answers.consumerSecret,
+                            redirect_uri: job.input._callbackUri,
+                            grant_type: 'authorization_code'
+                        }
+                    },
+                    function(response) {
+                        answers.token = response;
+                        done(null, true);
+                    },
+                    function(err) {
+                        done(null, false);
+                    });
+            }
+        }]
+    }, this.input);
+};
+
+Washers.Pinterest.prototype = Object.create(Washer.prototype);
+Washers.Pinterest.className = Helpers.buildClassName(__filename);
+
+module.exports = Washers.Pinterest;
