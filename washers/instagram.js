@@ -165,6 +165,7 @@ Washers.Instagram.prototype.requestMedia = function(method, quantity, callback) 
             return posts.length < quantity && nextMax;
         },
         function(err) {
+            posts = posts.slice(0, quantity);
             callback(err, posts);
         });
 };
