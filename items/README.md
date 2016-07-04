@@ -6,17 +6,16 @@ Items have basic properties that describe them which are declared in their const
 
 ```javascript
 Items.Sample = function(config) {
-	this.title = '';
-	this.description = '';
-
-	// Use moment() for date fields
-	this.date = moment();
-	this.tags = [];
-	this.mediaBytes = 0;
-	this.comments = {
-	    count: 0,
-	    data: []
-	};
+    this.title = ''; // text-only short string
+    this.caption = ''; // text-only longer string
+    this.description = ''; // formatted longer string
+    this.url = '';
+    this.date = moment();
+    this.author = '';
+    this.tags = [];
+    this.mediaUrl = ''; // media to include in enclosure
+    this.mediaBytes = 0; // size of enclosure
+    this.imageUrl = ''; // a single image representing the post
 
 	// A primary key prevents multiple instances of the same
 	// item from being entered into a database.

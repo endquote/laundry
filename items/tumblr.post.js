@@ -168,6 +168,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
             item.description += Item.buildVideo(downloads.video.newUrl, downloads.video.thumbnail ? downloads.video.thumbnail.newUrl : null, 1920, 1080);
             item.mediaUrl = downloads.video.newUrl;
             item.mediaBytes = downloads.video.bytes;
+            item.imageUrl = downloads.video.thumbnail.newUrl;
         } else {
             var biggest = post.player.sort(function(a, b) {
                 return a.width - b.width;
@@ -199,6 +200,8 @@ Items.Tumblr.Post.factory = function(post, downloads) {
             item.description += util.format('<p><img src="%s" width="%d" height="%d" /></p>', photo.url, photo.original_size.width, photo.original_size.height);
             item.description += photo.caption;
         });
+
+        item.imageUrl = post.photos[0].url;
 
         if (post.caption) {
             item.title += util.format(': %s', Helpers.shortenString(S(post.caption).stripTags(), titleLength));

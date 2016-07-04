@@ -60,6 +60,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
             data: post.comments
         },
         image: downloads.image.newUrl,
+        imageUrl: downloads.image.newUrl,
         video: downloads.video.newUrl,
         caption: post.caption ? post.caption.text : null,
         author: post.user.username,

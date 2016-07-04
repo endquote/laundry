@@ -2,14 +2,16 @@
 
 // Basic class representing an item from anywhere.
 var Item = function(config) {
-    this.title = '';
-    this.description = '';
+    this.title = ''; // text-only short string
+    this.caption = ''; // text-only longer string
+    this.description = ''; // formatted longer string
     this.url = '';
     this.date = moment();
     this.author = '';
     this.tags = [];
-    this.mediaUrl = '';
-    this.mediaBytes = 0;
+    this.mediaUrl = ''; // media to include in enclosure
+    this.mediaBytes = 0; // size of enclosure
+    this.imageUrl = ''; // a single image representing the post
 
     // The primary key is used in the MySQL (and maybe similar) washers to prevent the insertion of duplicate entries into a table.
     this._primaryKey = 'url';
