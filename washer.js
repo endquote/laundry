@@ -70,6 +70,15 @@ Washer.downloadMediaOption = function(download) {
     };
 };
 
+Washer.onlyNewOption = function(onlyNew) {
+    return {
+        type: 'confirm',
+        name: 'onlyNew',
+        message: 'Post only items created since the last run?',
+        default: onlyNew
+    };
+};
+
 Washer.quantityOption = function(count, message) {
     return {
         type: 'input',

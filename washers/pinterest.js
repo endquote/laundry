@@ -28,34 +28,44 @@ Washers.Pinterest = function(config, job) {
         }
     };
 
-    this.input = _.merge({
+    this.input = _.merge(Washers.Pinterest.authPrompts(job, 'input'), this.input);
+
+    this.output = _.merge(Washers.Pinterest.authPrompts(job, 'output'), this.output);
+};
+
+Washers.Pinterest.prototype = Object.create(Washer.prototype);
+Washers.Pinterest.className = Helpers.buildClassName(__filename);
+
+// Build up the authorization prompts for either mode.
+Washers.Pinterest.authPrompts = function(job, mode) {
+    return {
         prompts: [{
             name: 'consumerKey',
             message: 'App ID',
             when: function(answers) {
-                if (job && job.input.token) {
+                if (job && job[mode].token) {
                     return false;
                 }
-                console.log(wrap(util.format('Go to https://developers.pinterest.com/apps/ and create an app. For the callback URL enter %s. Fill in whatever for the other fields.\nWhat is the "App ID"?', job.input._callbackUri)));
+                console.log(wrap(util.format('Go to https://developers.pinterest.com/apps/ and create an app. For the callback URL enter %s. Fill in whatever for the other fields.\nWhat is the "App ID"?', job[mode]._callbackUri)));
                 return true;
             }
         }, {
             name: 'consumerSecret',
             message: 'App secret',
             when: function(answers) {
-                return job && job.input.token ? false : true;
+                return job && job[mode].token ? false : true;
             }
         }, {
             name: 'authVerifier',
             message: 'Auth code',
             when: function(answers) {
-                if (job && job.input.token) {
+                if (job && job[mode].token) {
                     return false;
                 }
 
                 // Get the auth code.
                 var done = this.async();
-                var url = util.format('https://api.pinterest.com/oauth/?response_type=code&redirect_uri=%s&client_id=%s&scope=read_public,write_public', job.input._callbackUri, answers.consumerKey);
+                var url = util.format('https://api.pinterest.com/oauth/?response_type=code&redirect_uri=%s&client_id=%s&scope=read_public,write_public', job[mode]._callbackUri, answers.consumerKey);
                 Helpers.shortenUrl(url, function(url) {
                     var prompt = 'Copy the following URL into your browser, approve access, and paste the code that comes back.\n%s';
                     console.log(util.format(prompt, url));
@@ -77,7 +87,7 @@ Washers.Pinterest = function(config, job) {
                             code: value,
                             client_id: answers.consumerKey,
                             client_secret: answers.consumerSecret,
-                            redirect_uri: job.input._callbackUri,
+                            redirect_uri: job[mode]._callbackUri,
                             grant_type: 'authorization_code'
                         }
                     },
@@ -90,11 +100,8 @@ Washers.Pinterest = function(config, job) {
                     });
             }
         }]
-    }, this.input);
+    };
 };
-
-Washers.Pinterest.prototype = Object.create(Washer.prototype);
-Washers.Pinterest.className = Helpers.buildClassName(__filename);
 
 // Clean usernames and boardnames for use in API endpoint URLs.
 Washers.Pinterest.encodeName = function(boardName) {

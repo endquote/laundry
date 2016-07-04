@@ -15,10 +15,11 @@ Input | Output
 ----- | ------
 gMail search | JSON files
 Instagram hashtag | MySQL database
-Instagram timeline | RSS (with enclosures)
-Instagram likes | Slack channel
-Instagram user | Web socket ([example](https://github.com/endquote/laundry/tree/master/samples/socket))
-RSS | 
+Instagram timeline | Pinterest boards
+Instagram likes | RSS (with enclosures)
+Instagram user | Slack channel
+Pinterest boards | Web socket ([example](https://github.com/endquote/laundry/tree/master/samples/socket))
+RSS |
 Slack channel | 
 Soundcloud artist | 
 Soundcloud timeline | 

@@ -25,6 +25,22 @@ Washers.Pinterest.Board = function(config, job) {
             Washer.quantityOption(this.quantity || 50)
         ]
     });
+
+    this.output = _.merge(this.output, {
+        description: 'Adds items to a Pinterest board.',
+        prompts: [{
+                name: 'username',
+                message: 'What user owns the board?'
+            }, {
+                name: 'boardName',
+                message: 'What is the board\'s name?',
+                setup: function(job) {
+                    this.default = job.output.boardName || job.name;
+                }
+            },
+            Washer.onlyNewOption(this.onlyNew === undefined ? true : this.onlyNew)
+        ]
+    });
 };
 
 Washers.Pinterest.Board.prototype = Object.create(Washers.Pinterest.prototype);
@@ -36,7 +52,6 @@ Washers.Pinterest.Board.prototype.doInput = function(callback) {
     var limit = 100;
     var that = this;
     async.doWhilst(function(callback) {
-
         Helpers.jsonRequest(
             that.job.log,
             extend({
@@ -68,6 +83,37 @@ Washers.Pinterest.Board.prototype.doInput = function(callback) {
 
         Item.download(Items.Pinterest.Pin, that, posts, callback);
     });
+};
+
+Washers.Pinterest.Board.prototype.doOutput = function(items, callback) {
+    var that = this;
+    async.eachLimit(items, 5, function(item, callback) {
+        if (that.onlyNew && item.date.isBefore(that.job.lastRun)) {
+            // This item was already posted.
+            process.nextTick(function() {
+                callback();
+            });
+        } else {
+            // Post the new item.
+            Helpers.jsonRequest(
+                that.job.log, {
+                    baseUrl: 'https://api.pinterest.com/v1/',
+                    url: 'pins/',
+                    method: 'POST',
+                    form: {
+                        board: util.format('%s/%s', Washers.Pinterest.encodeName(that.username), Washers.Pinterest.encodeName(that.boardName)),
+                        link: item.url,
+                        note: item.caption || '',
+                        image_url: item.imageUrl || 'https://endquote.github.io/laundry/pixel.png',
+                        access_token: that.token.access_token
+                    }
+                },
+                function(response) {
+                    callback();
+                },
+                callback);
+        }
+    }, callback);
 };
 
 module.exports = Washers.Pinterest.Board;
