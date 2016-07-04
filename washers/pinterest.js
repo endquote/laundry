@@ -23,11 +23,8 @@ Washers.Pinterest = function(config, job) {
 
     this._requestOptions = {
         baseUrl: 'https://api.pinterest.com/v1/',
-        oauth: {
-            consumer_key: this.consumerKey,
-            consumer_secret: this.consumerSecret,
-            token: this.token ? this.token.accessToken : null,
-            token_secret: this.token ? this.token.accessTokenSecret : null
+        qs: {
+            access_token: this.token ? this.token.access_token : ''
         }
     };
 
@@ -98,5 +95,16 @@ Washers.Pinterest = function(config, job) {
 
 Washers.Pinterest.prototype = Object.create(Washer.prototype);
 Washers.Pinterest.className = Helpers.buildClassName(__filename);
+
+// Clean usernames and boardnames for use in API endpoint URLs.
+Washers.Pinterest.encodeName = function(boardName) {
+    boardName = boardName
+        .replace(/[^\sA-zÀ-ÿ0-9]+/g, '') // remove punctuation and emoji
+    .replace(/\s+/g, '-'); // replace spaces with a dash
+    return encodeURIComponent(boardName);
+};
+
+// The fields to return for pins.
+Washers.Pinterest.pinFields = 'id,link,url,creator,board,created_at,note,color,counts,media,attribution,image,metadata';
 
 module.exports = Washers.Pinterest;
