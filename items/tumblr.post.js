@@ -73,7 +73,7 @@ Items.Tumblr.Post.factory = function(post, downloads) {
         date: moment(new Date(post.date)),
         author: post.blog_name,
         tags: post.tags,
-        caption: S(post.caption).stripTags().s
+        caption: post.caption ? S(post.caption).stripTags().s : ''
     });
 
     item.postType = post.type;
