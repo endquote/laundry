@@ -28,7 +28,7 @@ Washers.JSON.prototype.doOutput = function(items, callback) {
 
     var that = this;
     async.eachSeries(items, function(item, callback) {
-        var target = Item.buildPrefix(that.job.name, that.className) + '/' + item.date.unix() + '.json';
+        var target = Item.buildPrefix(that.job.name, that.className) + '/' + (item.id || item.date.unix()) + '.json';
         var json = JSONbig.stringify(item, null, 2);
         Storage.writeFile(target, json, function(err, destination) {
             if (destination) {
