@@ -49,8 +49,8 @@ Washers.Vogue.prototype.doInput = function(callback) {
                 }, function(err, response, body) {
                     var re = /<script id="initial-state" type="application\/json">(.*?)<\/script>/gim;
                     var blob = JSON.parse(decodeURIComponent(re.exec(body)[1])).context.dispatcher.stores.FashionShowReviewStore;
-                    item.review = blob.data.reviewCopy;
-                    item.slides = blob.data.slideShows.collection.slides.map(function(slide) {
+                    item.review = blob.reviewCopy;
+                    item.slides = blob.slideShows.collection.slides.map(function(slide) {
                         return slide.slidepath;
                     });
                     callback();
