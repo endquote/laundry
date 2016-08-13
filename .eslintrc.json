@@ -1,0 +1,36 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "no-underscore-dangle": "off"
+  },
+  "globals": {
+    "Laundry": true,
+    "Washers": true,
+    "Items": true,
+    "Washer": true,
+    "Item": true,
+    "Job": true,
+    "Helpers": true,
+    "Storage": true,
+    "allWashers": true,
+    "allItems": true,
+    "laundryConfig": true,
+    "commander": true,
+
+    "_": true,
+    "ns": true,
+    "fs": true,
+    "path": true,
+    "log": true,
+    "async": true,
+    "moment": true,
+    "util": true,
+    "validator": true,
+    "S": true,
+    "qs": true,
+    "extend": true,
+    "request": true,
+    "wrap": true,
+    "JSONbig": true
+  }
+}

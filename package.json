@@ -2,7 +2,7 @@
   "name": "laundry",
   "version": "1.5.5",
   "description": "Data laundering tools",
-  "main": "index.js",
+  "main": "command.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/endquote/laundry.git"
@@ -15,10 +15,10 @@
   },
   "homepage": "http://github.com/endquote/laundry",
   "bin": {
-    "laundry": "index.js"
+    "laundry": "command.js"
   },
   "scripts": {
-    "start": "node index.js tick"
+    "start": "node command.js tick"
   },
   "dependencies": {
     "async": "^1.5.0",
@@ -51,5 +51,10 @@
     "winston": "^2.1.1",
     "word-wrap": "^1.1.0",
     "youtube-dl": "^1.11.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.3.0",
+    "eslint-config-airbnb-base": "^5.0.2",
+    "eslint-plugin-import": "^1.13.0"
   }
 }
