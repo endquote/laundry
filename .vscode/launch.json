@@ -1,21 +1,33 @@
 {
   "version": "0.2.0",
   "configurations": [{
-    "name": "Launch",
+    "name": "no arguments",
     "type": "node",
     "request": "launch",
-    "program": "${workspaceRoot}/command.js",
+    "program": "${workspaceRoot}/index.js",
     "stopOnEntry": false,
     "args": [],
     "cwd": "${workspaceRoot}",
-    "preLaunchTask": null,
-    "runtimeExecutable": null,
     "runtimeArgs": [
       "--nolazy"
     ],
+    "externalConsole": false,
+    "sourceMaps": false,
+    "outDir": null
+  }, {
+    "name": "list - local",
+    "type": "node",
+    "request": "launch",
+    "program": "${workspaceRoot}/index.js",
+    "stopOnEntry": false,
+    "args": ["list", "--baseUrl=http://localhost/laundry", "--mediaAge=7", "--proxy="],
     "env": {
-      "NODE_ENV": "development"
+      "LAUNDRY_LOCAL": "${workspaceRoot}/output"
     },
+    "cwd": "${workspaceRoot}",
+    "runtimeArgs": [
+      "--nolazy"
+    ],
     "externalConsole": false,
     "sourceMaps": false,
     "outDir": null
