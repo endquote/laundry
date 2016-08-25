@@ -20,7 +20,6 @@ global.wrap = require('word-wrap'); // https://www.npmjs.com/package/word-wrap
 global.JSONbig = require('json-bigint'); // https://www.npmjs.com/package/json-bigint
 
 var processStart = Date.now();
-
 var daemon = false;
 var daemonInterval = 60;
 var daemonTimeout = null;
