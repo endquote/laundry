@@ -11,7 +11,7 @@
     "runtimeArgs": [
       "--nolazy"
     ],
-    "externalConsole": false,
+    "externalConsole": true,
     "sourceMaps": false,
     "outDir": null
   }, {
@@ -28,7 +28,7 @@
     "runtimeArgs": [
       "--nolazy"
     ],
-    "externalConsole": false,
+    "externalConsole": true,
     "sourceMaps": false,
     "outDir": null
   }]

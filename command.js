@@ -1,5 +1,9 @@
 /* eslint-disable no-console */
 
+const commander = require('commander');
+const fs = require('fs-extra');
+const path = require('path');
+
 const Laundry = require('./laundry');
 
 /**
@@ -10,6 +14,7 @@ class Command {
   constructor() {
     this._daemonInterval = 60;
     this._daemonTimeout = null;
+    this._commandPromise = null;
 
     this._setVersion();
     this._setOptions();
@@ -121,6 +126,7 @@ class Command {
       baseUrl: commander.baseUrl,
       mediaAge: commander.mediaAge,
       proxy: commander.proxy,
+      logLevel: commander.verbose ? 'debug' : 'info',
     });
 
     if (commander.local) {
@@ -130,35 +136,31 @@ class Command {
     }
 
     // Actually run the command.
-    try {
-      switch (name) {
-        case 'create':
-          this._laundry.createJob();
-          break;
-        case 'edit':
-          this._laundry.editJob();
-          break;
-        case 'run':
-          this._laundry.runJob();
-          break;
-        case 'destroy':
-          this._laundry.destroyJob();
-          break;
-        case 'list':
-          this._laundry.getJobs();
-          break;
-        case 'tick':
-          this._laundry.tick();
-          break;
-        case 'daemon':
-          this._daemonInterval = args.shift() || this._daemonInterval;
-          this._laundry.tick(this._daemonTick);
-          break;
-        default:
-          commander.help();
-      }
-    } catch (e) {
-      console.log(e.toString());
+    switch (name) {
+      case 'create':
+        this._commandPromise = this._laundry.createJob();
+        break;
+      case 'edit':
+        this._commandPromise = this._laundry.editJob();
+        break;
+      case 'run':
+        this._commandPromise = this._laundry.runJob();
+        break;
+      case 'destroy':
+        this._commandPromise = this._laundry.destroyJob();
+        break;
+      case 'list':
+        this._commandPromise = this._laundry.getJobs();
+        break;
+      case 'tick':
+        this._commandPromise = this._laundry.tick();
+        break;
+      case 'daemon':
+        this._daemonInterval = args.shift() || this._daemonInterval;
+        this._commandPromise = this._laundry.tick(this._daemonTick);
+        break;
+      default:
+        commander.help();
     }
   }
 
@@ -167,11 +169,7 @@ class Command {
    */
   execute() {
     commander.parse(process.argv);
-
-    // If no command, show help.
-    if (commander.args.filter(arg => arg.commands).length === 0) {
-      commander.help();
-    }
+    return this._commandPromise || Promise.resolve();
   }
 
   /**

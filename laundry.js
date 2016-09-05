@@ -6,19 +6,27 @@ class Laundry {
   /**
    * Creates an instance of Laundry.
    * @param {object} param
-   * @param {string} param.baseUrl - The name of the command to run.
-   * @param {number} param.mediaAge - The name of the command to run.
-   * @param {string} param.proxy - The name of the command to run.
+   * @param {string} param.baseUrl - The base URL of any downloaded files.
+   * @param {number} param.mediaAge - How long to keep downloaded media.
+   * @param {string} param.proxy - The URL of the proxy server to use.
+   * @param {string} param.logLevel - How verbose to make the logs.
    */
   constructor({
     baseUrl = null,
     mediaAge = 30,
     proxy = null,
+    logLevel = 'info',
   } = {}) {
     this._baseUrl = baseUrl || null;
     this._mediaAge = mediaAge || 30;
     this._proxy = proxy || null;
     this._storage = null;
+
+    // Configure logging.
+    global.log = require('winston');
+    log.retainLogs = 30;
+    log.level = logLevel;
+    log.remove(log.transports.Console);
   }
 
   /**
@@ -45,30 +53,31 @@ class Laundry {
     if (!this._storage) {
       throw new Error('Storage has not been configured, call setStorageLocal or setStorageS3.');
     }
+    return this._storage.init();
   }
 
   createJob() {
-    this._ensureStorage();
+    return this._ensureStorage();
   }
 
   editJob() {
-    this._ensureStorage();
+    return this._ensureStorage();
   }
 
   runJob() {
-    this._ensureStorage();
+    return this._ensureStorage();
   }
 
   destroyJob() {
-    this._ensureStorage();
+    return this._ensureStorage();
   }
 
   getJobs() {
-    this._ensureStorage();
+    return this._ensureStorage();
   }
 
   tick() {
-    this._ensureStorage();
+    return this._ensureStorage();
   }
 }
 

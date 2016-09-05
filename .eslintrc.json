@@ -13,21 +13,6 @@
     "import/newline-after-import": "off"
   },
   "globals": {
-    "_": true,
-    "ns": true,
-    "fs": true,
-    "path": true,
-    "async": true,
-    "moment": true,
-    "util": true,
-    "validator": true,
-    "S": true,
-    "qs": true,
-    "extend": true,
-    "request": true,
-    "commander": true,
-    "wrap": true,
-    "JSONbig": true,
     "log": true
   }
 }

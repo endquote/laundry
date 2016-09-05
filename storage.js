@@ -1,6 +1,7 @@
 class Storage {
-  constructor() {
-    console.log('hi storage');
+  init() {
+    return this._initLog()
+      .then(() => this._initConfig());
   }
 }
 
