@@ -3,6 +3,7 @@
 const commander = require('commander');
 const fs = require('fs-extra');
 const path = require('path');
+const chalk = require('chalk');
 
 const Laundry = require('./laundry');
 
@@ -14,8 +15,6 @@ class Command {
   constructor() {
     this._daemonInterval = 60;
     this._daemonTimeout = null;
-    this._commandPromise = null;
-
     this._setVersion();
     this._setOptions();
     this._setCommands();
@@ -78,39 +77,58 @@ class Command {
   _setCommands() {
     commander.command('create [job]')
       .description('configure a new job')
-      .action(job => this._runCommand('create', job));
+      .action(job => {
+        this._configure();
+        this._doCreate(job);
+      });
 
     commander.command('edit [job]')
       .description('edit an existing job')
-      .action(job => this._runCommand('edit', job));
+      .action(job => {
+        this._configure();
+        this.doEdit(job);
+      });
 
     commander.command('run [job]')
       .description('run an existing job (or "all" to run all jobs)')
-      .action(job => this._runCommand('run', job));
+      .action(job => {
+        this._configure();
+        this._doRun(job);
+      });
 
     commander.command('destroy [job]')
       .description('destroy an existing job')
-      .action(job => this._runCommand('destroy', job));
+      .action(job => {
+        this._configure();
+        this._doDestroy(job);
+      });
 
     commander.command('list')
       .description('list configured jobs')
-      .action(() => this._runCommand('list'));
+      .action(() => {
+        this._configure();
+        this._doList();
+      });
 
     commander.command('tick')
       .description('run on an interval or cron to trigger scheduled jobs')
-      .action(() => this._runCommand('tick'));
+      .action(() => {
+        this._configure();
+        this._doTick();
+      });
 
     commander.command('daemon [seconds]')
       .description('run contiuously, calling tick on an interval')
-      .action(seconds => this._runCommand('daemon', seconds));
+      .action(seconds => {
+        this._configure();
+        this._doDaemon(seconds);
+      });
   }
 
   /**
-   * Figure out what to do with the command and the arguments provided and actually run the command.
-   * @param {string} name - The name of the command to run.
-   * @param {any} args - Any additional arguments for that command.
+   * Set up storage and options based on the arguments provided.
    */
-  _runCommand(name, ...args) {
+  _configure() {
     if (commander.local && (commander.s3key || commander.s3secret || commander.s3bucket)) {
       console.error('Ambiguous: Provide only local or S3 arguments.');
       return;
@@ -134,34 +152,6 @@ class Command {
     } else if (commander.s3key && commander.s3secret && commander.s3bucket) {
       this._laundry.setStorageS3(commander.s3key, commander.s3secret, commander.s3bucket);
     }
-
-    // Actually run the command.
-    switch (name) {
-      case 'create':
-        this._commandPromise = this._laundry.createJob();
-        break;
-      case 'edit':
-        this._commandPromise = this._laundry.editJob();
-        break;
-      case 'run':
-        this._commandPromise = this._laundry.runJob();
-        break;
-      case 'destroy':
-        this._commandPromise = this._laundry.destroyJob();
-        break;
-      case 'list':
-        this._commandPromise = this._laundry.getJobs();
-        break;
-      case 'tick':
-        this._commandPromise = this._laundry.tick();
-        break;
-      case 'daemon':
-        this._daemonInterval = args.shift() || this._daemonInterval;
-        this._commandPromise = this._laundry.tick(this._daemonTick);
-        break;
-      default:
-        commander.help();
-    }
   }
 
   /**
@@ -169,14 +159,67 @@ class Command {
    */
   execute() {
     commander.parse(process.argv);
-    return this._commandPromise || Promise.resolve();
+    if (commander.args.filter(arg => arg.commands).length === 0) {
+      commander.help();
+    }
   }
 
-  /**
-   * After a tick runs in daemon mode, run it again after a timeout.
-   */
-  _daemonTick() {
-    setTimeout(() => this._laundry.tick(this._daemonTick), this._daemonInterval * 1000);
+  _doCreate(job) {
+    throw new Error('not implemented');
+  }
+
+  _doEdit(job) {
+    throw new Error('not implemented');
+  }
+
+  _doRun(job) {
+    throw new Error('not implemented');
+  }
+
+  _doDestroy(job) {
+    throw new Error('not implemented');
+  }
+
+  _doTick() {
+    throw new Error('not implemented');
+  }
+
+  _doDaemon(seconds) {
+    this._laundry.tick().then(() => {
+      setTimeout(() => this._doDaemon(seconds), seconds * 1000);
+    });
+  }
+
+  _doList() {
+    this._laundry.getJobs().then(() => {
+      let out = 'Current jobs: \n';
+      if (!this._laundry.config.jobs.length) {
+        out = 'There are no jobs configured. Use "laundry create" to make one.';
+      }
+
+      this._laundry.config.jobs.forEach(job => {
+        if (job) {
+          const schedule = job.schedule;
+          if (typeof schedule === 'number') {
+            out += `${chalk.bold('job.name')} runs every ${job.schedule} minutes.`;
+          } else if (!schedule) {
+            out += `${chalk.bold('job.name')} runs manually.`;
+          } else if (schedule.indexOf(':') !== -1) {
+            out += `${chalk.bold('job.name')} runs every day at ${job.schedule}.`;
+          } else {
+            out += `${chalk.bold('job.name')} runs after another job called ${job.schedule}.`;
+          }
+
+          if (job.lastRun && job.lastRun.format) {
+            out += ` Last run ${job.lastRun.format('l LTS')}`;
+          }
+
+          out += '\n';
+        }
+      });
+
+      console.log(out);
+    });
   }
 }
 

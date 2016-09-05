@@ -21,6 +21,7 @@ class Laundry {
     this._mediaAge = mediaAge || 30;
     this._proxy = proxy || null;
     this._storage = null;
+    this.config = null;
 
     // Configure logging.
     global.log = require('winston');
@@ -53,7 +54,10 @@ class Laundry {
     if (!this._storage) {
       throw new Error('Storage has not been configured, call setStorageLocal or setStorageS3.');
     }
-    return this._storage.init();
+    return this._storage.init()
+      .then(config => {
+        this.config = config;
+      });
   }
 
   createJob() {
