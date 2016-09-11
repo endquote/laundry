@@ -41,24 +41,25 @@ Washers.Vogue.prototype.doInput = function(callback) {
 
             // Hit each show's page to get the details.
             async.eachLimit(items, 5, function(item, callback) {
-                var url = util.format('http://www.vogue.com/fashion-shows/%s', item.urlFragment);
-                that.job.log.debug(url);
-                request(url, {
-                    proxy: commander.proxy,
-                    gzip: true
-                }, function(err, response, body) {
-                    var re = /<script id="initial-state" type="application\/json">(.*?)<\/script>/gim;
-                    var blob = JSON.parse(decodeURIComponent(re.exec(body)[1])).context.dispatcher.stores.FashionShowReviewStore;
-                    item.review = blob.reviewCopy;
-                    item.slides = blob.slideShows.collection.slides.map(function(slide) {
-                        return slide.slidepath;
+                    var url = util.format('http://www.vogue.com/fashion-shows/%s', item.urlFragment);
+                    that.job.log.debug(url);
+                    request(url + '/slideshow/collection', {
+                        proxy: commander.proxy,
+                        gzip: true
+                    }, function(err, response, body) {
+                        var re = /<script id="initial-state" type="application\/json">(.*?)<\/script>/gim;
+                        var blob = JSON.parse(decodeURIComponent(re.exec(body)[1])).context.dispatcher.stores.FashionShowReviewStore;
+                        item.review = blob.fashionShow.reviewCopy;
+                        item.review += util.format('<p>&emdash;<a href="http://www.vogue.com/%s">%s</a></p>', blob.fashionShow.reviewContributorURI, blob.fashionShow.reviewContributor);
+                        item.slides = blob.slides.map(function(slide) {
+                            return slide.slidepath;
+                        });
+                        callback();
                     });
-                    callback();
+                },
+                function(err) {
+                    Item.download(Items.Vogue, that, items, callback);
                 });
-
-            }, function(err) {
-                Item.download(Items.Vogue, that, items, callback);
-            });
         }
     );
 };
