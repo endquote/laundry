@@ -84,14 +84,16 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
     // If it's an "extended tweet", copy the extended data back to the original properties so the remaining parsing code still works.
     if (tweet.full_text) {
-        tweet.extended_entities = tweet.extended_entities || {};
+        tweet.text = tweet.full_text;
+    }
+
+    if (tweet.extended_entities) {
         tweet.extended_entities.hashtags = tweet.extended_entities.hashtags || [];
         tweet.extended_entities.symbols = tweet.extended_entities.symbols || [];
         tweet.extended_entities.user_mentions = tweet.extended_entities.user_mentions || [];
         tweet.extended_entities.urls = tweet.extended_entities.urls || [];
         tweet.extended_entities.media = tweet.extended_entities.media || [];
         tweet.entities = tweet.extended_entities;
-        tweet.text = tweet.full_text;
     }
 
     var item = new Items.Twitter.Tweet({
@@ -135,7 +137,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
         var c = s.substr(i, 1);
 
         // Skip media, it gets added at the end.
-        var media = tweet.extended_entities && tweet.extended_entities.media && tweet.extended_entities.media.filter(function(media) {
+        var media = tweet.entities && tweet.entities.media && tweet.entities.media.filter(function(media) {
             return i >= media.indices[0] && i <= media.indices[1];
         })[0];
         if (media) {
