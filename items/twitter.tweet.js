@@ -81,6 +81,19 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
 
 // Construct an Item given an API response and any upload info.
 Items.Twitter.Tweet.factory = function(tweet, downloads) {
+
+    // If it's an "extended tweet", copy the extended data back to the original properties so the remaining parsing code still works.
+    if (tweet.full_text) {
+        tweet.extended_entities = tweet.extended_entities || {};
+        tweet.extended_entities.hashtags = tweet.extended_entities.hashtags || [];
+        tweet.extended_entities.symbols = tweet.extended_entities.symbols || [];
+        tweet.extended_entities.user_mentions = tweet.extended_entities.user_mentions || [];
+        tweet.extended_entities.urls = tweet.extended_entities.urls || [];
+        tweet.extended_entities.media = tweet.extended_entities.media || [];
+        tweet.entities = tweet.extended_entities;
+        tweet.text = tweet.full_text;
+    }
+
     var item = new Items.Twitter.Tweet({
         title: tweet.user.screen_name + ': ',
         description: '',
