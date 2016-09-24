@@ -82,18 +82,16 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
 // Construct an Item given an API response and any upload info.
 Items.Twitter.Tweet.factory = function(tweet, downloads) {
 
-    // If it's an "extended tweet", copy the extended data back to the original properties so the remaining parsing code still works.
+    // Use extended text if it's there
     if (tweet.full_text) {
         tweet.text = tweet.full_text;
     }
 
+    // Use extended entities if it's there
     if (tweet.extended_entities) {
-        tweet.extended_entities.hashtags = tweet.extended_entities.hashtags || [];
-        tweet.extended_entities.symbols = tweet.extended_entities.symbols || [];
-        tweet.extended_entities.user_mentions = tweet.extended_entities.user_mentions || [];
-        tweet.extended_entities.urls = tweet.extended_entities.urls || [];
-        tweet.extended_entities.media = tweet.extended_entities.media || [];
-        tweet.entities = tweet.extended_entities;
+        for (var entityType in tweet.extended_entities) {
+            tweet.entities[entityType] = tweet.extended_entities[entityType];
+        }
     }
 
     var item = new Items.Twitter.Tweet({
