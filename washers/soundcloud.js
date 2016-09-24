@@ -24,10 +24,15 @@ Washers.SoundCloud = function(config, job) {
         }
     };
 
+    // Including an API key because it looks like they may be hard to get. Please
+    // don't cause it to be revoked.
+    // https://developers.soundcloud.com/blog/api-sign-up-changes
+
     this.input = _.merge({
         prompts: [{
             name: 'clientId',
             message: 'Client ID',
+            default: 'be9c7a83fe6815b08c68d32a80f75dcf',
             when: function(answers) {
                 if (job && job.input.token) {
                     return false;
@@ -38,6 +43,7 @@ Washers.SoundCloud = function(config, job) {
         }, {
             name: 'clientSecret',
             message: 'Client secret',
+            default: 'a6cd2c3d058fd887754375c0eedc7c02',
             when: function(answers) {
                 return job && job.input.token ? false : true;
             }
