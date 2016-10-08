@@ -5,6 +5,7 @@ var Autolinker = require('autolinker'); // https://github.com/gregjacobs/Autolin
 // Item which describes an Instagram object
 ns('Items.Instagram', global);
 Items.Instagram.Media = function(config) {
+    this.id = '';
     this.type = '';
     this.image = '';
     this.caption = '';
@@ -48,6 +49,7 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
 // Construct an Item given an API response and any upload info.
 Items.Instagram.Media.factory = function(post, downloads) {
     var item = new Items.Instagram.Media({
+        id: post.id,
         type: post.video_versions ? 'video' : 'still',
         date: moment.unix(post.taken_at),
         url: util.format('https://www.instagram.com/p/%s/', post.code),
@@ -131,6 +133,8 @@ Items.Instagram.Media.factory = function(post, downloads) {
                 comment.user.username, comment.user.username, Items.Instagram.Media.linkify(comment.text));
         });
     }
+
+    item.description += util.format('<p>(<a href="instagram://media?id=%s">open in app</a>)</p>', item.id);
 
     return item;
 };
