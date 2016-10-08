@@ -14,26 +14,16 @@ Laundry is made up of _washers_, each with an input or an output, or both. Any i
 Input | Output
 ----- | ------
 gMail search | JSON files
-Instagram hashtag | MySQL database
-Instagram timeline | Pinterest boards
-Instagram likes | RSS (with enclosures)
-Instagram user | Slack channel
-Pinterest boards | Web socket ([example](https://github.com/endquote/laundry/tree/master/samples/socket))
-RSS |
-Slack channel | 
-Soundcloud artist | 
-Soundcloud timeline | 
-Tumblr blog | 
-Tumblr likes | 
-Tumblr timeline | 
-Twitter hashtag | 
-Twitter timeline | 
-Twitter list | 
-Twitter user | 
-Vimeo feed | 
+Instagram timeline, user, hashtag, likes | MySQL database
+Pinterest boards | Pinterest boards
+RSS | RSS (with enclosures)
+Slack channel | Slack channel
+Soundcloud timeline, artist | Web socket ([example](https://github.com/endquote/laundry/tree/master/samples/socket))
+Tumblr blog, likes, timeline, hashtag | 
+Twitter timeline, hashtag, list, user | 
+Vimeo feed, user, tag, group, channel, category | 
 Vogue fashion shows | 
-YouTube channel |
-YouTube subscriptions | 
+YouTube subscriptions, channel |
 
 There are many more ideas for new washers and additions to existing washers, listed among the [issues](https://github.com/endquote/laundry/issues). Development of new washers is a great way to contribute to the project. There is [more documentation](https://github.com/endquote/laundry/blob/master/washers/README.md) on that if you're interested.
 
