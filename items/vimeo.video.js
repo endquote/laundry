@@ -52,11 +52,12 @@ Items.Vimeo.Video.factory = function(video, downloads) {
     description = player + '<p>' + description + '</p>';
 
     var item = new Items.Vimeo.Video({
+        // The washer can set a date field, otherwise use release_time
+        date: moment(video.clip.date || video.clip.release_time),
         id: video.clip.uri.split('/').pop(),
         title: video.clip.user.name + ': ' + video.clip.name,
         description: description,
         url: video.clip.link,
-        date: moment(video.clip.release_time),
         author: video.clip.user.name,
         thumbnail: downloads.thumbnail.newUrl,
         mediaUrl: downloads.video.newUrl,

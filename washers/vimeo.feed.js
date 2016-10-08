@@ -57,6 +57,11 @@ Washers.Vimeo.Feed.prototype.doInput = function(callback) {
             return;
         }
 
+        // Posts on vimeo.com home page seem to be sorted by modified_time
+        posts.forEach(function(p) {
+            p.clip.date = p.clip.modified_time;
+        });
+
         Item.download(Items.Vimeo.Video, that, posts, callback);
     });
 };
