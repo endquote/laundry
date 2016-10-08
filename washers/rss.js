@@ -123,6 +123,10 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
     var feed = new RSSWriter(feedSettings);
 
     if (items) {
+        items.sort(function(a, b) {
+            return b.date.toDate().getTime() - a.date.toDate().getTime();
+        });
+
         items.forEach(function(item) {
             var entry = {
                 title: item.title,
