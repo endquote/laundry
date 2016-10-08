@@ -45,9 +45,7 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
     var retrievedTotal = 0;
     var retrievedLast = 0;
     var maxId = null;
-    if (!options) {
-        options = {};
-    }
+    options = options || {};
     options.count = 1000;
     options.tweet_mode = 'extended';
 
