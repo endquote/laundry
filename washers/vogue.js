@@ -48,14 +48,18 @@ Washers.Vogue.prototype.doInput = function(callback) {
                         gzip: true
                     }, function(err, response, body) {
                         var re = /<script id="initial-state" type="application\/json">(.*?)<\/script>/gim;
-                        var blob = JSON.parse(decodeURIComponent(re.exec(body)[1])).context.dispatcher.stores.FashionShowReviewStore;
-                        if (blob.fashionShow.reviewCopy) {
-                            item.review = blob.fashionShow.reviewCopy;
-                            item.review += util.format('<p>—<a href="http://www.vogue.com/%s">%s</a></p>', blob.fashionShow.reviewContributorURI, blob.fashionShow.reviewContributor);
+                        try {
+                            var blob = JSON.parse(re.exec(body)[1]).context.dispatcher.stores.FashionShowReviewStore;
+                            if (blob.fashionShow.reviewCopy) {
+                                item.review = blob.fashionShow.reviewCopy;
+                                item.review += util.format('<p>—<a href="http://www.vogue.com/%s">%s</a></p>', blob.fashionShow.reviewContributorURI, blob.fashionShow.reviewContributor);
+                            }
+                            item.slides = blob.slides.map(function(slide) {
+                                return slide.slidepath;
+                            });
+                        } catch (e) {
+                            that.job.log.error(e);
                         }
-                        item.slides = blob.slides.map(function(slide) {
-                            return slide.slidepath;
-                        });
                         callback();
                     });
                 },
