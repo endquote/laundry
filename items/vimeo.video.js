@@ -40,7 +40,6 @@ Items.Vimeo.Video.downloadLogic = function(prefix, obj, washer, cache, download)
 
 // Construct an Item given an API response and any upload info.
 Items.Vimeo.Video.factory = function(video, downloads) {
-    console.log(video.clip.uri);
     var player = util.format('<img src="%s" />', downloads.thumbnail.newUrl);
     if (downloads.video.newUrl !== downloads.video.oldUrl) {
         player = Item.buildVideo(downloads.video.newUrl, downloads.thumbnail.newUrl, 640, 480);
