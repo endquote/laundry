@@ -30,6 +30,7 @@ Twitter hashtag |
 Twitter timeline | 
 Twitter list | 
 Twitter user | 
+Vimeo feed | 
 Vogue fashion shows | 
 YouTube channel |
 YouTube subscriptions | 
