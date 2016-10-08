@@ -17,12 +17,12 @@ Items.Vimeo.Video.prototype = Object.create(Item.prototype);
 Items.Vimeo.Video.className = Helpers.buildClassName(__filename);
 
 Items.Vimeo.Video.downloadLogic = function(prefix, obj, washer, cache, download) {
-    var targetDate = moment(obj.clip.release_time).toDate();
-    var id = obj.clip.uri.split('/').pop();
+    var targetDate = moment(obj.release_time).toDate();
+    var id = obj.uri.split('/').pop();
     return {
         thumbnail: function(callback) {
             // Figure out the biggest thumbnail available.
-            var thumbnail = obj.clip.pictures.sizes.sort(function(a, b) {
+            var thumbnail = obj.pictures.sizes.sort(function(a, b) {
                 return a.width - b.width;
             }).pop();
 
@@ -33,7 +33,7 @@ Items.Vimeo.Video.downloadLogic = function(prefix, obj, washer, cache, download)
         video: function(callback) {
             // Upload the video
             var target = prefix + '/' + id + '.mp4';
-            Storage.downloadUrl(washer.job.log, obj.clip.link, target, targetDate, cache, true, download, callback);
+            Storage.downloadUrl(washer.job.log, obj.link, target, targetDate, cache, true, download, callback);
         }
     };
 };
@@ -45,24 +45,25 @@ Items.Vimeo.Video.factory = function(video, downloads) {
         player = Item.buildVideo(downloads.video.newUrl, downloads.thumbnail.newUrl, 640, 480);
     }
 
-    var description = video.clip.description || '';
+    var description = video.description || '';
     description = description.replace(/[\n\r]{2,}/gim, '</p><p>');
     description = description.replace(/[\n\r]/gim, '<br/>');
     description = Autolinker.link(description);
-    description = player + '<p>' + description + '</p>';
+    if (description) {
+        description = player + '<p>' + description + '</p>';
+    }
 
     var item = new Items.Vimeo.Video({
-        // The washer can set a date field, otherwise use release_time
-        date: moment(video.clip.date || video.clip.release_time),
-        id: video.clip.uri.split('/').pop(),
-        title: video.clip.user.name + ': ' + video.clip.name,
+        date: moment(video.release_time),
+        id: video.uri.split('/').pop(),
+        title: video.user.name + ': ' + video.name,
         description: description,
-        url: video.clip.link,
-        author: video.clip.user.name,
+        url: video.link,
+        author: video.user.name,
         thumbnail: downloads.thumbnail.newUrl,
         mediaUrl: downloads.video.newUrl,
         mediaBytes: downloads.video.bytes,
-        duration: video.clip.duration,
+        duration: video.duration,
         downloads: downloads
     });
 

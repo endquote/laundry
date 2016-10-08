@@ -25,22 +25,30 @@ Washers.Vimeo.Feed.prototype = Object.create(Washers.Vimeo.prototype);
 Washers.Vimeo.Feed.className = Helpers.buildClassName(__filename);
 
 Washers.Vimeo.Feed.prototype.doInput = function(callback) {
+    // https://developer.vimeo.com/api/endpoints/me#/feed
+    this.requestFeed('/me/feed', null, callback);
+};
+
+Washers.Vimeo.Feed.prototype.requestFeed = function(method, options, callback) {
     var posts = [];
 
     var lastResponse = null;
     var page = 1;
     var limit = 20;
     var that = this;
+
+    options = options || {};
+    options.page = page;
+    options.per_page = 50;
+    options.filter = options.filter || 'playable';
+    options.filter_playable = options.filter_playable || true;
+
     async.doWhilst(function(callback) {
-        // https://developer.vimeo.com/api/endpoints/me#/feed
         Helpers.jsonRequest(
             that.job.log,
             extend({
-                uri: '/me/feed',
-                qs: {
-                    page: page,
-                    per_page: 50
-                }
+                uri: method,
+                qs: options
             }, that._requestOptions),
             function(response) {
                 posts = posts.concat(response.data);
@@ -57,9 +65,9 @@ Washers.Vimeo.Feed.prototype.doInput = function(callback) {
             return;
         }
 
-        // Posts on vimeo.com home page seem to be sorted by modified_time
-        posts.forEach(function(p) {
-            p.clip.date = p.clip.modified_time;
+        // We only care about the clip
+        posts = posts.map(function(p) {
+            return p.clip || p;
         });
 
         Item.download(Items.Vimeo.Video, that, posts, callback);
