@@ -50,8 +50,9 @@ Items.Vimeo.Video.factory = function(video, downloads) {
     description = description.replace(/[\n\r]/gim, '<br/>');
     description = Autolinker.link(description);
     if (description) {
-        description = player + '<p>' + description + '</p>';
+        description = '<p>' + description + '</p>';
     }
+    description = player + description;
 
     var item = new Items.Vimeo.Video({
         date: moment(video.release_time),

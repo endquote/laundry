@@ -1,3 +1,4 @@
+devconfig
 *.sublime-workspace
 node_modules
 bin
