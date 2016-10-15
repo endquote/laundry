@@ -134,8 +134,6 @@ Items.Instagram.Media.factory = function(post, downloads) {
         });
     }
 
-    item.description += util.format('<p>(<a href="instagram://media?id=%s">open in app</a>)</p>', item.id);
-
     return item;
 };
 
