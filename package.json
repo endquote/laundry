@@ -51,5 +51,8 @@
     "winston": "^2.1.1",
     "word-wrap": "^1.1.0",
     "youtube-dl": "^1.11.1"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.3"
   }
 }
