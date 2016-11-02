@@ -3,3 +3,4 @@ devconfig
 node_modules
 bin
 *.log
+test

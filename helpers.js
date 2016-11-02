@@ -109,8 +109,8 @@ Helpers.jsonRequest = function(log, options, callback, errorCallback) {
         }
         if (!err && (body && !body.errors && !body.error) && validStatusCodes.indexOf(response.statusCode) !== -1) {
             callback(body, response);
-        } else {
-            errorCallback(err || body);
+        } else if (errorCallback) {
+            errorCallback(err || body || response.statusCode);
         }
     });
 };
