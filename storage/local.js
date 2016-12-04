@@ -161,7 +161,11 @@ Storage.Local.downloadUrl = function(log, url, target, targetDate, cache, useYTD
 
                     response.pipe(fs.createWriteStream(target));
                 });
-            }).end();
+            })
+            .on('error', function (err) {
+                callback(err, result);
+            })
+            .end();
         } catch (err) {
             callback(err, result);
         }

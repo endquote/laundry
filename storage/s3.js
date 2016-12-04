@@ -205,7 +205,11 @@ Storage.S3.downloadUrl = function(log, url, target, targetDate, cache, useYTDL, 
                         }
                         callback(err, result);
                     });
-            }).end();
+            })
+            .on('error', function (err) {
+                callback(err, result);
+            })
+            .end();
         } catch (err) {
             callback(err, result);
         }
