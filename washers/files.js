@@ -42,7 +42,12 @@ Washers.Files.prototype.doInput = function (callback) {
 
                 var url = '';
                 if (commander.local) {
-                    url = commander.baseUrl + path.relative(commander.local, file).replace(/\\/g, '/');
+                    // Convert to relative path with escaped parts.
+                    url = commander.baseUrl + path.relative(commander.local, file)
+                        .replace(/\\/g, '/')
+                        .split('/')
+                        .map(function (p) { return encodeURIComponent(p); })
+                        .join('/');
                 }
 
                 // Convert files into Items.
