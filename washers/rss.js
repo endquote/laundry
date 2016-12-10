@@ -106,8 +106,8 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
 
     // If there are any enclosures, add some custom iTunes podcast stuff.
     if (items.filter(function(item) {
-        return item.mediaUrl;
-    }).length) {
+            return item.mediaUrl;
+        }).length) {
         feedSettings.custom_namespaces = {
             'itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd'
         };
@@ -151,7 +151,7 @@ Washers.RSS.prototype.doOutput = function(items, callback) {
                 }, {
                     'itunes:image': {
                         _attr: {
-                            href: item.artwork || item.thumbnail
+                            href: item.artwork || item.thumbnail || item.imageUrl
                         }
                     }
                 }];
