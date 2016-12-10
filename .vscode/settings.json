@@ -8,8 +8,8 @@
         "**/node_modules": true,
         "output": true
     },
+    "editor.formatOnSave": true,
     "jshint.enable": true,
-    "beautify.onSave": ["js", "html", "css"]
-,
-"eslint.enable": false
+    "beautify.onSave": ["js", "html", "css"],
+    "eslint.enable": false
 }
