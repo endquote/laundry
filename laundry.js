@@ -107,6 +107,7 @@ Laundry.create = function(jobName, callback) {
         if (err) {
             callback(err);
         } else if (job) {
+            job.lastRun = null;
             if (laundryConfig.jobs.indexOf(job) === -1) {
                 laundryConfig.jobs.push(job);
             }
