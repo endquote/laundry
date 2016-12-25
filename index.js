@@ -187,7 +187,7 @@ function runCommand(cmd, args) {
         }
 
         // Update youtube-dl every day.
-        if (cmd === 'run' && moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
+        if ((cmd === 'run' || cmd === 'tick') && moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
             log.info('Updating youtube-dl');
             var downloader = require('youtube-dl/lib/downloader');
             downloader(function error(err, done) {
@@ -196,7 +196,13 @@ function runCommand(cmd, args) {
                 }
                 log.info(done);
                 laundryConfig.settings.ytdlupdate = moment();
-                doCmd();
+                Storage.saveConfig(function(err) {
+                    if (err) {
+                        onComplete(err);
+                        return;
+                    }
+                    doCmd();
+                });
             });
         } else {
             doCmd();
