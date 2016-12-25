@@ -66,12 +66,8 @@ Washers.Instagram.prototype.login = function(callback) {
             jar: that._jar,
         }, that._requestOptions),
         function(result, response) {
-            var rx = /csrftoken=([^;]+)/;
-            var csrftoken = rx.exec(response.headers['set-cookie'][0])[1];
-
             var data = {
                 'phone_id': that.generateUUID(true),
-                '_csrftoken': 'Set-Cookie: csrftoken=' + csrftoken,
                 'username': that.username,
                 'guid': that._igUuid,
                 'device_id': that._igDeviceId,
