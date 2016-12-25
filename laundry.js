@@ -591,20 +591,25 @@ Laundry.tick = function(callback) {
 
             var jobs = laundryConfig.jobs.filter(function(job) {
                 if (!job.schedule) {
+                    // job runs manually
                     return false;
+                }
+
+                if (!job.lastRun) {
+                    // job has a schedule but has never run, so run it
+                    return true;
                 }
 
                 if (typeof(job.schedule) === 'number') {
                     // every n minutes
-                    return !job.lastRun || now.diff(job.lastRun, 'minutes') >= job.schedule;
+                    return now.diff(job.lastRun, 'minutes') >= job.schedule;
 
                 } else if (job.schedule.indexOf(':') !== -1) {
                     // after a specific time
-                    var time = moment({
-                        hour: job.schedule.split(':')[0],
-                        minute: job.schedule.split(':')[1]
-                    });
-                    return now.isAfter(time) && (!job.lastRun || now.diff(job.lastRun, 'days') >= 1);
+                    var lastIdealRun = moment(job.lastRun);
+                    lastIdealRun.minute(job.schedule.split(':')[0]);
+                    lastIdealRun.hour(job.schedule.split(':')[1]);
+                    return now.diff(lastIdealRun, 'days') >= 1;
                 }
 
                 return false;
