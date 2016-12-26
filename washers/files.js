@@ -30,15 +30,19 @@ Washers.Files.prototype.doInput = function (callback) {
     var items = [];
 
     // Do a glob search for the files.
-    glob(this.path, {}, function (err, files) {
+    glob(this.path, { silent: true, strict: false }, function (err, files) {
         if (err) {
-            call(err, items);
+            callback(err, items);
             return;
         }
 
         async.each(files, function (file, callback) {
             // Get more info about each file.
             fs.stat(file, function (err, stats) {
+                if (err) {
+                    callback();
+                    return;
+                }
 
                 var url = '';
                 if (commander.local) {
