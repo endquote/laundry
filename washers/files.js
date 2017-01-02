@@ -8,7 +8,7 @@ input: converts files into Items
 */
 
 ns('Washers', global);
-Washers.Files = function (config, job) {
+Washers.Files = function(config, job) {
     Washer.call(this, config, job);
 
     this.name = 'Files';
@@ -26,20 +26,25 @@ Washers.Files = function (config, job) {
 Washers.Files.prototype = Object.create(Washer.prototype);
 Washers.Files.className = Helpers.buildClassName(__filename);
 
-Washers.Files.prototype.doInput = function (callback) {
+Washers.Files.prototype.doInput = function(callback) {
+    var that = this;
     var items = [];
 
     // Do a glob search for the files.
-    glob(this.path, { silent: true, strict: false }, function (err, files) {
+    glob(this.path, {
+        silent: true,
+        strict: false
+    }, function(err, files) {
         if (err) {
             callback(err, items);
             return;
         }
 
-        async.each(files, function (file, callback) {
+        async.each(files, function(file, callback) {
             // Get more info about each file.
-            fs.stat(file, function (err, stats) {
+            fs.stat(file, function(err, stats) {
                 if (err) {
+                    that.job.log.error(err);
                     callback();
                     return;
                 }
@@ -50,7 +55,9 @@ Washers.Files.prototype.doInput = function (callback) {
                     url = commander.baseUrl + path.relative(commander.local, file)
                         .replace(/\\/g, '/')
                         .split('/')
-                        .map(function (p) { return encodeURIComponent(p); })
+                        .map(function(p) {
+                            return encodeURIComponent(p);
+                        })
                         .join('/');
                 }
 
@@ -66,7 +73,7 @@ Washers.Files.prototype.doInput = function (callback) {
                 }));
                 callback();
             });
-        }, function (err) {
+        }, function(err) {
 
             // Return Items.
             callback(err, items);
