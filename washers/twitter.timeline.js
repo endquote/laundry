@@ -75,7 +75,7 @@ Washers.Twitter.Timeline.prototype.requestTweets = function(method, options, cal
                     tweets.forEach(function(tweet) {
                         maxId = tweet.id_str;
                         var include = true;
-                        if (that.excludeReplies && tweet.in_reply_to_screen_name && tweet.in_reply_to_screen_name != tweet.user.screen_name) {
+                        if (that.excludeReplies && tweet.in_reply_to_screen_name && tweet.in_reply_to_screen_name !== tweet.user.screen_name) {
                             include = false;
                         }
                         if (that.excludeRetweets && (tweet.retweeted_status || tweet.quoted_status_id)) {
