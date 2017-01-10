@@ -5,8 +5,8 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
-        "**/node_modules": true,
-        "output": true
+        "**/test": true,
+        "**/node_modules": true
     },
     "editor.formatOnSave": true,
     "jshint.enable": true,
