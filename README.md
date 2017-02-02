@@ -21,7 +21,7 @@ RSS | RSS (with enclosures)
 Slack channel | Slack channel
 Soundcloud timeline, artist |
 Tumblr blog, likes, timeline, hashtag | 
-Twitter timeline, hashtag, list, user | 
+Twitter timeline, hashtag, list, user, favorites | 
 Vimeo feed, user, tag, group, channel, category | 
 Vogue fashion shows | 
 YouTube subscriptions, channel |
