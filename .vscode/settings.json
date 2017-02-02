@@ -10,6 +10,5 @@
     },
     "editor.formatOnSave": true,
     "jshint.enable": true,
-    "beautify.onSave": ["js", "html", "css"],
     "eslint.enable": false
 }
