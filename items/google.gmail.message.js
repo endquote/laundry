@@ -56,21 +56,27 @@ Items.Google.Gmail.Message.factory = function(item, downloads) {
 
     // Get the address the message was sent to
     var to = item.payload.headers.filter(function(header) {
-        return header.name === 'To';
+        return header.name.toLowerCase() === 'to';
     })[0];
-    to = to.value;
-    to = to.match(/\b([A-Za-z0-9%+._-])+[@]+([%+a-z0-9A-Z.-]*)\b/g)[0];
+    if (to) {
+        to = to.value;
+        to = to.match(/\b([A-Za-z0-9%+._-])+[@]+([%+a-z0-9A-Z.-]*)\b/g)[0];
+    }
+    to = to || '';
 
     // Build the web link to the message
     var link = util.format('https://mail.google.com/mail/?authuser=%s#all/%s', to, item.threadId);
 
     // Figure out who it's from
     var from = item.payload.headers.filter(function(header) {
-        return header.name === 'From';
+        return header.name.toLowerCase() === 'from';
     })[0];
-    from = from.value;
-    from = from.replace(/<.*>/, '').trim(); // remove email address
-    from = from.replace(/^"|"$/gm, ''); // remove quotes at beginning and end
+    if (from) {
+        from = from.value;
+        from = from.replace(/<.*>/, '').trim(); // remove email address
+        from = from.replace(/^"|"$/gm, ''); // remove quotes at beginning and end
+    }
+    from = from || '';
 
     return new Items.Google.Gmail.Message({
         title: subject,

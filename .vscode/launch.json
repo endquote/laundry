@@ -6,7 +6,7 @@
         "request": "launch",
         "program": "${workspaceRoot}/index.js",
         "stopOnEntry": false,
-        "args": ["--local=/Users/endquote/Source/laundry/test/", "-v", "run", "tweetstorm"],
+        "args": ["--local=/Users/endquote/Source/laundry/test/", "-v", "run", "gmail"],
         "cwd": "${workspaceRoot}",
         "preLaunchTask": null,
         "runtimeExecutable": null,
