@@ -35,9 +35,18 @@ Items.Instagram.Media.className = Helpers.buildClassName(__filename);
 
 Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, download) {
     return {
-        image: function(callback) {
-            var target = prefix + '/' + obj.id + '.jpg';
-            Storage.downloadUrl(washer.job.log, obj.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, callback);
+        images: function(callback) {
+            var results = [];
+            var imgs = obj.carousel_media || [obj];
+            async.each(imgs, function(img, callback) {
+                var target = prefix + '/' + img.id + '.jpg';
+                Storage.downloadUrl(washer.job.log, img.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
+                    results.push(res);
+                    callback();
+                });
+            }, function(err) {
+                callback(err, results);
+            });
         },
         video: function(callback) {
             var target = prefix + '/' + obj.id + '.mp4';
@@ -61,8 +70,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
             count: post.comment_count,
             data: post.comments
         },
-        image: downloads.image.newUrl,
-        imageUrl: downloads.image.newUrl,
+        images: downloads.images,
         video: downloads.video.newUrl,
         caption: post.caption ? post.caption.text : null,
         author: post.user.username,
@@ -88,7 +96,10 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (!item.video) {
-        item.description = util.format('<p><a href="%s"><img src="%s"/></a></p>', item.url, item.image);
+        item.description = '';
+        item.images.forEach(function(i) {
+            item.description += util.format('<p><a href="%s"><img src="%s"/></a></p>', item.url, i.newUrl);
+        });
     } else {
         item.description = Item.buildVideo(item.video, item.image, 600, 600);
     }
