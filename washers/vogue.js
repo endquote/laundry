@@ -52,7 +52,9 @@ Washers.Vogue.prototype.doInput = function(callback) {
                             var blob = JSON.parse(re.exec(body)[1]).context.dispatcher.stores.FashionShowReviewStore;
                             if (blob.fashionShow.reviewCopy) {
                                 item.review = blob.fashionShow.reviewCopy;
-                                item.review += util.format('<p>—<a href="http://www.vogue.com/%s">%s</a></p>', blob.fashionShow.reviewContributorURI, blob.fashionShow.reviewContributor);
+                                if (blob.fashionShow.reviewContributor) {
+                                    item.review += util.format('<p>—<a href="http://www.vogue.com/%s">%s</a></p>', blob.fashionShow.reviewContributorURI, blob.fashionShow.reviewContributor);
+                                }
                             }
                             item.slides = blob.slides.map(function(slide) {
                                 return slide.slidepath;
