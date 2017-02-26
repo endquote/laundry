@@ -7,7 +7,7 @@ ns('Items.Instagram', global);
 Items.Instagram.Media = function(config) {
     this.id = '';
     this.type = '';
-    this.image = '';
+    this.images = [];
     this.caption = '';
     this.authorpic = '';
     this.comments = {
@@ -71,6 +71,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
             data: post.comments
         },
         images: downloads.images,
+        imageUrl: downloads.images[0].newUrl,
         video: downloads.video.newUrl,
         caption: post.caption ? post.caption.text : null,
         author: post.user.username,
