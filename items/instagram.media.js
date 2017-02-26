@@ -101,7 +101,8 @@ Items.Instagram.Media.factory = function(post, downloads) {
             item.description += util.format('<p><a href="%s"><img src="%s"/></a></p>', item.url, i.newUrl);
         });
     } else {
-        item.description = Item.buildVideo(item.video, item.image, 600, 600);
+        var poster = item.images[0] ? item.images[0].newUrl : null;
+        item.description = Item.buildVideo(item.video, poster, 600, 600);
     }
 
     if (item.caption) {
