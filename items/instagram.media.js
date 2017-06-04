@@ -68,7 +68,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
         },
         comments: {
             count: post.comment_count,
-            data: post.comments
+            data: post.preview_comments
         },
         images: downloads.images,
         imageUrl: downloads.images[0].newUrl,
