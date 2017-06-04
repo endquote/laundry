@@ -64,7 +64,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
         url: util.format('https://www.instagram.com/p/%s/', post.code),
         likes: {
             count: post.like_count,
-            data: post.likers
+            data: post.top_likers
         },
         comments: {
             count: post.comment_count,
@@ -128,7 +128,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
     if (item.likes.data && item.likes.data.length) {
         item.description += ': ';
         item.likes.data.forEach(function(like, index, list) {
-            item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like.username, like.username);
+            item.description += util.format('<a href="http://instagram.com/%s">%s</a>', like, like);
             if (index < list.length - 1) {
                 item.description += ', ';
             }
