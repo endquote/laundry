@@ -43,7 +43,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
             return;
         }
 
-        // Get the list of user's we're following, it's a paged list.
+        // Get the list of users we're following, it's a paged list.
         var next_max_id;
         async.doWhilst(function(callback) {
             Helpers.jsonRequest(
