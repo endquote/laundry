@@ -23,8 +23,8 @@ Washers.Instagram = function(config, job) {
 
     // https://github.com/mgp25/Instagram-API/blob/master/src/Constants.php
     this._igApi = 'https://i.instagram.com/api/v1/';
-    this._igUserAgent = 'Instagram 10.14.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
-    this._igKey = 'fa558a0a4c9fd70e9c6a9a24811a59b62c6c0147ca8f93b9338f8283d6b4aa70';
+    this._igUserAgent = 'Instagram 10.22.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
+    this._igKey = '5c81a2073328a9c98ba731dd73095fb6a7443c00c7d1362607aa81e3790d89a0';
     this._igKeyVersion = '4';
 
     this._jar = request.jar();
