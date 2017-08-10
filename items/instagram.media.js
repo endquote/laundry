@@ -103,7 +103,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
         });
     } else {
         var poster = item.images[0] ? item.images[0].newUrl : null;
-        item.description = Item.buildVideo(item.video, poster, 600, 600);
+        item.description = Item.buildVideo(item.video, poster, 0, 0, true, true);
     }
 
     if (item.caption) {

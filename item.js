@@ -99,13 +99,19 @@ Item.buildPrefix = function(jobName, className) {
 };
 
 // Build an HTML video player.
-Item.buildVideo = function(videoUrl, thumbUrl, width, height) {
+Item.buildVideo = function(videoUrl, thumbUrl, width, height, autoPlay, loop) {
     var s = util.format('<p><video controls width="100%" src="%s" autobuffer="false" preload="none"', videoUrl);
     if (thumbUrl) {
         s += util.format(' poster="%s"', thumbUrl);
     }
     if (width && height) {
         s += util.format(' width="%d" height="%d"', width, height);
+    }
+    if (autoPlay) {
+        s += ' autoplay="true"';
+    }
+    if (loop) {
+        s += ' loop="true"';
     }
     s += '></video></p>';
     return s;
