@@ -93,7 +93,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
 
     item.title = item.author;
     if (item.caption) {
-        item.title += ': ' + Helpers.shortenString(item.caption, 30);
+        item.title += ': ' + Helpers.shortenString(item.caption.replace(/[\r\n]/g, ' '), 30);
     }
 
     if (!item.video) {
