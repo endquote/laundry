@@ -107,6 +107,7 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (item.caption) {
+        item.caption = item.caption.replace(/[\r\n]/g, '<br>');
         item.description += util.format('<p>%s</p>', Items.Instagram.Media.linkify(item.caption));
     }
 
