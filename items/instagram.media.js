@@ -38,6 +38,7 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
         images: function(callback) {
             var results = [];
             var imgs = obj.carousel_media || [obj];
+            imgs = imgs.filter(i => i.media_type !== 2);
             async.each(imgs, function(img, callback) {
                 var target = prefix + '/' + img.id + '.jpg';
                 Storage.downloadUrl(washer.job.log, img.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
@@ -48,9 +49,22 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
                 callback(err, results);
             });
         },
-        video: function(callback) {
-            var target = prefix + '/' + obj.id + '.mp4';
-            Storage.downloadUrl(washer.job.log, obj.video_versions ? obj.video_versions[0].url : null, target, moment.unix(obj.taken_at).toDate(), cache, false, download, callback);
+        videos: function(callback) {
+            var results = [];
+            var videos = obj.carousel_media || [obj];
+            videos = videos.filter(i => i.media_type === 2);
+            async.each(videos, function(video, callback) {
+                var target = prefix + '/' + video.id + '.mp4';
+                Storage.downloadUrl(washer.job.log, video.video_versions[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
+                    results.push(res);
+                    Storage.downloadUrl(washer.job.log, video.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, poster) {
+                        res.poster = poster;
+                        callback();
+                    });
+                });
+            }, function(err) {
+                callback(err, results);
+            });
         }
     };
 };
@@ -71,14 +85,14 @@ Items.Instagram.Media.factory = function(post, downloads) {
             data: post.preview_comments
         },
         images: downloads.images,
-        imageUrl: downloads.images[0].newUrl,
-        video: downloads.video.newUrl,
+        imageUrl: downloads.images.length ? downloads.images[0].newUrl : '',
+        videos: downloads.videos,
         caption: post.caption ? post.caption.text : null,
         author: post.user.username,
         authorpic: post.user.profile_pic_url,
         location: post.location,
-        mediaUrl: downloads.video.newUrl,
-        mediaBytes: downloads.video.bytes,
+        mediaUrl: downloads.videos.length ? downloads.videos[0].newUrl : '',
+        mediaBytes: downloads.videos.length ? downloads.videos[0].bytes : 0,
         downloads: downloads
     });
 
@@ -96,14 +110,22 @@ Items.Instagram.Media.factory = function(post, downloads) {
         item.title += ': ' + Helpers.shortenString(item.caption.replace(/[\r\n]/g, ' '), 30);
     }
 
-    if (!item.video) {
-        item.description = '';
+    item.description = '';
+
+    if (item.images) {
         item.images.forEach(function(i) {
             item.description += util.format('<p><a href="%s"><img src="%s"/></a></p>', item.url, i.newUrl);
         });
-    } else {
-        var poster = item.images[0] ? item.images[0].newUrl : null;
-        item.description = Item.buildVideo(item.video, poster, 0, 0, true, true);
+    }
+
+    if (item.id === '1576122118419994878_5821462185') {
+        var x = 1;
+    }
+
+    if (item.videos) {
+        item.videos.forEach((function(v) {
+            item.description += Item.buildVideo(v.newUrl, v.poster.newUrl, 0, 0, item.videos.length === 1, item.videos.length === 1);
+        }))
     }
 
     if (item.caption) {

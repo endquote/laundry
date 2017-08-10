@@ -100,7 +100,7 @@ Item.buildPrefix = function(jobName, className) {
 
 // Build an HTML video player.
 Item.buildVideo = function(videoUrl, thumbUrl, width, height, autoPlay, loop) {
-    var s = util.format('<p><video controls width="100%" src="%s" autobuffer="false" preload="none"', videoUrl);
+    var s = util.format('<p><video controls width="100%" src="%s"', videoUrl);
     if (thumbUrl) {
         s += util.format(' poster="%s"', thumbUrl);
     }
