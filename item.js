@@ -113,7 +113,7 @@ Item.buildVideo = function(videoUrl, thumbUrl, width, height, autoPlay, loop) {
     if (loop) {
         s += ' loop="true"';
     }
-    s += '></video></p>';
+    s += ' muted="true"></video></p>';
     return s;
 };
 
