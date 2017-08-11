@@ -64,6 +64,8 @@ Items.Twitter.Tweet.downloadLogic = function(prefix, obj, washer, cache, downloa
                         })[0];
                         target = prefix + '/' + obj.id + mediaIndex + '.' + variant.url.split('.').pop();
                         Storage.downloadUrl(washer.job.log, variant.url, target, targetDate, cache, false, download, function(err, video) {
+                            video.width = entity.sizes.large ? entity.sizes.large.w : 0;
+                            video.height = entity.sizes.large ? entity.sizes.large.h : 0;
                             res.video = video;
                             callback();
                         });
@@ -120,7 +122,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
     // Start with media, then tweet text.
     downloads.media.forEach(function(media) {
         if (media.video && media.video.newUrl !== media.video.oldUrl) {
-            item.description += Item.buildVideo(media.video.newUrl, media.newUrl);
+            item.description += Item.buildVideo(media.video.newUrl, media.newUrl, media.video.width, media.video.height, true, true);
         } else {
             item.description += util.format('<p><img src="%s"/></p>', media.newUrl);
         }
