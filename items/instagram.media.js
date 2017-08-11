@@ -56,6 +56,8 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
             async.each(videos, function(video, callback) {
                 var target = prefix + '/' + video.id + '.mp4';
                 Storage.downloadUrl(washer.job.log, video.video_versions[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
+                    res.width = video.video_versions[0].width;
+                    res.height = video.video_versions[0].height;
                     results.push(res);
                     target = target.replace('.mp4', '.jpg');
                     Storage.downloadUrl(washer.job.log, video.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, poster) {
@@ -119,14 +121,10 @@ Items.Instagram.Media.factory = function(post, downloads) {
         });
     }
 
-    if (item.id === '1576122118419994878_5821462185') {
-        var x = 1;
-    }
-
     if (item.videos) {
         item.videos.forEach((function(v) {
-            item.description += Item.buildVideo(v.newUrl, v.poster.newUrl, 0, 0, item.videos.length === 1, item.videos.length === 1);
-        }))
+            item.description += Item.buildVideo(v.newUrl, v.poster.newUrl, v.width, v.height, item.videos.length === 1, item.videos.length === 1);
+        }));
     }
 
     if (item.caption) {
