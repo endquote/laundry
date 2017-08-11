@@ -57,6 +57,7 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
                 var target = prefix + '/' + video.id + '.mp4';
                 Storage.downloadUrl(washer.job.log, video.video_versions[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
                     results.push(res);
+                    target = target.replace('.mp4', '.jpg');
                     Storage.downloadUrl(washer.job.log, video.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, poster) {
                         res.poster = poster;
                         callback();
