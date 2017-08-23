@@ -42,7 +42,7 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
             async.each(imgs, function(img, callback) {
                 var target = prefix + '/' + img.id + '.jpg';
                 Storage.downloadUrl(washer.job.log, img.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
-                    results.push(res);
+                    results[imgs.indexOf(img)] = res;
                     callback();
                 });
             }, function(err) {
@@ -58,7 +58,7 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
                 Storage.downloadUrl(washer.job.log, video.video_versions[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
                     res.width = video.video_versions[0].width;
                     res.height = video.video_versions[0].height;
-                    results.push(res);
+                    results[videos.indexOf(video)] = res;
                     target = target.replace('.mp4', '.jpg');
                     Storage.downloadUrl(washer.job.log, video.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, poster) {
                         res.poster = poster;
