@@ -1,8 +1,7 @@
 {
-    "globals":
-    {
+    "globals": {
         "Laundry": true,
-        "Washers": true, 
+        "Washers": true,
         "Items": true,
         "Washer": true,
         "Item": true,
@@ -13,7 +12,7 @@
         "allItems": true,
         "laundryConfig": true,
         "commander": true,
-        
+
         "_": true,
         "ns": true,
         "fs": true,
@@ -35,5 +34,6 @@
     "nocomma": true,
     "strict": true,
     "node": true,
-    "loopfunc": true
+    "loopfunc": true,
+    "esversion": 6
 }
