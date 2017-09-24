@@ -83,8 +83,8 @@ commander.parse(process.argv);
 
 // If no command, show help.
 if (commander.args.filter(function(arg) {
-    return arg.commands;
-}).length === 0) {
+        return arg.commands;
+    }).length === 0) {
     commander.help();
 }
 
@@ -192,17 +192,19 @@ function runCommand(cmd, args) {
             var downloader = require('youtube-dl/lib/downloader');
             downloader(function error(err, done) {
                 if (err) {
-                    return log.error(err.stack);
-                }
-                log.info(done);
-                laundryConfig.settings.ytdlupdate = moment();
-                Storage.saveConfig(function(err) {
-                    if (err) {
-                        onComplete(err);
-                        return;
-                    }
+                    log.error(err.stack);
                     doCmd();
-                });
+                } else {
+                    log.info(done);
+                    laundryConfig.settings.ytdlupdate = moment();
+                    Storage.saveConfig(function(err) {
+                        if (err) {
+                            onComplete(err);
+                            return;
+                        }
+                        doCmd();
+                    });
+                }
             });
         } else {
             doCmd();
