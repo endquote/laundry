@@ -37,12 +37,13 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
     return {
         images: function(callback) {
             var results = [];
-            var imgs = obj.carousel_media || [obj];
-            imgs = imgs.filter(i => i.media_type !== 2);
+            var media = obj.carousel_media || [obj];
+            var imgs = media.filter(i => i.media_type !== 2);
             async.each(imgs, function(img, callback) {
                 var target = prefix + '/' + img.id + '.jpg';
                 Storage.downloadUrl(washer.job.log, img.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
-                    results[imgs.indexOf(img)] = res;
+                    res.index = media.indexOf(img);
+                    results.push(res);
                     callback();
                 });
             }, function(err) {
@@ -51,14 +52,15 @@ Items.Instagram.Media.downloadLogic = function(prefix, obj, washer, cache, downl
         },
         videos: function(callback) {
             var results = [];
-            var videos = obj.carousel_media || [obj];
-            videos = videos.filter(i => i.media_type === 2);
+            var media = obj.carousel_media || [obj];
+            var videos = media.filter(i => i.media_type === 2);
             async.each(videos, function(video, callback) {
                 var target = prefix + '/' + video.id + '.mp4';
                 Storage.downloadUrl(washer.job.log, video.video_versions[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, res) {
+                    res.index = media.indexOf(video);
                     res.width = video.video_versions[0].width;
                     res.height = video.video_versions[0].height;
-                    results[videos.indexOf(video)] = res;
+                    results.push(res);
                     target = target.replace('.mp4', '.jpg');
                     Storage.downloadUrl(washer.job.log, video.image_versions2.candidates[0].url, target, moment.unix(obj.taken_at).toDate(), cache, false, download, function(err, poster) {
                         res.poster = poster;
@@ -115,19 +117,16 @@ Items.Instagram.Media.factory = function(post, downloads) {
 
     item.description = '';
 
-    if (item.images) {
-        item.images.forEach(function(i) {
-            item.description += util.format('<p><a href="%s"><img src="%s"/></a></p>', item.url, i.newUrl);
-        });
-    }
-
-    if (item.videos) {
-        var autoplay = item.videos.length + item.images.length === 1;
-        item.videos.forEach((function(v) {
-            item.description += Item.buildVideo(v.newUrl, v.poster.newUrl,
-                v.width, v.height, autoplay, autoplay);
-        }));
-    }
+    var media = item.images.concat(item.videos).sort((a, b) => a.index - b.index);
+    var autoplay = media.length === 1;
+    media.forEach(function(m) {
+        if (item.images.indexOf(m) !== -1) {
+            item.description += util.format('<p><a href="%s"><img src="%s"/></a></p>', item.url, m.newUrl);
+        } else if (item.videos.indexOf(m) !== -1) {
+            item.description += Item.buildVideo(m.newUrl, m.poster.newUrl,
+                m.width, m.height, autoplay, autoplay);
+        }
+    });
 
     if (item.caption) {
         item.caption = item.caption.replace(/[\r\n]/g, '<br>');
