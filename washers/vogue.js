@@ -47,9 +47,10 @@ Washers.Vogue.prototype.doInput = function(callback) {
                         proxy: commander.proxy,
                         gzip: true
                     }, function(err, response, body) {
-                        var re = /<script id="initial-state" type="application\/json">(.*?)<\/script>/gim;
+                        var re = /initialState = { react:(.*?), relay/im;
                         try {
-                            var blob = JSON.parse(re.exec(body)[1]).context.dispatcher.stores.FashionShowReviewStore;
+                            var json = re.exec(body)[1];
+                            var blob = JSON.parse(json).context.dispatcher.stores.FashionShowReviewStore;
                             if (blob.fashionShow.reviewCopy) {
                                 item.review = blob.fashionShow.reviewCopy;
                                 if (blob.fashionShow.reviewContributor) {
