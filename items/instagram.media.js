@@ -122,8 +122,10 @@ Items.Instagram.Media.factory = function(post, downloads) {
     }
 
     if (item.videos) {
+        var autoplay = item.videos.length + item.images.length === 1;
         item.videos.forEach((function(v) {
-            item.description += Item.buildVideo(v.newUrl, v.poster.newUrl, v.width, v.height, item.videos.length === 1, item.videos.length === 1);
+            item.description += Item.buildVideo(v.newUrl, v.poster.newUrl,
+                v.width, v.height, autoplay, autoplay);
         }));
     }
 

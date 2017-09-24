@@ -120,9 +120,10 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
     });
 
     // Start with media, then tweet text.
+    var autoplay = downloads.media.length === 1;
     downloads.media.forEach(function(media) {
         if (media.video && media.video.newUrl !== media.video.oldUrl) {
-            item.description += Item.buildVideo(media.video.newUrl, media.newUrl, media.video.width, media.video.height, true, true);
+            item.description += Item.buildVideo(media.video.newUrl, media.newUrl, media.video.width, media.video.height, autoplay, autoplay);
         } else {
             item.description += util.format('<p><img src="%s"/></p>', media.newUrl);
         }
