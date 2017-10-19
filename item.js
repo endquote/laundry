@@ -108,12 +108,12 @@ Item.buildVideo = function(videoUrl, thumbUrl, width, height, autoPlay, loop) {
         s += util.format(' width="%d" height="%d"', width, height);
     }
     if (autoPlay) {
-        s += ' autoplay playsinline';
+        // s += ' autoplay playsinline';
     }
     if (loop) {
         s += ' loop';
     }
-    s += ' muted="true"></video></p>';
+    s += ' muted></video></p>';
     return s;
 };
 
