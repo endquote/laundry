@@ -186,6 +186,9 @@ function runCommand(cmd, args) {
             Laundry[cmd].apply(null, args);
         }
 
+        doCmd();
+        return;
+        /* // currently disabled. it's downloading a 16-bit version that doesn't run on current windows.
         // Update youtube-dl every day.
         if ((cmd === 'run' || cmd === 'tick') && moment().diff(laundryConfig.settings.ytdlupdate, 'hours') >= 24) {
             log.info('Updating youtube-dl');
@@ -209,7 +212,7 @@ function runCommand(cmd, args) {
         } else {
             doCmd();
         }
-
+        */
     });
 }
 
