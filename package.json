@@ -1,6 +1,6 @@
 {
   "name": "laundry",
-  "version": "1.8.17",
+  "version": "1.8.18",
   "description": "Data laundering tools",
   "main": "index.js",
   "repository": {
