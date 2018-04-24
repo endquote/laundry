@@ -18,13 +18,13 @@ Items.Google.Gmail.Message.downloadLogic = function(prefix, obj, washer, cache) 
 Items.Google.Gmail.Message.factory = function(item, downloads) {
     // Grab date header
     var date = item.payload.headers.filter(function(header) {
-        return header.name === 'Date';
+        return header.name.toUpperCase() === 'DATE';
     })[0];
     date = moment(new Date(date.value));
 
     // Grab subject header
     var subject = item.payload.headers.filter(function(header) {
-        return header.name === 'Subject';
+        return header.name.toUpperCase() === 'SUBJECT';
     })[0];
     subject = subject ? subject.value : '';
 
@@ -56,7 +56,7 @@ Items.Google.Gmail.Message.factory = function(item, downloads) {
 
     // Get the address the message was sent to
     var to = item.payload.headers.filter(function(header) {
-        return header.name.toLowerCase() === 'to';
+        return header.name.toUpperCase() === 'TO';
     })[0];
     if (to) {
         to = to.value;
@@ -69,7 +69,7 @@ Items.Google.Gmail.Message.factory = function(item, downloads) {
 
     // Figure out who it's from
     var from = item.payload.headers.filter(function(header) {
-        return header.name.toLowerCase() === 'from';
+        return header.name.toUpperCase() === 'FROM';
     })[0];
     if (from) {
         from = from.value;
