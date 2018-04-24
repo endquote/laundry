@@ -81,6 +81,7 @@ Storage.Local.downloadUrl = function(log, url, target, targetDate, cache, useYTD
     };
 
     var resultUrl = commander.baseUrl + target;
+    target = target.split('?')[0]; // no query strings
     target = path.join(commander.local, target);
 
     // See if the file has previously been uploaded
