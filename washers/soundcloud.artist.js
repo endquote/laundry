@@ -1,7 +1,7 @@
 'use strict';
 
 /*
-Converts media from the user's SoundCloud timeline into items.
+Converts media from a Soundcloud artist's feed into items.
 input: none
 output: none
 */
