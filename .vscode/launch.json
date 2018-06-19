@@ -1,30 +1,28 @@
 {
     "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "debug",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceRoot}/index.js",
-            "stopOnEntry": false,
-            "args": [
-                "--local=/Users/endquote/Source/laundry/test/",
-                "-v",
-                "run",
-                "instagram-timeline"
-            ],
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": null,
-            "runtimeExecutable": null,
-            "runtimeArgs": [
-                "--nolazy"
-            ],
-            "env": {
-                "NODE_ENV": "development"
-            },
-            "console": "integratedTerminal",
-            "sourceMaps": false,
-            "outFiles": []
-        }
-    ]
+    "configurations": [{
+        "name": "debug",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceRoot}/index.js",
+        "stopOnEntry": false,
+        "args": [
+            "--local=/Users/endquote/Source/laundry/test/",
+            "-v",
+            "run",
+            "soundcloud-playlist"
+        ],
+        "cwd": "${workspaceRoot}",
+        "preLaunchTask": null,
+        "runtimeExecutable": null,
+        "runtimeArgs": [
+            "--nolazy"
+        ],
+        "env": {
+            "NODE_ENV": "development"
+        },
+        "console": "integratedTerminal",
+        "sourceMaps": false,
+        "outFiles": []
+    }]
 }

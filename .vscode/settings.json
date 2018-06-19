@@ -8,7 +8,7 @@
         "**/test": true,
         "**/node_modules": true
     },
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "jshint.enable": true,
     "eslint.enable": false
 }
