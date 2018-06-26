@@ -51,7 +51,7 @@
         "walk": "^2.3.9",
         "winston": "^2.1.1",
         "word-wrap": "^1.1.0",
-        "youtube-dl": "^1.11.1"
+        "youtube-dl": "^1.12.2"
     },
     "devDependencies": {
         "jshint": "^2.9.3"
