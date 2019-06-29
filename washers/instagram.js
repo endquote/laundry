@@ -11,6 +11,8 @@ On June 1 2016 Instagram changed their API and terms to prevent things like Laun
 Switched to the private API by porting this PHP implementation.
 https://github.com/mgp25/Instagram-API
 
+Running out of memory? Add --max-old-space-size=4096 in laundry.cmd.
+
 */
 ns('Washers', global);
 Washers.Instagram = function(config, job) {
