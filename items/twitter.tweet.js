@@ -99,7 +99,7 @@ Items.Twitter.Tweet.factory = function(tweet, downloads) {
     var item = new Items.Twitter.Tweet({
         title: tweet.user.screen_name + ': ',
         description: '',
-        date: moment(new Date(tweet.created_at)),
+        date: moment(new Date(tweet.created_at)), // second accuracy -- milliseconds seem to only be in the streaming API
         author: tweet.user.screen_name,
         favorites: tweet.favorite_count,
         isFavorited: tweet.favorited,
