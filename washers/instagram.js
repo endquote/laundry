@@ -15,7 +15,7 @@ Running out of memory? Add --max-old-space-size=4096 in laundry.cmd.
 
 */
 ns('Washers', global);
-Washers.Instagram = function(config, job) {
+Washers.Instagram = function (config, job) {
     Washer.call(this, config, job);
 
     this.name = '';
@@ -25,8 +25,8 @@ Washers.Instagram = function(config, job) {
 
     // https://github.com/mgp25/Instagram-API/blob/master/src/Constants.php
     this._igApi = 'https://i.instagram.com/api/v1/';
-    this._igUserAgent = 'Instagram 85.0.0.21.100 Android (24/7.0; 380dpi; 1080x1920; OnePlus; ONEPLUS A3010; OnePlus3T; qcom; en_US)';
-    this._igKey = '937463b5272b5d60e9d20f0f8d7d192193dd95095a3ad43725d494300a5ea5fc';
+    this._igUserAgent = 'Instagram 107.0.0.27.121 Android (24/7.0; 380dpi; 1080x1920; OnePlus; ONEPLUS A3010; OnePlus3T; qcom; en_US; 168361634)';
+    this._igKey = 'c36436a942ea1dbb40d7f2d7d45280a620d991ce8c62fb4ce600f0a048c32c11';
     this._igKeyVersion = '4';
 
     this._jar = request.jar();
@@ -54,7 +54,7 @@ Washers.Instagram.prototype = Object.create(Washer.prototype);
 Washers.Instagram.className = Helpers.buildClassName(__filename);
 
 // https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L80
-Washers.Instagram.prototype.login = function(callback) {
+Washers.Instagram.prototype.login = function (callback) {
     var that = this;
 
     this._igUuid = this._igUuid || this.generateUUID(true);
@@ -67,7 +67,7 @@ Washers.Instagram.prototype.login = function(callback) {
             url: 'si/fetch_headers/?challenge_type=signup&guid=' + this.generateUUID(false),
             jar: that._jar,
         }, that._requestOptions),
-        function(result, response) {
+        function (result, response) {
             var data = {
                 'phone_id': that.generateUUID(true),
                 'username': that.username,
@@ -84,7 +84,7 @@ Washers.Instagram.prototype.login = function(callback) {
                     jar: that._jar,
                     form: that.generateSignature(JSON.stringify(data))
                 }, that._requestOptions),
-                function(result, response) {
+                function (result, response) {
                     that._igUsernameId = result.logged_in_user.pk;
                     that._igRankToken = that._igUsernameId + '_' + that._igUuid;
                     that.job.log.info(util.format('Logged in as %s', result.logged_in_user.username));
@@ -97,7 +97,7 @@ Washers.Instagram.prototype.login = function(callback) {
 };
 
 // https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L1607
-Washers.Instagram.prototype.generateUUID = function(dashes) {
+Washers.Instagram.prototype.generateUUID = function (dashes) {
     return util.format(dashes ? '%s%s-%s-%s-%s-%s%s%s' : '%s%s%s%s%s%s%s%s',
         Math.round(Math.random() * 65535).toString(16),
         Math.round(Math.random() * 65535).toString(16),
@@ -109,7 +109,7 @@ Washers.Instagram.prototype.generateUUID = function(dashes) {
 };
 
 // https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L1599
-Washers.Instagram.prototype.generateDeviceID = function(username, password) {
+Washers.Instagram.prototype.generateDeviceID = function (username, password) {
     var shasum = crypto.createHash('md5');
     shasum.update(username + password, 'utf8');
     var seed = shasum.digest('hex');
@@ -125,7 +125,7 @@ Washers.Instagram.prototype.generateDeviceID = function(username, password) {
 };
 
 // https://github.com/mgp25/Instagram-API/blob/01687b861cf328cef9fa5e36c6b9446fd0908a7a/src/Instagram.php#L1592
-Washers.Instagram.prototype.generateSignature = function(data) {
+Washers.Instagram.prototype.generateSignature = function (data) {
     var hash = crypto.createHmac('sha256', this._igKey);
     hash.update(data);
     var signature = hash.digest('hex');
@@ -137,32 +137,32 @@ Washers.Instagram.prototype.generateSignature = function(data) {
 
 
 // Helper method for API endpoints which return a list of posts.
-Washers.Instagram.prototype.requestMedia = function(method, quantity, callback) {
+Washers.Instagram.prototype.requestMedia = function (method, quantity, callback) {
     var that = this;
     var posts = [];
     var nextMax = null;
-    async.doWhilst(function(callback) {
-            Helpers.jsonRequest(
-                that.job.log,
-                extend({
-                    jar: that._jar,
-                    url: method,
-                    qs: {
-                        max_id: nextMax ? nextMax : ''
-                    }
-                }, that._requestOptions),
-                function(response) {
-                    posts = posts.concat(response.items);
-                    that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
-                    nextMax = response.next_max_id ? response.next_max_id.toString() : null;
-                    callback();
-                },
-                callback);
-        },
-        function() {
+    async.doWhilst(function (callback) {
+        Helpers.jsonRequest(
+            that.job.log,
+            extend({
+                jar: that._jar,
+                url: method,
+                qs: {
+                    max_id: nextMax ? nextMax : ''
+                }
+            }, that._requestOptions),
+            function (response) {
+                posts = posts.concat(response.items);
+                that.job.log.debug(util.format('Got %d/%d posts', posts.length, quantity));
+                nextMax = response.next_max_id ? response.next_max_id.toString() : null;
+                callback();
+            },
+            callback);
+    },
+        function () {
             return posts.length < quantity && nextMax;
         },
-        function(err) {
+        function (err) {
             posts = posts.slice(0, quantity);
             callback(err, posts);
         });
