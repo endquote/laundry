@@ -7,10 +7,10 @@
         "program": "${workspaceRoot}/index.js",
         "stopOnEntry": false,
         "args": [
-            "--local=/Users/endquote/Source/laundry/test/",
+            "--local=/Users/joshs/Source/laundry/test/",
             "-v",
             "run",
-            "soundcloud-playlist"
+            "instagram-timeline"
         ],
         "cwd": "${workspaceRoot}",
         "preLaunchTask": null,
