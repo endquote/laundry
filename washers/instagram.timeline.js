@@ -88,7 +88,7 @@ Washers.Instagram.Timeline.prototype.doInput = function(callback) {
                 posts.sort(function(a, b) {
                     return b.taken_at - a.taken_at;
                 });
-                posts = posts.slice(0, 150);
+                posts = posts.slice(0, 1000);
 
                 // Trigger item creation, download, and processing.
                 Item.download(Items.Instagram.Media, that, posts, callback);
