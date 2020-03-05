@@ -100,12 +100,14 @@ Item.buildPrefix = function(jobName, className) {
 
 // Build an HTML video player.
 Item.buildVideo = function(videoUrl, thumbUrl, width, height, autoPlay, loop) {
-    var s = util.format('<p><video controls width="100%" src="%s"', videoUrl);
+    var s = util.format('<p><video controls src="%s"', videoUrl);
     if (thumbUrl) {
         s += util.format(' poster="%s"', thumbUrl);
     }
     if (width && height) {
         s += util.format(' width="%d" height="%d"', width, height);
+    } else {
+        s+= ' width="100%"';
     }
     if (autoPlay) {
         // s += ' autoplay playsinline';
